@@ -9,17 +9,50 @@
   @media (prefers-color-scheme:dark){:root{--bg:#0B1230;--ink:#EAF0FF;--muted:#9CABD6;--cobalt:#7C99FF;--line:#2A3A78}}
   body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.5 Georgia,'Times New Roman',serif}
   main{max-width:560px;margin:0 auto;padding:12vh 20px 40px}
-  ul{list-style:none;margin:0;padding:0;border-top:1.5px solid var(--line)}
-  li{border-bottom:1.5px solid var(--line);padding:16px 0}
-  a{color:var(--cobalt);font-size:22px}
+  details{border-top:1.5px solid var(--line)}
+  details:last-of-type{border-bottom:1.5px solid var(--line)}
+  summary{list-style:none;cursor:pointer;padding:16px 0;font-size:21px;display:flex;gap:14px;align-items:baseline}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"+";flex:none;width:15px;text-align:center;color:var(--cobalt);
+    font:400 21px/1 system-ui,sans-serif}
+  details[open]>summary::before{content:"\2212"}
+  summary:hover{color:var(--cobalt)}
+  summary span{color:var(--muted);font-family:system-ui,sans-serif;font-size:14px}
+  ul{list-style:none;margin:0 0 6px;padding:0 0 0 29px}
+  li{padding:0 0 16px}
+  a{color:var(--cobalt);font-size:20px}
   small{display:block;color:var(--muted);font-family:system-ui,sans-serif;font-size:15px;margin-top:2px}
 </style>
 </head>
 <body>
 <main>
-  <ul>
-    <li><a href="espanol-past-tense.html">Español: past tense para checos</a><small>Trenažér španělských minulých časů a příčestí, 430 sloves</small></li>
-  </ul>
+  <details name="sb" id="hry">
+    <summary>Hry a pokusy <span>2</span></summary>
+    <ul>
+      <li><a href="vetron-v1.html">Větroň v1</a><small>První verze – Grob G-102 Astir pod kumuly, šipky a mezerník</small></li>
+      <li><a href="vetron-v7.html">Větroň v7</a><small>Simulátor nad mapou Česka – vlek, termika, svahovka, závětrná vlna, pohled z kabiny</small></li>
+    </ul>
+  </details>
+  <details name="sb" id="espanol">
+    <summary>Español <span>1</span></summary>
+    <ul>
+      <li><a href="espanol-past-tense.html">Past tense para checos</a><small>Trenažér španělských minulých časů a příčestí, 430 sloves</small></li>
+    </ul>
+  </details>
 </main>
+<script>
+  // otevřená je vždy jen jedna sekce; starší prohlížeče neznají details[name]
+  const secs = [...document.querySelectorAll('details')];
+  const KEY = 'sb-open';
+  try { const o = localStorage.getItem(KEY); if (o) { const d = document.getElementById(o); if (d) d.open = true; } } catch (e) {}
+  for (const d of secs) d.addEventListener('toggle', () => {
+    if (d.open) for (const o of secs) if (o !== d) o.open = false;
+    // zavření sousední sekce nesmí přepsat právě uloženou volbu
+    try {
+      if (d.open) localStorage.setItem(KEY, d.id);
+      else if (localStorage.getItem(KEY) === d.id) localStorage.setItem(KEY, '');
+    } catch (e) {}
+  });
+</script>
 </body>
 </html>
