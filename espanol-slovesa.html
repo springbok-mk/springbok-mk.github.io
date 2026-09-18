@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Español: slovesa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,700;1,400;1,700&family=Alegreya+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>:root{
+  --bg:#EEF2FA; --surface:#FFFFFF; --surface2:#E4EAF7; --ink:#12203F; --muted:#56638A; --line:#CBD5EA;
+  --cobalt:#1E44B5; --cobalt-deep:#142E80; --pale:#A9BDF2; --saffron:#E9A20F; --on-cobalt:#FFFFFF;
+  --ok:#1F7A4C; --ok-bg:#E1F3E8; --bad:#C2341F; --bad-bg:#FBE6E2; --warn:#8A5A00; --warn-bg:#FCF0D2;
+  --es:'Alegreya', Georgia, 'Times New Roman', serif; --ui:'Alegreya Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --nav-h:62px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0B1230; --surface:#141E47; --surface2:#1C2960; --ink:#EAF0FF; --muted:#9CABD6; --line:#2A3A78;
+    --cobalt:#7C99FF; --cobalt-deep:#AFC1FF; --pale:#3A4FA3; --saffron:#F5B93A; --on-cobalt:#0B1230;
+    --ok:#6BD39A; --ok-bg:#12382A; --bad:#FF8A76; --bad-bg:#43191A; --warn:#F5C970; --warn-bg:#3B2F12;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0B1230; --surface:#141E47; --surface2:#1C2960; --ink:#EAF0FF; --muted:#9CABD6; --line:#2A3A78;
+  --cobalt:#7C99FF; --cobalt-deep:#AFC1FF; --pale:#3A4FA3; --saffron:#F5B93A; --on-cobalt:#0B1230;
+  --ok:#6BD39A; --ok-bg:#12382A; --bad:#FF8A76; --bad-bg:#43191A; --warn:#F5C970; --warn-bg:#3B2F12;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:17px;line-height:1.45;min-height:100vh;min-height:100dvh}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+button:focus-visible,input:focus-visible,summary:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--saffron);outline-offset:2px}
+h1,h2,h3{font-family:var(--es);font-weight:700;margin:0;line-height:1.15}
+.es{font-family:var(--es)}
+.muted{color:var(--muted)}
+.wrap{max-width:640px;margin:0 auto;padding:0 16px calc(var(--nav-h) + 28px + env(safe-area-inset-bottom))}
+.screen[hidden]{display:none}
+
+/* azulejo strip: the one decorative element */
+.strip{height:22px;background-color:var(--cobalt);
+  background-image:radial-gradient(circle at 0 0,var(--bg) 0 7px,transparent 7.5px),radial-gradient(circle at 22px 0,var(--bg) 0 7px,transparent 7.5px),radial-gradient(circle at 0 22px,var(--bg) 0 7px,transparent 7.5px),radial-gradient(circle at 22px 22px,var(--bg) 0 7px,transparent 7.5px),radial-gradient(circle at 11px 11px,var(--saffron) 0 3px,transparent 3.5px);
+  background-size:22px 22px}
+.masthead{padding:18px 0 6px;display:flex;align-items:flex-end;justify-content:space-between;gap:12px}
+.masthead h1{font-size:34px;letter-spacing:-.01em;font-style:italic}
+.masthead p{margin:2px 0 0;color:var(--muted);font-size:15px}
+.streak{text-align:right;font-size:14px;color:var(--muted);white-space:nowrap}
+.streak b{display:block;font-family:var(--es);font-size:26px;color:var(--ink);line-height:1}
+
+.today{margin:14px 0 18px}
+.today .row{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);margin-bottom:6px}
+.bar{height:8px;background:var(--surface2);border-radius:2px;overflow:hidden}
+.bar>i{display:block;height:100%;background:var(--cobalt);width:0;transition:width .35s ease}
+.bar.gold>i{background:var(--saffron)}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:54px;padding:12px 18px;border-radius:12px;font-weight:700;font-size:18px;text-align:center}
+.btn.primary{background:var(--cobalt);color:var(--on-cobalt)}
+.btn.primary:active{background:var(--cobalt-deep)}
+.btn.ghost{background:var(--surface);border:1.5px solid var(--line)}
+.btn.danger{background:var(--bad-bg);color:var(--bad)}
+.btn small{display:block;font-weight:400;font-size:14px;opacity:.85}
+.btn .stack{display:block}
+.btn:disabled{opacity:.45;cursor:default}
+.cta-row{display:grid;gap:10px}
+
+.chips{display:flex;gap:8px;overflow-x:auto;padding:2px 0 4px;margin:22px 0 4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:8px 14px;border-radius:999px;border:1.5px solid var(--line);background:var(--surface);font-size:15px;white-space:nowrap}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+.group{margin-top:26px}
+.group h2{font-size:22px;margin-bottom:2px}
+.group>p{margin:0 0 10px;color:var(--muted);font-size:15px}
+.deck{display:block;width:100%;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:13px 14px 12px;margin-bottom:8px}
+.deck:active{border-color:var(--cobalt)}
+.deck .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.deck .name{font-weight:700}
+.deck .ex{font-family:var(--es);font-style:italic;color:var(--muted);font-size:16px;margin:1px 0 9px}
+.deck .meta{font-size:13px;color:var(--muted);white-space:nowrap}
+.badge{display:inline-block;background:var(--saffron);color:#12203F;border-radius:999px;padding:1px 8px;font-size:12.5px;font-weight:700;margin-left:6px}
+.badge.red{background:var(--bad);color:#fff}
+
+/* bottom nav */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1.5px solid var(--line);display:flex;justify-content:center;padding-bottom:env(safe-area-inset-bottom);z-index:20}
+nav.tabs .in{display:flex;width:100%;max-width:640px}
+nav.tabs button{flex:1;height:var(--nav-h);font-size:13px;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+nav.tabs button svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs button[aria-current="page"]{color:var(--cobalt);font-weight:700}
+body.in-session nav.tabs{display:none}
+body.in-session .wrap{padding-bottom:24px}
+
+/* session */
+.s-head{display:flex;align-items:center;gap:12px;padding:12px 0 10px;position:sticky;top:0;background:var(--bg);z-index:5}
+.s-head .x{width:40px;height:40px;border-radius:10px;font-size:22px;color:var(--muted);flex:none}
+.s-head .bar{flex:1}
+.s-head .count{font-size:14px;color:var(--muted);min-width:48px;text-align:right;font-variant-numeric:tabular-nums}
+.card{background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:18px 16px 16px;margin-top:6px}
+.tense{font-size:14.5px;color:var(--cobalt);font-weight:700}
+.tense span{color:var(--muted);font-weight:400}
+.retry-tag{float:right;margin-left:10px;font-size:13px;color:var(--bad);font-weight:700}
+.inf{font-family:var(--es);font-size:40px;font-weight:700;line-height:1.05;margin:10px 0 2px;word-break:break-word}
+.cz{color:var(--muted);font-size:16px}
+.who{display:inline-block;margin-top:14px;font-family:var(--es);font-size:21px;font-style:italic;border-bottom:3px solid var(--saffron);padding-bottom:1px}
+.sentence{font-family:var(--es);font-size:26px;line-height:1.3;margin:12px 0 6px}
+.sentence .gap{display:inline-block;min-width:74px;border-bottom:3px solid var(--cobalt);text-align:center;color:var(--cobalt);font-weight:700;padding:0 4px}
+.sentence .gap.ok{color:var(--ok);border-color:var(--ok)}
+.sentence .gap.shown{color:var(--ink);border-color:var(--saffron)}
+.hintline{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}
+.pill{font-family:var(--es);font-size:17px;padding:3px 10px;border-radius:8px;background:var(--surface2)}
+.pill.person{font-style:italic}
+
+.answer{margin-top:16px}
+.typed{display:flex;align-items:center;gap:10px;background:var(--surface);border:2px solid var(--ink);border-radius:12px;padding:0 12px;min-height:58px}
+.typed .pre{font-family:var(--es);font-size:24px;color:var(--muted);white-space:nowrap}
+.typed input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font-family:var(--es);font-size:24px;padding:12px 0;outline:none}
+.typed.ok{border-color:var(--ok);background:var(--ok-bg)}
+.typed.bad{border-color:var(--bad);background:var(--bad-bg)}
+.accents{display:flex;gap:6px;margin-top:8px}
+.accents button{flex:1;height:44px;border-radius:9px;background:var(--surface2);font-family:var(--es);font-size:21px}
+.accents button:active{background:var(--pale)}
+.actions{display:grid;grid-template-columns:1fr 2fr;gap:8px;margin-top:10px}
+.opts{display:grid;gap:9px}
+.opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:12px;padding:13px 14px;font-family:var(--es);font-size:23px;min-height:58px}
+.opt kbd{font-family:var(--ui);font-size:13px;color:var(--muted);border:1.5px solid var(--line);border-radius:6px;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;flex:none}
+.opt:active{border-color:var(--cobalt)}
+.opt.ok{border-color:var(--ok);background:var(--ok-bg)}
+.opt.bad{border-color:var(--bad);background:var(--bad-bg)}
+.opt:disabled{cursor:default;opacity:1}
+.opt.dim{opacity:.5}
+.linkbtn{color:var(--muted);text-decoration:underline;font-size:15px;padding:10px 4px}
+
+.fb{margin-top:14px;border-radius:14px;padding:14px 14px 12px;border-left:6px solid var(--ok);background:var(--ok-bg)}
+.fb.bad{border-color:var(--bad);background:var(--bad-bg)}
+.fb.warn{border-color:var(--saffron);background:var(--warn-bg)}
+.fb .verdict{font-weight:700;color:var(--ok)}
+.fb.bad .verdict{color:var(--bad)}
+.fb.warn .verdict{color:var(--warn)}
+.fb .right{font-family:var(--es);font-size:28px;font-weight:700;margin:2px 0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fb .yours{font-size:15px}
+.fb .yours s{font-family:var(--es);font-size:18px}
+.fb .full{font-family:var(--es);font-size:19px;margin-top:6px}
+.fb .full b{color:var(--cobalt-deep)}
+.fb .note{margin-top:8px;font-size:15.5px}
+.say{width:38px;height:38px;border-radius:50%;background:var(--surface);border:1.5px solid var(--line);display:inline-flex;align-items:center;justify-content:center;flex:none}
+.say svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+details.conj{margin-top:10px;font-size:15px}
+details.conj summary{cursor:pointer;color:var(--muted);padding:6px 0}
+table.ct{border-collapse:collapse;width:100%;margin-top:4px}
+table.ct td{padding:3px 0;border-bottom:1px solid var(--line);vertical-align:baseline}
+table.ct td:first-child{color:var(--muted);font-size:14px;width:40%}
+table.ct td:last-child{font-family:var(--es);font-size:18px}
+table.ct tr.me td:last-child{font-weight:700;color:var(--cobalt-deep)}
+table.ct .irr{color:var(--bad)}
+.next{margin-top:12px}
+
+/* summary */
+.sum h2{font-size:30px;margin:26px 0 4px}
+.score{font-family:var(--es);font-size:64px;font-weight:700;line-height:1;margin:14px 0 2px}
+.score small{font-size:22px;color:var(--muted);font-weight:400}
+.miss{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:8px}
+.miss .f{font-family:var(--es);font-size:20px;font-weight:700}
+.miss .w{font-size:14.5px;color:var(--muted)}
+
+/* mosaic */
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13.5px;color:var(--muted);margin:10px 0 4px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:0 100% 0 100%;margin-right:5px;vertical-align:-1px}
+.bandtitle{font-size:14px;color:var(--muted);margin:18px 0 6px;display:flex;justify-content:space-between}
+.mosaic{display:grid;grid-template-columns:repeat(auto-fill,minmax(34px,1fr));gap:4px}
+.tile{aspect-ratio:1;background:var(--surface);border:1px solid var(--line);border-radius:2px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;padding:2px;gap:1px;position:relative}
+.tile i{display:block;background:var(--line)}
+.tile i:nth-child(1),.tile i:nth-child(4){border-radius:0 100% 0 100%}
+.tile i:nth-child(2),.tile i:nth-child(3){border-radius:100% 0 100% 0}
+.q1{background:var(--pale)!important}.q2{background:var(--cobalt)!important}.q3{background:var(--saffron)!important}.qx{background:var(--bad)!important}
+.keybox{display:grid;grid-template-columns:64px 1fr;gap:14px;align-items:center;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:12px;margin-top:12px;font-size:14.5px}
+.keybox .tile{width:64px}
+.keybox ul{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:2px 10px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 6px}
+.stat{background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px}
+.stat b{display:block;font-family:var(--es);font-size:28px;line-height:1.1}
+.stat span{font-size:13px;color:var(--muted)}
+.hard{display:flex;justify-content:space-between;align-items:center;width:100%;padding:10px 2px;border-bottom:1px solid var(--line);text-align:left}
+.hard .v{font-family:var(--es);font-size:20px;font-weight:700}
+.hard .n{font-size:14px;color:var(--bad)}
+.search{width:100%;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:12px 14px;font:inherit;font-size:17px;margin-top:16px}
+
+/* sheet */
+.sheet-bg{position:fixed;inset:0;background:rgba(8,14,40,.55);z-index:40;display:flex;align-items:flex-end;justify-content:center}
+.sheet-bg[hidden]{display:none}
+.sheet{background:var(--bg);width:100%;max-width:640px;max-height:88dvh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 16px calc(24px + env(safe-area-inset-bottom))}
+.sheet h2{font-size:34px}
+.sheet h3{font-size:17px;font-family:var(--ui);margin:16px 0 2px;color:var(--cobalt)}
+.sheet .closer{float:right;width:40px;height:40px;font-size:24px;color:var(--muted)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}
+table.ct td:first-child{width:44%}
+
+/* cheat sheet + settings */
+.doc h2{font-size:30px;margin:22px 0 6px}
+.doc details{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;margin-bottom:8px;padding:0 14px}
+.doc summary{font-weight:700;padding:14px 0;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:10px}
+.doc summary::-webkit-details-marker{display:none}
+.doc summary::after{content:'+';color:var(--muted);font-weight:400;font-size:22px;line-height:1}
+.doc details[open] summary::after{content:'–'}
+.doc .body{padding:0 0 14px;font-size:16px}
+.doc .body p{margin:0 0 10px}
+.doc .body .es{font-size:18px}
+.doc .tbl{overflow-x:auto}
+.doc table{border-collapse:collapse;width:100%;font-size:15.5px}
+.doc th{text-align:left;font-weight:700;color:var(--muted);font-size:13.5px;padding:4px 8px 4px 0;border-bottom:1.5px solid var(--line)}
+.doc td{padding:5px 8px 5px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.doc td.es{font-size:17.5px}
+.doc .no{color:var(--bad);text-decoration:line-through}
+.set{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:4px 14px;margin-bottom:12px}
+.set .line{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--line)}
+.set .line:last-child{border-bottom:0}
+.set .line small{display:block;color:var(--muted);font-size:14px}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;flex:none}
+.seg button{padding:8px 12px;font-size:15px;min-width:44px}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.switch{position:relative;width:52px;height:32px;border-radius:16px;background:var(--line);flex:none;transition:background .15s}
+.switch::after{content:'';position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:transform .15s}
+.switch[aria-checked="true"]{background:var(--cobalt)}
+.switch[aria-checked="true"]::after{transform:translateX(20px)}
+textarea.code{width:100%;min-height:90px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:13px/1.3 ui-monospace,Menlo,Consolas,monospace;padding:10px}
+.toast{position:fixed;left:50%;bottom:calc(var(--nav-h) + 18px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:10px;font-size:15px;z-index:60;max-width:90vw;text-align:center}
+.empty{background:var(--surface);border:1.5px dashed var(--line);border-radius:14px;padding:18px;color:var(--muted);text-align:center;margin-top:12px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (min-width:700px){.inf{font-size:48px}.sentence{font-size:30px}.opts{grid-template-columns:1fr 1fr}}
+
+/* v2 */
+nav.tabs button{font-size:12.5px}
+.lvl{margin-top:30px;background:var(--surface2);border-radius:14px;padding:14px}
+.lvl-t{font-weight:700;margin-bottom:8px}
+.lvl p{margin:10px 0 0;font-size:15px;color:var(--muted)}
+.seg.wide{display:flex;width:100%;background:var(--surface)}
+.seg.wide button{flex:1;padding:11px 6px;font-size:14.5px;line-height:1.2}
+.sentence.czbig{font-family:var(--ui);font-size:23px;font-weight:700;line-height:1.3}
+.hintrow{display:flex;flex-wrap:wrap;gap:4px 18px;margin-top:4px}
+.typed input{font-size:22px}
+u.lack{text-decoration:underline;text-decoration-color:var(--saffron);text-decoration-thickness:3px;text-underline-offset:3px}
+.claude-out{margin-top:8px;font-size:15.5px;background:var(--surface);border-radius:10px;padding:10px 12px;white-space:pre-wrap}
+.btn.small{min-height:46px;font-size:16px;margin-top:6px}
+.gram .lead{font-size:18px;margin:0 0 6px}
+.gram section{margin-top:30px;scroll-margin-top:12px}
+.gram h3{font-size:24px;margin-bottom:8px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px}
+.gram h3 .es{font-style:italic;font-weight:400;color:var(--cobalt);font-size:21px}
+.gram p{margin:10px 0 6px}
+.gram .es{font-size:18px}
+.exm{border-left:4px solid var(--saffron);padding:4px 0 4px 12px;margin:6px 0 12px}
+.exm .es{font-size:19.5px;line-height:1.3}
+.exm .es b,.gram td.es b,.steps .es b{color:var(--cobalt-deep)}
+.exm .cz{font-size:15px}
+.gram .warn,.gram .tip{background:var(--warn-bg);border-radius:10px;padding:10px 12px;font-size:15.5px}
+.gram .tip{background:var(--surface2)}
+.steps{margin:0;padding-left:22px}
+.steps li{margin-bottom:10px}
+.toc{margin:14px 0 6px}
+.tl{width:100%;height:auto;margin:8px 0 0;background:var(--surface);border:1.5px solid var(--line);border-radius:14px}
+.tl-es{font-family:var(--es);font-style:italic;font-size:14px;fill:var(--ink)}
+.tl-cz{font-family:var(--ui);font-size:10.5px;fill:var(--muted)}
+
+/* web build: navigation on top (free hosting floats an ad over the bottom edge) */
+body.nav-top{padding-top:calc(var(--nav-h) + env(safe-area-inset-top))}
+body.nav-top.in-session{padding-top:0}
+body.nav-top nav.tabs{top:0;bottom:auto;border-top:0;border-bottom:1.5px solid var(--line);padding-bottom:0;padding-top:env(safe-area-inset-top)}
+body.nav-top .wrap{padding-bottom:40px}
+body.nav-top .toast{bottom:24px}
+body.nav-top .gram section{scroll-margin-top:calc(var(--nav-h) + 12px)}
+
+/* verbos */
+.lvln{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:2px;background:var(--cobalt);color:var(--on-cobalt);font-family:var(--es);font-size:17px;margin-right:10px;vertical-align:1px}
+.deck .sub{font-size:14.5px;color:var(--muted);margin-top:3px}
+.inf.czprompt{font-family:var(--ui);font-size:32px;line-height:1.15}
+.chipsflow{line-height:2.1}
+.vchip{display:inline-block;font-family:var(--es);font-size:16.5px;background:var(--surface2);border-radius:8px;padding:1px 9px;cursor:pointer;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="strip" aria-hidden="true"></div>
+<main>
+  <div class="screen" id="s-home"><div class="wrap"></div></div>
+  <div class="screen" id="s-session" hidden><div class="wrap"></div></div>
+  <div class="screen" id="s-summary" hidden><div class="wrap"></div></div>
+  <div class="screen" id="s-mosaic" hidden><div class="wrap"></div></div>
+  <div class="screen" id="s-sheet" hidden><div class="wrap"></div></div>
+  <div class="screen" id="s-settings" hidden><div class="wrap"></div></div>
+</main>
+<div class="sheet-bg" id="sheet-bg" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<nav class="tabs" aria-label="Hlavní navigace"><div class="in">
+  <button data-go="home"><svg viewBox="0 0 24 24"><path d="M5 4v16l14-8z"/></svg>Trénink</button>
+  <button data-go="mosaic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7"/><rect x="13" y="4" width="7" height="7"/><rect x="4" y="13" width="7" height="7"/><rect x="13" y="13" width="7" height="7"/></svg>Mozaika</button>
+  <button data-go="sheet"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7M9 8h3"/></svg>Tvary</button>
+  <button data-go="settings"><svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>Nastavení</button>
+</div></nav>
+<script>
+(function () { /* closed scope: nothing leaks to globals, nothing can clobber the app */
+const VERB_RAW = "ser|být|1|___ muy amable con nosotros.|Jsi k nám moc milý.|\nestar|být (stav, místo)|3|___ en casa de mis padres.|Jsme u mých rodičů.|\nhaber|být, existovat (hay); pomocné sloveso|2|___ mucha gente en el centro.|V centru je hodně lidí.|hay\ntener|mít|0|___ una reunión muy larga.|Mám hodně dlouhou poradu.|\nhacer|dělat, udělat|1|___ un trabajo excelente.|Děláš skvělou práci.|\npoder|moci|0|No ___ terminar el informe.|Nemůžu dokončit zprávu.|\ndecir|říct|2|Carlos me ___ la verdad.|Carlos mi říká pravdu.|\nir|jít, jet|3|___ al cine con unos amigos.|Jdeme s přáteli do kina.|\nver|vidět|0|___ una película muy buena.|Dívám se na moc dobrý film.|\ndar|dát|5|Mis padres me ___ un regalo.|Rodiče mi dávají dárek.|\nsaber|vědět, umět; (indefinido) dozvědět se|0|___ la noticia por la radio.|Tu zprávu vím z rádia.|\nquerer|chtít, mít rád|2|Lucía no ___ venir con nosotros.|Lucía s námi nechce jít.|\nllegar|přijít, dorazit|0|___ tarde al trabajo.|Přicházím pozdě do práce.|\npasar|projít, stát se, strávit|3|___ unas horas en la playa.|Trávíme pár hodin na pláži.|\ndeber|muset, mít povinnost; dlužit|0|___ llamarte antes.|Musím ti zavolat dřív.|\nponer|položit, dát|0|___ las llaves en la mesa.|Dávám klíče na stůl.|\nparecer|zdát se, připadat|2|La idea me ___ muy buena.|Ten nápad se mi zdá moc dobrý.|\nquedar|zbýt; domluvit si sraz|3|___ con Ana en el centro.|Máme sraz s Anou v centru.|\ncreer|věřit, myslet si|0|No ___ ni una palabra.|Nevěřím ani slovo.|\nhablar|mluvit|0|___ con mi jefe.|Mluvím se šéfem.|\nllevar|nést, vézt, nosit|0|___ a los niños al colegio.|Vezu děti do školy.|\ndejar|nechat, přestat|1|___ la puerta abierta.|Necháváš otevřené dveře.|\nseguir|následovat, pokračovat|5|Los turistas ___ al guía por toda la ciudad.|Turisté následují průvodce po celém městě.|\nencontrar|najít|0|___ mi cartera debajo del sofá.|Nacházím peněženku pod gaučem.|\nllamar|volat, zavolat|2|Me ___ tu hermana.|Volá mi tvoje sestra.|\nvenir|přijít, přijet|5|___ mis primos de Madrid.|Přijíždějí moji bratranci z Madridu.|\npensar|myslet, přemýšlet|0|___ mucho en ti.|Hodně na tebe myslím.|\nsalir|odejít, vyjít|0|___ de casa muy temprano.|Vycházím z domu hodně brzy.|\nvolver|vrátit se|5|Mis vecinos ___ de vacaciones.|Moji sousedé se vracejí z dovolené.|\ntomar|vzít, dát si (pití)|3|___ un café en la terraza.|Dáváme si kávu na terase.|\nconocer|znát; (indefinido) poznat, seznámit se|0|___ a tu hermana.|Znám tvou sestru.|\nvivir|žít, bydlet, zažít|3|___ una experiencia increíble.|Zažíváme něco neuvěřitelného.|\nsentir|cítit, litovat|2|Marta ___ un dolor fuerte en la espalda.|Marta cítí silnou bolest v zádech.|\ntratar|zacházet; (tratar de) pokusit se|0|___ de hablar con ella.|Snažím se s ní promluvit.|\nmirar|dívat se|1|___ el móvil demasiado.|Moc se díváš do mobilu.|\ncontar|počítat; vyprávět|2|El abuelo nos ___ una historia.|Děda nám vypráví příběh.|\nempezar|začít|0|___ un curso de español.|Začínám kurz španělštiny.|\nesperar|čekat, doufat|0|___ el autobús media hora.|Čekám půl hodiny na autobus.|\nbuscar|hledat|0|___ las gafas por toda la casa.|Hledám brýle po celém domě.|\nnecesitar|potřebovat|0|___ ayuda con el ordenador.|Potřebuju pomoc s počítačem.|\nentrar|vstoupit, vejít|5|Los ladrones ___ por la ventana.|Zloději lezou dovnitř oknem.|\ntrabajar|pracovat|0|___ hasta muy tarde.|Pracuju do pozdních hodin.|\nescribir|psát|0|___ un correo a mi profesora.|Píšu e-mail své učitelce.|\nperder|ztratit, prohrát|3|___ el partido.|Prohráváme zápas.|\nentender|rozumět, pochopit|0|No ___ nada en clase.|V hodině ničemu nerozumím.|\npedir|žádat, objednat|3|___ una pizza para cenar.|Objednáváme si pizzu k večeři.|\nrecibir|dostat, přijmout|0|___ una carta del banco.|Dostávám dopis z banky.|\nrecordar|pamatovat si, vzpomenout si|0|___ tu cumpleaños.|Pamatuju si tvoje narozeniny.|\ngustar|líbit se|2|Me ___ mucho la película.|Ten film se mi moc líbí.|\ncomer|jíst|3|___ paella en un restaurante.|Jíme paellu v restauraci.|\nterminar|skončit, dokončit|4|___ el proyecto.|Dokončujete projekt.|\npermitir|dovolit|2|El jefe me ___ salir antes.|Šéf mi dovoluje odejít dřív.|\naparecer|objevit se|2|___ mi gato en el jardín.|Na zahradě se objevuje můj kocour.|\nconseguir|získat, sehnat|0|___ dos entradas para el concierto.|Získávám dva lístky na koncert.|\ncomenzar|začít|2|La película ___ con retraso.|Film začíná se zpožděním.|\nservir|sloužit, podávat|2|El camarero nos ___ la cena.|Číšník nám servíruje večeři.|\nsacar|vytáhnout, vyndat|0|___ al perro a pasear.|Beru psa na procházku.|\nmantener|udržovat, udržet|5|Los jugadores ___ la calma.|Hráči zachovávají klid.|\nresultar|vyjít, ukázat se|2|El examen ___ muy difícil.|Zkouška se ukazuje jako hodně těžká.|\nleer|číst|0|___ un artículo interesante.|Čtu zajímavý článek.|\ncaer|spadnout|2|___ mucha nieve en las montañas.|V horách padá hodně sněhu.|\ncambiar|změnit, vyměnit|0|___ de opinión.|Měním názor.|\npresentar|představit, předložit|2|Pablo me ___ a su novia.|Pablo mi představuje svou přítelkyni.|\ncrear|vytvořit|3|___ una página web nueva.|Vytváříme nový web.|\nabrir|otevřít|0|___ la ventana del salón.|Otevírám okno v obýváku.|\nconsiderar|zvážit, považovat|3|___ todas las opciones.|Zvažujeme všechny možnosti.|\noír|slyšet|0|___ un ruido extraño en la cocina.|Slyším v kuchyni divný zvuk.|\nacabar|skončit, dokončit|1|___ los deberes muy rápido.|Doděláváš úkoly hodně rychle.|\nconvertir|přeměnit|5|___ el garaje en una oficina.|Přestavují garáž na kancelář.|\nganar|vyhrát, vydělat|2|Mi equipo ___ el partido.|Můj tým vyhrává zápas.|\nformar|tvořit, sestavit|3|___ un grupo de trabajo.|Sestavujeme pracovní skupinu.|\ntraer|přinést|1|___ vino para la cena.|Neseš víno k večeři.|\npartir|odjet; rozdělit|2|El tren ___ con retraso.|Vlak odjíždí se zpožděním.|\nmorir|zemřít|2|___ un escritor muy famoso.|Umírá velmi slavný spisovatel.|\naceptar|přijmout|0|___ la oferta de trabajo.|Přijímám pracovní nabídku.|\nrealizar|uskutečnit, provést|5|Los médicos ___ la operación.|Lékaři provádějí operaci.|\nsuponer|předpokládat; znamenat|2|El cambio ___ un gran problema.|Ta změna znamená velký problém.|\ncomprender|pochopit|0|Por fin ___ el problema.|Konečně chápu ten problém.|\nlograr|dosáhnout, podařit se|3|___ nuestro objetivo.|Dosahujeme svého cíle.|\nexplicar|vysvětlit|2|La profesora nos ___ el subjuntivo.|Učitelka nám vysvětluje subjunktiv.|\npreguntar|zeptat se|0|Le ___ a Juan por su familia.|Ptám se Juana na rodinu.|\ntocar|dotknout se; hrát (na nástroj)|0|___ la guitarra en una fiesta.|Hraju na večírku na kytaru.|\nreconocer|uznat, poznat|0|No ___ a tu primo.|Nepoznávám tvého bratrance.|\nestudiar|studovat, učit se|0|___ los verbos irregulares.|Učím se nepravidelná slovesa.|\nalcanzar|dosáhnout, dohonit|2|La temperatura ___ los cuarenta grados.|Teplota dosahuje čtyřiceti stupňů.|\nnacer|narodit se|5|Cada día ___ miles de niños.|Každý den se rodí tisíce dětí.|\ndirigir|řídit, vést|2|Elena ___ la reunión.|Elena vede poradu.|\ncorrer|běžet|0|___ diez kilómetros.|Běhám deset kilometrů.|\nutilizar|používat|3|___ un programa nuevo.|Používáme nový program.|\npagar|platit|0|___ la cuenta del restaurante.|Platím účet v restauraci.|\nayudar|pomoct|0|___ a mi vecina con la compra.|Pomáhám sousedce s nákupem.|\njugar|hrát (si)|3|___ al tenis.|Hrajeme tenis.|\nescuchar|poslouchat|0|___ un pódcast en español.|Poslouchám podcast ve španělštině.|\ncumplir|splnit; dovršit (věk)|2|Mi hija ___ diez años.|Moje dcera slaví desáté narozeniny.|\nofrecer|nabídnout|5|Me ___ un puesto en Barcelona.|Nabízejí mi místo v Barceloně.|\ndescubrir|objevit, zjistit|0|___ un restaurante fantástico.|Objevuju fantastickou restauraci.|\nlevantarse|vstát|0|Me ___ a las seis.|Vstávám v šest.|\nintentar|zkusit, pokusit se|0|___ llamarte tres veces.|Zkouším se ti třikrát dovolat.|\ncomprar|koupit|0|___ un coche nuevo.|Kupuju nové auto.|\ndormir|spát|2|El bebé ___ muy mal.|Miminko spí hodně špatně.|\nusar|používat|4|___ mi ordenador sin permiso.|Používáte můj počítač bez dovolení.|\ndecidir|rozhodnout (se)|3|___ vender la casa.|Rozhodujeme se prodat dům.|\nrepetir|opakovat|2|El profesor ___ la pregunta.|Učitel opakuje otázku.|\nolvidar|zapomenout|0|___ las llaves en la oficina.|Zapomínám klíče v kanceláři.|\nvaler|stát (cenu), vyplatit se|2|El esfuerzo ___ la pena.|Ta námaha stojí za to.|\nmostrar|ukázat|2|Ana me ___ sus fotos.|Ana mi ukazuje své fotky.|\nocupar|zabrat, obsadit|5|Los estudiantes ___ la plaza.|Studenti obsazují náměstí.|\nmover|hýbat, přesunout|0|___ el sofá al otro lado.|Přesouvám gauč na druhou stranu.|\ncontinuar|pokračovat|3|___ con el trabajo.|Pokračujeme v práci.|\nocurrir|stát se, přihodit se|2|___ algo muy raro.|Děje se něco hodně divného.|\nsuceder|stát se|2|___ algo inesperado.|Děje se něco nečekaného.|\nexistir|existovat|2|No ___ una solución fácil.|Neexistuje snadné řešení.|\nproducir|vyrábět, produkovat|2|La fábrica ___ mil coches.|Továrna vyrábí tisíc aut.|\nfijarse|všimnout si|0|Me ___ en un detalle importante.|Všímám si důležitého detailu.|\nacercarse|přiblížit se|2|Un hombre se ___ a nosotros.|Blíží se k nám nějaký muž.|\ndedicar|věnovat|0|___ dos horas al español.|Věnuju dvě hodiny španělštině.|\naprender|naučit se|0|___ veinte palabras nuevas.|Učím se dvacet nových slov.|\nsubir|stoupat, vyjít nahoru|2|___ el precio de la gasolina.|Stoupá cena benzínu.|\nevitar|vyhnout se|0|___ el tráfico del centro.|Vyhýbám se provozu v centru.|\ninteresar|zajímat|2|Me ___ mucho tu propuesta.|Tvůj návrh mě moc zajímá.|\ncerrar|zavřít|5|___ la tienda antes de tiempo.|Zavírají obchod dřív, než mají.|\nechar|hodit, vyhodit, nalít|1|___ demasiada sal a la sopa.|Dáváš do polévky moc soli.|\nresponder|odpovědět|2|Marta ___ a mi mensaje.|Marta mi odpovídá na zprávu.|\nsufrir|trpět, utrpět|2|El ciclista ___ un accidente.|Cyklista má nehodu.|\nimportar|záležet, vadit; dovážet|2|La empresa ___ fruta de Chile.|Firma dováží ovoce z Chile.|\nobtener|získat, obdržet|0|___ el permiso de conducir.|Získávám řidičský průkaz.|\nobservar|pozorovat|3|___ las estrellas desde la terraza.|Pozorujeme hvězdy z terasy.|\nindicar|ukázat, naznačit|2|El policía nos ___ el camino.|Policista nám ukazuje cestu.|\nimaginar|představit si|0|___ mi vida en España.|Představuju si svůj život ve Španělsku.|\ndesarrollar|vyvinout, rozvíjet|5|Los ingenieros ___ una aplicación nueva.|Inženýři vyvíjejí novou aplikaci.|\nseñalar|ukázat, označit|2|El niño ___ la luna con el dedo.|Dítě ukazuje prstem na měsíc.|\nelegir|zvolit, vybrat|3|___ el hotel más barato.|Vybíráme nejlevnější hotel.|\npreparar|připravit|0|___ la cena para todos.|Připravuju večeři pro všechny.|\nproponer|navrhnout|2|Laura ___ una solución.|Laura navrhuje řešení.|\ndemostrar|dokázat, prokázat|1|___ tu talento.|Prokazuješ svůj talent.|\nsignificar|znamenat|2|Tu visita ___ mucho para mí.|Tvoje návštěva pro mě hodně znamená.|\nreunirse|sejít se|3|Nos ___ con el director.|Scházíme se s ředitelem.|\nfaltar|chybět|1|___ a clase otra vez.|Zase chybíš na hodině.|\nacompañar|doprovodit|0|___ a mi madre al médico.|Doprovázím mámu k lékaři.|\ndesear|přát (si)|5|Todos me ___ suerte.|Všichni mi přejí štěstí.|\nenseñar|učit; ukázat|2|Mi abuela me ___ a cocinar.|Babička mě učí vařit.|\nconstruir|stavět|5|___ un puente nuevo.|Stavějí nový most.|\nvender|prodat|0|___ mi bicicleta vieja.|Prodávám své staré kolo.|\nrepresentar|představovat, zastupovat|2|La abogada ___ a la empresa.|Advokátka zastupuje firmu.|\ndesaparecer|zmizet|2|___ mi maleta en el aeropuerto.|Na letišti se mi ztrácí kufr.|\nmandar|poslat; poručit|0|___ un paquete a Praga.|Posílám balík do Prahy.|\nandar|chodit, jít|3|___ diez kilómetros por el monte.|Jdeme deset kilometrů po horách.|\npreferir|dát přednost|0|___ quedarme en casa.|Raději zůstávám doma.|\nasegurar|zajistit, pojistit; ujistit|0|___ la casa contra incendios.|Pojišťuju dům proti požáru.|\ncrecer|růst|2|La empresa ___ un diez por ciento.|Firma roste o deset procent.|\nsurgir|vyvstat, objevit se|2|___ un problema nuevo.|Objevuje se nový problém.|\nmatar|zabít|0|___ una araña enorme.|Zabíjím obrovského pavouka.|\nentregar|odevzdat, doručit|0|___ el informe a tiempo.|Odevzdávám zprávu včas.|\ncolocar|umístit|3|___ los libros en la estantería.|Dáváme knihy do police.|\nestablecer|zřídit, stanovit|5|___ unas normas nuevas.|Stanovují nová pravidla.|\nguardar|uschovat, uložit|0|___ el documento en el ordenador.|Ukládám dokument do počítače.|\niniciar|zahájit|5|___ una investigación.|Zahajují vyšetřování.|\nbajar|sejít dolů; snížit, klesnout|2|___ la temperatura.|Klesá teplota.|\nnotar|všimnout si|0|___ algo raro en su voz.|Všímám si něčeho divného v jeho hlase.|\nmeter|vložit, strčit|0|___ la ropa en la lavadora.|Dávám prádlo do pračky.|\nactuar|jednat; hrát (roli)|5|Los bomberos ___ muy rápido.|Hasiči zasahují hodně rychle.|\nacordarse|vzpomenout si|0|Me ___ de ti.|Vzpomínám si na tebe.|\ncortar|řezat, krájet, stříhat|0|___ el césped del jardín.|Sekám trávník na zahradě.|\nromper|rozbít|1|___ mi taza favorita.|Rozbíjíš můj oblíbený hrnek.|\nadquirir|získat, nabýt|2|La empresa ___ un edificio nuevo.|Firma získává novou budovu.|\nlanzar|hodit; uvést na trh|5|___ un producto nuevo.|Uvádějí na trh nový produkt.|\naprovechar|využít|3|___ el buen tiempo para pasear.|Využíváme hezkého počasí k procházce.|\napoyar|podpořit; opřít|5|Mis amigos me ___ mucho.|Přátelé mě hodně podporují.|\nnegar|popřít, odmítnout|2|El ministro lo ___ todo.|Ministr všechno popírá.|\navanzar|postoupit, pokročit|3|___ mucho con el proyecto.|S projektem hodně postupujeme.|\nresolver|vyřešit|0|___ el problema con el banco.|Řeším problém s bankou.|\ncostar|stát (cenu)|2|La reparación me ___ cien euros.|Oprava mě stojí sto eur.|\nexigir|vyžadovat|5|Los clientes ___ una explicación.|Zákazníci požadují vysvětlení.|\naumentar|zvýšit (se)|2|___ el número de turistas.|Zvyšuje se počet turistů.|\nrecoger|sebrat, vyzvednout|0|___ a los niños del colegio.|Vyzvedávám děti ze školy.|\nabandonar|opustit|5|Los vecinos ___ el edificio.|Sousedé opouštějí budovu.|\nimponer|uložit, vnutit, zavést|2|El gobierno ___ nuevas medidas.|Vláda zavádí nová opatření.|\nobligar|donutit|2|La lluvia nos ___ a volver.|Déšť nás nutí vrátit se.|\naplicar|použít, uplatnit|3|___ las nuevas reglas.|Uplatňujeme nová pravidla.|\nexpresar|vyjádřit|2|El presidente ___ su opinión.|Prezident vyjadřuje svůj názor.|\nprovocar|vyvolat, způsobit|2|La tormenta ___ muchos daños.|Bouřka působí hodně škod.|\ndefender|bránit, hájit|2|El abogado ___ a su cliente.|Advokát hájí svého klienta.|\nquitar|odebrat, sundat, sklidit|0|___ la mesa después de comer.|Po jídle sklízím ze stolu.|\nconducir|řídit (auto), vést|0|___ cinco horas sin parar.|Řídím pět hodin bez zastávky.|\natender|věnovat se, obsloužit, ošetřit|2|La doctora me ___ enseguida.|Doktorka se mi hned věnuje.|\ncompartir|sdílet, podělit se|3|___ un taxi hasta el aeropuerto.|Sdílíme taxi na letiště.|\nluchar|bojovat|5|Los trabajadores ___ por sus derechos.|Pracovníci bojují za svá práva.|\ninsistir|trvat na, naléhat|2|Mi madre ___ en pagar.|Moje máma trvá na tom, že zaplatí.|\ncelebrar|slavit|3|___ el cumpleaños de Marta.|Slavíme Martiny narozeniny.|\npublicar|zveřejnit, vydat|2|El periódico ___ la entrevista.|Noviny zveřejňují ten rozhovor.|\nsentarse|posadit se|3|Nos ___ en la primera fila.|Sedáme si do první řady.|\ncuidar|starat se, hlídat|0|___ a los hijos de mi hermana.|Hlídám děti své sestry.|\nquedarse|zůstat|0|Me ___ en casa.|Zůstávám doma.|\nirse|odejít, odjet|2|Marta se ___ sin despedirse.|Marta odchází bez rozloučení.|\nponerse|obléct si; začít; stát se|0|Me ___ el abrigo nuevo.|Oblékám si nový kabát.|\ndespertarse|probudit se|0|Me ___ muy temprano.|Budím se hodně brzy.|\ncasarse|oženit se, vdát se|2|Se ___ mi mejor amigo.|Žení se můj nejlepší kamarád.|\nviajar|cestovat|3|___ a Sevilla en tren.|Jedeme do Sevilly vlakem.|\nenviar|poslat|0|___ el contrato por correo.|Posílám smlouvu poštou.|\ncantar|zpívat|5|Los niños ___ en el concierto.|Děti zpívají na koncertě.|\nbailar|tančit|3|___ salsa en una fiesta.|Na večírku tančíme salsu.|\ncocinar|vařit|2|Mi padre ___ para toda la familia.|Můj táta vaří pro celou rodinu.|\nlimpiar|uklízet, čistit|0|___ toda la casa.|Uklízím celý dům.|\nlavar|mýt, prát|0|___ el coche.|Myju auto.|\nbeber|pít|4|___ demasiado café.|Pijete moc kávy.|\ndescansar|odpočívat|4|___ muy poco.|Odpočíváte hodně málo.|\ncaminar|chodit, jít pěšky|0|___ hasta el trabajo.|Chodím do práce pěšky.|\nnadar|plavat|3|___ en el mar.|Plaveme v moři.|\nvisitar|navštívit|3|___ a los abuelos.|Navštěvujeme prarodiče.|\ninvitar|pozvat|5|Mis vecinos me ___ a cenar.|Sousedé mě zvou na večeři.|\nregalar|darovat|0|Le ___ un libro a mi padre.|Dávám tátovi darem knihu.|\nprestar|půjčit|2|Mi hermano me ___ su coche.|Bratr mi půjčuje auto.|\ndevolver|vrátit (věc)|0|___ los libros a la biblioteca.|Vracím knihy do knihovny.|\ncaerse|spadnout, upadnout|0|Me ___ por las escaleras.|Padám ze schodů.|\ndormirse|usnout|0|Me ___ en el sofá.|Usínám na gauči.|\nsentirse|cítit se|0|Me ___ muy cansado.|Cítím se hodně unavený.|\nabrazar|obejmout|0|___ a mi madre en la estación.|Objímám mámu na nádraží.|\nbesar|políbit|2|Julia ___ a su novio delante de todos.|Julia líbá svého přítele přede všemi.|\namar|milovat|0|___ a mi familia.|Miluju svou rodinu.|\nodiar|nenávidět|0|___ los lunes.|Nesnáším pondělky.|\nreír|smát se|3|Nos ___ mucho con tu chiste.|Hodně se smějeme tvému vtipu.|\nsonreír|usmát se|2|La niña me ___.|Ta holčička se na mě usmívá.|\nllorar|plakat|2|El niño ___ durante una hora.|To dítě už hodinu pláče.|\ngritar|křičet|2|El entrenador nos ___ mucho.|Trenér na nás hodně křičí.|\ncontestar|odpovědět|1|No ___ a mi pregunta.|Neodpovídáš na mou otázku.|\nsaludar|pozdravit|2|El vecino me ___ en la escalera.|Soused mě zdraví na schodech.|\ndespedirse|rozloučit se|3|Nos ___ de nuestros amigos.|Loučíme se s přáteli.|\nagradecer|poděkovat|0|Le ___ su ayuda a Pedro.|Děkuju Pedrovi za pomoc.|\nperdonar|odpustit|2|Mi mujer me ___.|Žena mi odpouští.|\nprometer|slíbit|1|Me ___ una respuesta.|Slibuješ mi odpověď.|\nmentir|lhát|2|El testigo ___ al juez.|Svědek lže soudci.|\nengañar|podvést, oklamat|5|Me ___ con el precio.|Šidí mě s cenou.|\nrobar|ukrást|5|Me ___ la bicicleta.|Kradou mi kolo.|\nesconder|schovat|2|El perro ___ mi zapato.|Pes mi schovává botu.|\ncubrir|přikrýt, pokrýt|2|La nieve ___ todo el pueblo.|Sníh pokrývá celou vesnici.|\nllenar|naplnit|0|___ el depósito del coche.|Tankuju plnou nádrž.|\ntirar|hodit, vyhodit; táhnout|0|___ la basura.|Vyhazuju odpadky.|\nempujar|tlačit, strčit|5|___ el coche hasta la gasolinera.|Tlačí auto až k benzínce.|\ncoger|vzít, chytit|0|___ el tren de las ocho.|Jedu vlakem v osm.|\nsoltar|pustit|2|El niño ___ el globo.|Dítě pouští balónek.|\ncolgar|pověsit, zavěsit|0|___ un cuadro en el salón.|Věším obraz v obýváku.|\nencender|zapnout, rozsvítit|0|___ la calefacción.|Zapínám topení.|\napagar|vypnout, zhasnout|1|No ___ la luz del baño.|Nezhasínáš světlo v koupelně.|\narreglar|opravit, dát do pořádku|2|El fontanero ___ el grifo.|Instalatér opravuje kohoutek.|\nreparar|opravit|5|___ el ascensor.|Opravují výtah.|\nfuncionar|fungovat|2|El plan ___ perfectamente.|Plán funguje perfektně.|\nprobar|zkusit, ochutnat|3|___ un vino de la región.|Ochutnáváme víno z regionu.|\nmedir|měřit|0|___ la habitación para el armario.|Měřím pokoj kvůli skříni.|\npesar|vážit|2|La enfermera ___ al bebé.|Sestra váží miminko.|\nescoger|vybrat|4|___ un buen regalo.|Vybíráte dobrý dárek.|\ncomparar|srovnat|3|___ los precios de tres tiendas.|Porovnáváme ceny ve třech obchodech.|\nmejorar|zlepšit (se)|2|El tiempo ___ mucho.|Počasí se hodně zlepšuje.|\nreducir|snížit, zmenšit|2|La empresa ___ los gastos.|Firma snižuje náklady.|\ntraducir|přeložit|0|___ un texto del checo al español.|Překládám text z češtiny do španělštiny.|\nintroducir|zavést, vložit, zadat|0|___ los datos en el sistema.|Zadávám údaje do systému.|\nincluir|zahrnout|5|Me ___ en la lista de invitados.|Zařazují mě na seznam hostů.|\ndestruir|zničit|2|El fuego ___ el almacén.|Oheň ničí sklad.|\nhuir|utéct|5|Los ladrones ___ por el tejado.|Zloději utíkají přes střechu.|\ncontribuir|přispět|3|___ con cien euros.|Přispíváme sto eury.|\nsustituir|nahradit|2|Marcos ___ al portero lesionado.|Marcos nahrazuje zraněného brankáře.|\nconcluir|uzavřít, dojít k závěru|5|___ las negociaciones.|Uzavírají jednání.|\ninfluir|ovlivnit|2|El tiempo ___ en el resultado.|Počasí ovlivňuje výsledek.|\ndistribuir|rozdělit, rozdat|5|Los voluntarios ___ comida.|Dobrovolníci rozdávají jídlo.|\nllover|pršet|2|___ muchísimo.|Hrozně moc prší.|\nnevar|sněžit|2|___ en la sierra.|Na horách sněží.|\npreocuparse|dělat si starosti|0|Me ___ por ti.|Dělám si o tebe starosti.|\nalegrarse|zaradovat se, být rád|0|Me ___ mucho de verte.|Moc rád tě vidím.|\nmolestar|obtěžovat, vadit|2|El ruido me ___ mucho.|Ten hluk mi hodně vadí.|\ndoler|bolet|2|Me ___ la cabeza.|Bolí mě hlava.|\nencantar|moc se líbit|2|Me ___ el concierto.|Ten koncert se mi strašně líbí.|\naburrirse|nudit se|0|Me ___ en la reunión.|Na poradě se nudím.|\nsorprender|překvapit|2|Su reacción me ___.|Jeho reakce mě překvapuje.|\nasustar|vyděsit|2|El perro ___ a los niños.|Pes děsí děti.|\ncansarse|unavit se; omrzet|0|Me ___ de esperar.|Čekání mě unavuje.|\nenfadarse|rozzlobit se|2|Mi jefa se ___ conmigo.|Šéfová se na mě zlobí.|\nenamorarse|zamilovat se|0|Me ___ de esta ciudad.|Zamilovávám se do tohohle města.|\ndivertirse|bavit se|5|Los niños se ___ mucho en el parque.|Děti se v parku hodně baví.|\nducharse|sprchovat se|0|Me ___ con agua fría.|Sprchuju se studenou vodou.|\nvestirse|obléct se|2|Pablo se ___ muy elegante.|Pablo se obléká hodně elegantně.|\nacostarse|jít spát, lehnout si|3|Nos ___ muy tarde.|Chodíme spát hodně pozdě.|\nlavarse|umýt se|0|Me ___ las manos.|Myju si ruce.|\nperderse|ztratit se, zabloudit|3|Nos ___ en el casco antiguo.|Ztrácíme se ve starém městě.|\nromperse|zlomit si; rozbít se|2|Mi hijo se ___ un brazo.|Můj syn si láme ruku.|\nenterarse|dozvědět se|0|Me ___ de la noticia.|Dozvídám se tu zprávu.|\nquejarse|stěžovat si|5|Los clientes se ___ del servicio.|Zákazníci si stěžují na obsluhu.|\nequivocarse|splést se|0|Me ___ de calle.|Pletu si ulici.|\narrepentirse|litovat (čeho)|0|Me ___ de mi decisión.|Lituju svého rozhodnutí.|\natreverse|odvážit se|0|No me ___ a decírselo.|Neodvažuju se mu to říct.|\nmudarse|přestěhovat se|3|Nos ___ a un piso más grande.|Stěhujeme se do většího bytu.|\nacostumbrarse|zvyknout si|0|Me ___ al nuevo horario.|Zvykám si na nový rozvrh.|\ncallarse|zmlknout, mlčet|5|Todos se ___ de repente.|Všichni najednou mlknou.|\nlevantar|zvednout|0|___ una caja muy pesada.|Zvedám hodně těžkou krabici.|\ndespertar|probudit (někoho)|2|El ruido ___ al bebé.|Hluk budí miminko.|\ndespedir|propustit (z práce)|2|La empresa ___ a veinte personas.|Firma propouští dvacet lidí.|\nacordar|dohodnout, dojednat|5|Los dos países ___ un alto el fuego.|Obě země dojednávají příměří.|\ncomponer|složit, skládat|2|El músico ___ una canción nueva.|Hudebník skládá novou píseň.|\nexponer|vystavit, vyložit|2|La artista ___ sus cuadros en Madrid.|Umělkyně vystavuje své obrazy v Madridu.|\noponerse|postavit se proti|5|Los vecinos se ___ al proyecto.|Sousedé se stavějí proti projektu.|\nposponer|odložit (na později)|5|___ la reunión.|Odkládají poradu.|\nprever|předvídat|5|Los expertos ___ una crisis.|Odborníci předpovídají krizi.|\ndescribir|popsat|2|La testigo ___ al ladrón.|Svědkyně popisuje zloděje.|\ninscribirse|přihlásit se, zapsat se|0|Me ___ en un curso de cocina.|Hlásím se do kurzu vaření.|\nsuscribirse|přihlásit se k odběru|0|Me ___ a un canal de cocina.|Přihlašuju se k odběru kanálu o vaření.|\nenvolver|zabalit|0|___ los regalos de Navidad.|Balím vánoční dárky.|\ndisolver|rozpustit|2|El presidente ___ el parlamento.|Prezident rozpouští parlament.|\ndeshacer|rozdělat, vybalit, zrušit|0|___ la maleta.|Vybaluju kufr.|\nrehacer|předělat|0|___ todo el trabajo.|Předělávám celou práci.|\nsatisfacer|uspokojit|2|La respuesta no me ___.|Ta odpověď mě neuspokojuje.|\nreabrir|znovu otevřít|5|___ el museo.|Znovu otevírají muzeum.|\nfreír|smažit|0|___ unos huevos para cenar.|Smažím si vejce k večeři.|\nimprimir|tisknout|0|___ los billetes de avión.|Tisknu letenky.|\ncontener|obsahovat|2|La botella ___ un litro de agua.|Láhev obsahuje litr vody.|\nposeer|vlastnit|2|Mi tío ___ tres casas.|Můj strýc vlastní tři domy.|\ndetener|zastavit, zadržet|2|La policía ___ a dos sospechosos.|Policie zadržuje dva podezřelé.|\nsostener|držet, podpírat|0|___ la escalera con las dos manos.|Držím žebřík oběma rukama.|\nentretener|bavit, zabavit|2|El payaso ___ a los niños.|Klaun baví děti.|\nintervenir|zasáhnout|2|La policía ___ en la pelea.|Policie zasahuje do rvačky.|\natraer|přitahovat, přilákat|2|El festival ___ a miles de turistas.|Festival láká tisíce turistů.|\ndistraer|rozptýlit|2|El ruido me ___.|Ten hluk mě rozptyluje.|\nextraer|vytáhnout, vytrhnout|2|El dentista me ___ una muela.|Zubař mi trhá stoličku.|\ncaber|vejít se|5|No ___ todas las maletas en el coche.|Do auta se nevejdou všechny kufry.|\ncontradecir|odporovat (komu)|2|El ministro ___ al presidente.|Ministr odporuje prezidentovi.|\npredecir|předpovědět|2|El periodista ___ el resultado.|Novinář předpovídá výsledek.|\nfirmar|podepsat|0|___ el contrato de alquiler.|Podepisuju nájemní smlouvu.|\nahorrar|šetřit, ušetřit|3|___ bastante dinero.|Šetříme dost peněz.|\ngastar|utratit|4|___ demasiado dinero en ropa.|Utrácíte moc peněz za oblečení.|\ncobrar|účtovat, inkasovat; dostat výplatu|5|Me ___ veinte euros por el aparcamiento.|Účtují mi dvacet eur za parkování.|\nalquilar|pronajmout (si)|3|___ un apartamento en la costa.|Pronajímáme si apartmán na pobřeží.|\nreservar|rezervovat|0|___ una mesa para cuatro.|Rezervuju stůl pro čtyři.|\ncancelar|zrušit|5|___ nuestro vuelo.|Ruší nám let.|\nconfirmar|potvrdit|2|El hotel ___ la reserva.|Hotel potvrzuje rezervaci.|\norganizar|organizovat|3|___ una fiesta sorpresa.|Pořádáme večírek s překvapením.|\nrevisar|zkontrolovat|0|___ todos los documentos.|Kontroluju všechny dokumenty.|\ncomprobar|ověřit|0|___ la dirección en el mapa.|Ověřuju si adresu na mapě.|\ncorregir|opravit (chybu)|2|La profesora ___ los exámenes.|Učitelka opravuje písemky.|\nborrar|smazat|1|___ todas mis fotos.|Mažeš všechny moje fotky.|\ncopiar|kopírovat|0|___ los archivos en un disco.|Kopíruju soubory na disk.|\ndescargar|stáhnout|0|___ la aplicación en el móvil.|Stahuju si aplikaci do mobilu.|\ninstalar|nainstalovat|5|Los técnicos ___ el aire acondicionado.|Technici instalují klimatizaci.|\nconectar|připojit|0|___ el ordenador a la tele.|Připojuju počítač k televizi.|\naprobar|schválit; složit (zkoušku)|0|___ el examen de conducir.|Skládám zkoušku v autoškole.|\nsuspender|neudělat (zkoušku); pozastavit|2|Mi hermano ___ matemáticas.|Můj bratr propadá z matematiky.|\npracticar|procvičovat|3|___ español con una nativa.|Procvičujeme španělštinu s rodilou mluvčí.|\nrepasar|zopakovat si|0|___ la gramática antes del examen.|Před zkouškou si opakuju gramatiku.|\naparcar|zaparkovat|0|___ delante de tu casa.|Parkuju před tvým domem.|\ngirar|otočit, zahnout|1|___ a la izquierda demasiado pronto.|Zahýbáš doleva moc brzy.|\ncruzar|přejít|3|___ la frontera a pie.|Přecházíme hranici pěšky.|\nparar|zastavit|2|El autobús ___ en todas las paradas.|Autobus staví na všech zastávkách.|\nalmorzar|obědvat|0|___ con un cliente.|Obědvám s klientem.|\ncenar|večeřet|3|___ en casa de Marta.|Večeříme u Marty.|\ndesayunar|snídat|0|___ en una cafetería.|Snídám v kavárně.|\nentrenar|trénovat|3|___ dos horas en el gimnasio.|Trénujeme dvě hodiny v posilovně.|\ndiseñar|navrhnout|2|La arquitecta ___ nuestra casa.|Architektka navrhuje náš dům.|\npintar|malovat, natřít|3|___ la cocina de blanco.|Malujeme kuchyň na bílo.|\ndibujar|kreslit|2|Mi hija ___ un caballo.|Moje dcera kreslí koně.|\nvotar|hlasovat|3|___ en contra de la propuesta.|Hlasujeme proti návrhu.|\ndisfrutar|užívat si|3|___ mucho de la excursión.|Výlet si moc užíváme.|\nsugerir|navrhnout, doporučit|2|El camarero nos ___ el pescado.|Číšník nám doporučuje rybu.|\nadvertir|varovat, upozornit|2|El médico me ___ del riesgo.|Lékař mě upozorňuje na riziko.|\ninvertir|investovat|3|___ nuestros ahorros en un piso.|Investujeme úspory do bytu.|\nherir|zranit|2|La explosión ___ a tres personas.|Výbuch zraňuje tři lidi.|\ncompetir|soutěžit|5|Veinte equipos ___ por el título.|O titul soutěží dvacet týmů.|\nimpedir|zabránit, znemožnit|2|La niebla ___ el aterrizaje.|Mlha znemožňuje přistání.|\nperseguir|pronásledovat|2|La policía ___ al ladrón.|Policie pronásleduje zloděje.|\ntardar|trvat (komu jak dlouho)|0|___ dos horas en llegar.|Cesta mi trvá dvě hodiny.|\ndurar|trvat|2|La reunión ___ tres horas.|Porada trvá tři hodiny.|\npermanecer|zůstat, setrvat|5|Los heridos ___ en el hospital.|Zranění zůstávají v nemocnici.|\nrecomendar|doporučit|2|Sara me ___ este libro.|Sara mi doporučuje tuhle knihu.|\naconsejar|poradit|2|Mi abogado me ___ esperar.|Advokát mi radí počkat.|\navisar|upozornit, dát vědět|1|No me ___ del cambio.|Nedáváš mi vědět o změně.|\ninformar|informovat|5|Nos ___ del retraso.|Informují nás o zpoždění.|\nanunciar|oznámit|2|El gobierno ___ nuevas ayudas.|Vláda oznamuje novou podporu.|\ncomunicar|sdělit|2|La empresa ___ su decisión.|Firma sděluje své rozhodnutí.|\ndiscutir|hádat se, diskutovat|0|___ con mi hermano.|Hádám se s bratrem.|\nescapar|uniknout, utéct|2|El gato ___ por la ventana.|Kocour utíká oknem.|\nsalvar|zachránit|5|Los bomberos ___ a una familia.|Hasiči zachraňují jednu rodinu.|\nproteger|chránit|2|El casco me ___ la cabeza.|Helma mi chrání hlavu.|\natacar|útočit, napadnout|2|Un perro ___ al cartero.|Pes napadá pošťáka.|\nañadir|přidat|0|___ más sal a la sopa.|Přidávám do polévky víc soli.|\nmezclar|smíchat|0|___ la harina con los huevos.|Míchám mouku s vejci.|\nvolar|letět|3|___ a Barcelona con retraso.|Letíme do Barcelony se zpožděním.|\naterrizar|přistát|2|El avión ___ sin problemas.|Letadlo přistává bez problémů.|\nsecar|sušit|0|___ la ropa al sol.|Suším prádlo na slunci.|\ntropezar|zakopnout|0|___ con una piedra.|Zakopávám o kámen.|\nsaltar|skákat|2|El gato ___ a la mesa.|Kocour skáče na stůl.|\nquemar|spálit|1|___ la tortilla.|Pálíš tortillu.|\nmorder|kousnout|2|Un perro me ___ en la pierna.|Pes mě kouše do nohy.|\nsoñar|snít; zdát se (komu)|0|___ con mi abuelo.|Zdá se mi o dědovi.|\ncargar|nabít, naložit|0|___ el móvil en el coche.|Nabíjím si mobil v autě.|\njuzgar|soudit|1|Me ___ sin conocerme.|Soudíš mě, aniž mě znáš.|\npegar|lepit; udeřit|2|El niño ___ un póster en la pared.|Dítě lepí plakát na zeď.|\nmarcar|označit, vytočit; dát gól|2|El delantero ___ dos goles.|Útočník dává dva góly.|\narrancar|nastartovat; vytrhnout|2|El coche no ___.|Auto nestartuje.|\nanalizar|analyzovat|3|___ los resultados.|Analyzujeme výsledky.|\nrechazar|odmítnout, zamítnout|5|___ mi solicitud.|Zamítají mou žádost.|\nregresar|vrátit se|2|Mi hermana ___ de México.|Moje sestra se vrací z Mexika.|\nconfiar|důvěřovat|0|___ en la persona equivocada.|Důvěřuju nesprávnému člověku.|\npelear|prát se, hádat se|5|Mis hijos ___ por un juguete.|Moje děti se perou o hračku.|\nsonar|znít, zvonit|2|El despertador no ___.|Budík nezvoní.|\napostar|vsadit|0|___ diez euros por tu equipo.|Sázím deset eur na tvůj tým.|\ncausar|způsobit|2|El hielo ___ varios accidentes.|Led působí několik nehod.|\ndudar|pochybovat, váhat|0|___ mucho antes de responder.|Hodně váhám, než odpovím.|\ncontrolar|kontrolovat, ovládat|5|Los policías ___ todos los coches.|Policisté kontrolují všechna auta.|\nsobrevivir|přežít|5|Todos los pasajeros ___ al accidente.|Nehodu přežívají všichni cestující.|\nrespirar|dýchat|0|___ aire puro en la montaña.|Dýchám čistý vzduch na horách.|\naguantar|vydržet, snést|0|___ el dolor sin pastillas.|Snáším bolest bez prášků.|\ninvestigar|vyšetřovat, zkoumat|2|La policía ___ el robo.|Policie vyšetřuje tu krádež.|\nadmitir|připustit, přiznat; přijmout|2|El director ___ su error.|Ředitel přiznává svou chybu.|\nconvencer|přesvědčit|1|Me ___ con tus argumentos.|Přesvědčuješ mě svými argumenty.|\nhallar|najít, nalézt|5|Los científicos ___ una solución.|Vědci nacházejí řešení.|\nrenunciar|vzdát se, rezignovat|2|La ministra ___ a su cargo.|Ministryně rezignuje na svou funkci.|\nmontar|nasednout, jezdit; smontovat|0|___ en bici por el parque.|Jezdím na kole po parku.|\nfumar|kouřit|1|___ demasiado.|Moc kouříš.|\nadivinar|uhodnout|4|___ la respuesta.|Hádáte odpověď.|\ninventar|vymyslet, vynalézt|2|Mi hijo ___ una excusa.|Můj syn si vymýšlí výmluvu.|\ndeclarar|prohlásit; vypovídat|2|El testigo ___ ante el juez.|Svědek vypovídá před soudcem.|\nvencer|porazit, zvítězit|2|Nuestro equipo ___ al campeón.|Náš tým poráží mistra.|\neliminar|odstranit, vyřadit|5|___ a mi equipo de la copa.|Vyřazují můj tým z poháru.|\nconfesar|přiznat (se)|2|El ladrón lo ___ todo.|Zloděj se ke všemu přiznává.|\natravesar|přejít, přeplout napříč|3|___ el río en barca.|Přeplouváme řeku na loďce.|\napretar|stisknout, zmáčknout|0|___ el botón equivocado.|Mačkám špatné tlačítko.|\nchocar|narazit, srazit se|2|Un coche ___ contra un árbol.|Auto naráží do stromu.|\ncurar|vyléčit|2|El veterinario ___ a mi perro.|Veterinář léčí mého psa.|\ncastigar|potrestat|2|La profesora ___ a toda la clase.|Učitelka trestá celou třídu.|\ndoblar|ohnout, složit; zahnout|0|___ la ropa limpia.|Skládám čisté prádlo.|\namenazar|vyhrožovat|2|Un cliente ___ al camarero.|Zákazník vyhrožuje číšníkovi.|\ncharlar|povídat si|3|___ un rato con los vecinos.|Chvíli si povídáme se sousedy.|\njuntar|spojit, dát dohromady|3|___ las dos mesas.|Dáváme ty dva stoly k sobě.|\nculpar|obvinit, dávat vinu|2|Mi jefe me ___ del error.|Šéf mi dává tu chybu za vinu.|\naveriguar|zjistit|0|___ dónde vive.|Zjišťuju, kde bydlí.|\nsoler|mít ve zvyku|0|___ desayunar a las siete.|Obvykle snídám v sedm.|\nunir|spojit|2|El puente ___ las dos orillas.|Most spojuje oba břehy.|\ntemer|bát se|0|___ lo peor.|Bojím se nejhoršího.|\njurar|přísahat|0|Te lo ___.|Přísahám ti to.|\nlamentar|litovat (čeho)|0|___ mucho el retraso.|Moc lituju toho zpoždění.|\nnegociar|vyjednávat|5|Los sindicatos ___ con la empresa.|Odbory vyjednávají s firmou.|\nmerecer|zasloužit si|1|___ unas vacaciones.|Zasloužíš si dovolenou.|\ncalentar|ohřát|0|___ la sopa en el microondas.|Ohřívám polévku v mikrovlnce.|\ngobernar|vládnout|2|El mismo partido ___ desde hace años.|Už roky vládne stejná strana.|\nrespetar|respektovat|3|___ tu decisión.|Respektujeme tvé rozhodnutí.|\ncalmar|uklidnit|2|La música me ___.|Hudba mě uklidňuje.|\noler|vonět, cítit (čichem)|2|La cocina ___ a café.|Kuchyň voní kávou.|\nmanejar|ovládat, zacházet; (LatAm) řídit|2|Mi abuela ___ muy bien el móvil.|Moje babička zvládá mobil moc dobře.|\npertenecer|patřit|2|Este coche ___ a mi hermano.|Tohle auto patří mému bratrovi.|\ndepender|záviset|2|Todo ___ del tiempo.|Všechno závisí na počasí.|\ntragar|polykat|0|___ la pastilla con agua.|Polykám prášek s vodou.|\nregistrar|zaregistrovat, prohledat|5|Los policías ___ el coche.|Policisté prohledávají auto.|\nvaciar|vyprázdnit|0|___ el lavavajillas.|Vyklízím myčku.|\nsoportar|snášet, vydržet|0|No ___ el ruido.|Nesnáším ten hluk.|\npescar|rybařit, chytat ryby|2|Mi tío ___ en el río.|Můj strýc chytá ryby v řece.|\nplantar|zasadit|3|___ tomates en el jardín.|Sázíme na zahradě rajčata.|\ncazar|lovit|2|El gato ___ ratones.|Kocour loví myši.|\nemplear|zaměstnat, použít|2|La fábrica ___ a cien personas.|Továrna zaměstnává sto lidí.|\nfingir|předstírat|1|___ que no me ves.|Předstíráš, že mě nevidíš.|\nadorar|zbožňovat|0|___ la comida italiana.|Zbožňuju italské jídlo.|\ncriar|vychovávat, chovat|5|Mis abuelos ___ gallinas.|Moji prarodiče chovají slepice.|\nrogar|snažně prosit|0|Te ___ un poco de paciencia.|Prosím tě o trochu trpělivosti.|\napreciar|vážit si, ocenit|0|___ mucho tu ayuda.|Moc si vážím tvé pomoci.|\nrezar|modlit se|2|Mi abuela ___ todas las noches.|Moje babička se modlí každý večer.|\nbarrer|zametat|0|___ la cocina.|Zametám kuchyň.|\nguiar|vést, provázet|2|Ana ___ a los turistas por el museo.|Ana provází turisty po muzeu.|\nprohibir|zakázat|2|La ley ___ fumar aquí.|Zákon tady zakazuje kouřit.|\nrevelar|odhalit, prozradit|2|El informe ___ muchos errores.|Zpráva odhaluje hodně chyb.|\nofender|urazit|1|Me ___ con esas palabras.|Těmi slovy mě urážíš.|\nparticipar|účastnit se|3|___ en un concurso.|Účastníme se soutěže.|\narrojar|hodit, vyhodit|5|Los niños ___ piedras al río.|Děti házejí kameny do řeky.|\nadmirar|obdivovat|0|___ tu paciencia.|Obdivuju tvou trpělivost.|\nasistir|zúčastnit se, docházet|0|___ a clase todos los días.|Chodím na hodiny každý den.|\nconservar|uchovat, zachovat|3|___ las fotos de la abuela.|Uchováváme babiččiny fotky.|\nprotestar|protestovat|5|Los estudiantes ___ contra la reforma.|Studenti protestují proti reformě.|\ninsultar|nadávat, urážet|2|El conductor ___ a todo el mundo.|Ten řidič nadává všem.|\nconsumir|spotřebovat, konzumovat|2|Este coche ___ muy poco.|Tohle auto má hodně malou spotřebu.|\ninterpretar|vykládat, hrát (roli), tlumočit|2|La actriz ___ a una reina.|Herečka hraje královnu.|\nextender|rozprostřít, rozšířit|0|___ el mapa sobre la mesa.|Rozkládám mapu na stůl.|\ntapar|přikrýt, zakrýt|0|___ la olla.|Přikrývám hrnec.|\nverificar|ověřit|3|___ todos los datos.|Ověřujeme všechny údaje.|\nfabricar|vyrábět|5|Aquí ___ zapatos.|Tady vyrábějí boty.|\nafirmar|tvrdit|2|El testigo ___ lo contrario.|Svědek tvrdí opak.|\ncalcular|počítat, spočítat|0|___ el precio total.|Počítám celkovou cenu.|\neducar|vychovávat|3|___ a nuestros hijos con paciencia.|Vychováváme své děti s trpělivostí.|\nexplorar|prozkoumat|3|___ la ciudad a pie.|Prozkoumáváme město pěšky.|\ndistinguir|rozlišit, rozeznat|0|No ___ los colores.|Nerozeznávám barvy.|\ncriticar|kritizovat|1|___ todo lo que hago.|Kritizuješ všechno, co dělám.|\ncultivar|pěstovat|5|Mis padres ___ verduras.|Moji rodiče pěstují zeleninu.|\nheredar|zdědit|2|Mi primo ___ la casa del abuelo.|Můj bratranec dědí dědův dům.|\nafeitarse|holit se|0|Me ___ cada mañana.|Holím se každé ráno.|\nfelicitar|blahopřát|3|Te ___ por tu nuevo trabajo.|Blahopřejeme ti k nové práci.|\ndisminuir|snížit se, ubývat|2|El número de clientes ___.|Počet zákazníků klesá.|\nbañarse|koupat se|5|Los niños se ___ en el río.|Děti se koupou v řece.|\nhervir|vařit (se), vřít|2|El agua ya ___.|Voda už se vaří.|\nplanchar|žehlit|0|___ las camisas.|Žehlím košile.|\ndecorar|zdobit|3|___ el árbol de Navidad.|Zdobíme vánoční stromek.|\naplaudir|tleskat|5|Todos ___ al final.|Na konci všichni tleskají.|\nejercer|vykonávat (povolání)|2|Mi hermana ___ de abogada.|Moje sestra pracuje jako advokátka.|\ntoser|kašlat|1|___ mucho.|Hodně kašleš.|\nsituar|umístit|2|El mapa ___ el pueblo al norte.|Mapa umisťuje vesnici na sever.|\nrenovar|obnovit, renovovat|0|___ mi pasaporte.|Obnovuju si pas.|\nesquiar|lyžovat|3|___ en los Alpes.|Lyžujeme v Alpách.|\npeinarse|česat se|2|Mi hija se ___ sola.|Moje dcera se češe sama.|\nconversar|konverzovat, povídat si|3|___ en español.|Povídáme si španělsky.|\n";
+const HUB_LINK = "./";
+/* Present-tense conjugation engine (presente de indicativo) */
+const E = (() => {
+  const PRON = ['yo', 'tú', 'él / ella', 'nosotros', 'vosotros', 'ellos / ellas'];
+  const PRON_CZ = ['já', 'ty', 'on / ona', 'my', 'vy', 'oni / ony'];
+  const REFL = ['me', 'te', 'se', 'nos', 'os', 'se'];
+  const DEACC = { 'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ü': 'u', 'ñ': 'n' };
+  const deaccent = s => s.replace(/[áéíóúüñ]/g, c => DEACC[c]);
+  const stripAcc = s => s.replace(/[áéíóú]/g, c => DEACC[c]);
+  const isRefl = inf => /(ar|er|ir|ír)se$/.test(inf);
+  const base = inf => isRefl(inf) ? inf.slice(0, -2) : inf;
+  const cls = b => stripAcc(b.slice(-2));
+  const stemOf = b => b.slice(0, -2);
+  const END = { ar: ['o', 'as', 'a', 'amos', 'áis', 'an'], er: ['o', 'es', 'e', 'emos', 'éis', 'en'], ir: ['o', 'es', 'e', 'imos', 'ís', 'en'] };
+
+  const E_IE = ['pensar', 'empezar', 'comenzar', 'cerrar', 'despertar', 'sentar', 'recomendar', 'negar', 'confesar', 'atravesar', 'apretar', 'calentar', 'gobernar', 'nevar', 'tropezar',
+    'querer', 'entender', 'perder', 'defender', 'encender', 'atender', 'extender', 'sentir', 'preferir', 'convertir', 'divertir', 'mentir', 'sugerir', 'advertir', 'invertir', 'herir', 'arrepentir', 'hervir'];
+  const O_UE = ['poder', 'volver', 'devolver', 'envolver', 'resolver', 'disolver', 'mover', 'llover', 'doler', 'morder', 'soler', 'encontrar', 'contar', 'recordar', 'mostrar', 'demostrar', 'costar',
+    'acordar', 'acostar', 'probar', 'comprobar', 'aprobar', 'soñar', 'sonar', 'volar', 'colgar', 'soltar', 'almorzar', 'apostar', 'rogar', 'renovar', 'dormir', 'morir'];
+  const E_I = ['pedir', 'servir', 'repetir', 'seguir', 'conseguir', 'perseguir', 'medir', 'despedir', 'impedir', 'competir', 'vestir', 'elegir', 'corregir'];
+  const ACC_I = ['enviar', 'confiar', 'vaciar', 'esquiar', 'criar', 'guiar'], ACC_U = ['continuar', 'actuar', 'situar'];
+  const FULL = {
+    ser: ['soy', 'eres', 'es', 'somos', 'sois', 'son'], estar: ['estoy', 'estás', 'está', 'estamos', 'estáis', 'están'], ir: ['voy', 'vas', 'va', 'vamos', 'vais', 'van'],
+    haber: ['he', 'has', 'ha', 'hemos', 'habéis', 'han'], dar: ['doy', 'das', 'da', 'damos', 'dais', 'dan'], ver: ['veo', 'ves', 've', 'vemos', 'veis', 'ven'],
+    prever: ['preveo', 'prevés', 'prevé', 'prevemos', 'prevéis', 'prevén'], saber: ['sé', 'sabes', 'sabe', 'sabemos', 'sabéis', 'saben'], caber: ['quepo', 'cabes', 'cabe', 'cabemos', 'cabéis', 'caben'],
+    'oír': ['oigo', 'oyes', 'oye', 'oímos', 'oís', 'oyen'], 'reír': ['río', 'ríes', 'ríe', 'reímos', 'reís', 'ríen'], 'sonreír': ['sonrío', 'sonríes', 'sonríe', 'sonreímos', 'sonreís', 'sonríen'],
+    'freír': ['frío', 'fríes', 'fríe', 'freímos', 'freís', 'fríen'], oler: ['huelo', 'hueles', 'huele', 'olemos', 'oléis', 'huelen'], jugar: ['juego', 'juegas', 'juega', 'jugamos', 'jugáis', 'juegan'],
+    adquirir: ['adquiero', 'adquieres', 'adquiere', 'adquirimos', 'adquirís', 'adquieren'], reunir: ['reúno', 'reúnes', 'reúne', 'reunimos', 'reunís', 'reúnen'],
+    prohibir: ['prohíbo', 'prohíbes', 'prohíbe', 'prohibimos', 'prohibís', 'prohíben'], huir: ['huyo', 'huyes', 'huye', 'huimos', 'huis', 'huyen'],
+    criar: ['crío', 'crías', 'cría', 'criamos', 'criais', 'crían'], guiar: ['guío', 'guías', 'guía', 'guiamos', 'guiais', 'guían'],
+  };
+  const ALT = { huir: { 4: 'huís' }, criar: { 4: 'criáis' }, guiar: { 4: 'guiáis' } };
+  const FAMILY = [ // suffix → forms of the suffix part
+    ['tener', ['tengo', 'tienes', 'tiene', 'tenemos', 'tenéis', 'tienen']], ['venir', ['vengo', 'vienes', 'viene', 'venimos', 'venís', 'vienen']],
+    ['poner', ['pongo', 'pones', 'pone', 'ponemos', 'ponéis', 'ponen']], ['hacer', ['hago', 'haces', 'hace', 'hacemos', 'hacéis', 'hacen']], ['facer', ['fago', 'faces', 'face', 'facemos', 'facéis', 'facen']],
+    ['decir', ['digo', 'dices', 'dice', 'decimos', 'decís', 'dicen']], ['traer', ['traigo', 'traes', 'trae', 'traemos', 'traéis', 'traen']], ['caer', ['caigo', 'caes', 'cae', 'caemos', 'caéis', 'caen']],
+  ];
+  const FAMILY_EXACT = { salir: ['salgo', 'sales', 'sale', 'salimos', 'salís', 'salen'], valer: ['valgo', 'vales', 'vale', 'valemos', 'valéis', 'valen'] };
+  const changeLast = (st, from, to) => { const i = st.lastIndexOf(from); return i < 0 ? st : st.slice(0, i) + to + st.slice(i + from.length); };
+
+  function klass(inf) {
+    const b = base(inf);
+    if (['ser', 'estar', 'ir', 'haber', 'dar', 'ver', 'prever', 'saber', 'caber', 'oír', 'oler'].includes(b)) return 'full';
+    if (FAMILY_EXACT[b] || FAMILY.some(f => b.endsWith(f[0]))) return 'go';
+    if (['reír', 'sonreír', 'freír'].includes(b)) return 'reir';
+    if (b === 'jugar') return 'ue'; if (b === 'adquirir') return 'ie';
+    if (E_IE.includes(b)) return 'ie'; if (O_UE.includes(b)) return 'ue'; if (E_I.includes(b)) return 'i';
+    if (/uir$/.test(b) && !/[gq]uir$/.test(b)) return 'uir';
+    if (ACC_I.includes(b) || ACC_U.includes(b) || b === 'reunir' || b === 'prohibir') return 'acc';
+    if (/[aeiou]c[ei]r$/.test(b)) return 'zco';
+    if (/(g[ei]r|guir|[^aeiou]cer)$/.test(b)) return 'orth';
+    return 'reg';
+  }
+  function naive(inf, p) { const b = base(inf); return stemOf(b) + END[cls(b)][p]; }
+  function pres(inf, p) {
+    const b = base(inf);
+    if (FULL[b]) return FULL[b][p];
+    if (FAMILY_EXACT[b]) return FAMILY_EXACT[b][p];
+    for (const [suf, forms] of FAMILY) if (b.endsWith(suf)) return b.slice(0, -suf.length) + forms[p];
+    const c = cls(b); let st = stemOf(b); const boot = p !== 3 && p !== 4;
+    if (boot) {
+      if (E_IE.includes(b)) st = changeLast(st, 'e', 'ie');
+      else if (O_UE.includes(b)) st = changeLast(st, 'o', 'ue');
+      else if (E_I.includes(b)) st = changeLast(st, 'e', 'i');
+      else if (/uir$/.test(b) && !/[gq]uir$/.test(b)) st = st + 'y';
+      else if (ACC_I.includes(b)) st = st.slice(0, -1) + 'í';
+      else if (ACC_U.includes(b)) st = st.slice(0, -1) + 'ú';
+    }
+    if (p === 0) {
+      if (/g[ei]r$/.test(b)) st = st.slice(0, -1) + 'j';
+      else if (/guir$/.test(b)) st = st.slice(0, -1);
+      else if (/[aeiou]c[ei]r$/.test(b)) st = st.slice(0, -1) + 'zc';
+      else if (/[^aeiou]cer$/.test(b)) st = st.slice(0, -1) + 'z';
+    }
+    return st + END[c][p];
+  }
+  const forms = (inf, p) => { const b = base(inf); return [pres(inf, p), ...((ALT[b] && ALT[b][p]) ? [ALT[b][p]] : [])]; };
+  function traps(inf, p) { // typical learner errors
+    const b = base(inf), ok = pres(inf, p), out = [naive(inf, p)], k = klass(inf);
+    if ((k === 'ie' || k === 'ue' || k === 'i') && (p === 3 || p === 4)) out.push(pres(inf, 0).replace(/o$/, '').replace(/j$/, 'g') + END[cls(b)][p]); // boot applied to nosotros: ✗piensamos
+    if (k === 'go' && p !== 0) { const f = FAMILY.find(x => b.endsWith(x[0])); out.push(pres(inf, 0).replace(/o$/, '') + END[cls(b)][p]); } // ✗tengues-like: tenges
+    if (k === 'zco' && p !== 0) out.push(pres(inf, 0).replace(/o$/, '') + END[cls(b)][p]);
+    if (/[áéíóú]/.test(ok) && p !== 4) out.push(stripAcc(ok));
+    return out.filter(x => x && x !== ok);
+  }
+  const irregularPersons = inf => [0, 1, 2, 3, 4, 5].filter(p => pres(inf, p) !== naive(inf, p));
+  return { PRON, PRON_CZ, REFL, deaccent, stripAcc, isRefl, base, cls, stemOf, pres, forms, naive, traps, klass, irregularPersons, E_IE, O_UE, E_I };
+})();
+
+
+/* ===== data ===== */
+const VERBS = VERB_RAW.trim().split('\n').map((l, i) => { const [inf, cz, p, es, czs, ans] = l.split('|'); return { inf, cz, p: +p, es, czs, ans: ans || '', rank: i }; });
+const VMAP = Object.fromEntries(VERBS.map(v => [v.inf, v]));
+const ONLY = { llover: [2], nevar: [2], ocurrir: [2, 5], suceder: [2, 5], doler: [2, 5], gustar: [2, 5], encantar: [2, 5] };
+const LEVELS = [
+  { n: 1, name: 'Význam slovesa', sub: 'česky → španělský infinitiv · 4 možnosti', ex: 'mluvit → hablar' },
+  { n: 2, name: 'Tvary v osobách', sub: 'česky + osoba → španělský tvar · 4 možnosti', ex: 'my · mluvit → hablamos' },
+  { n: 3, name: 'Sloveso ve větě', sub: 'doplň do španělské věty · možnosti, pak psaní', ex: 'Hablo con mi jefe.' },
+  { n: 4, name: 'Překlad celé věty', sub: 'česká věta → napiš španělsky', ex: 'Mluvím se šéfem. → …' },
+];
+const BANDS = [['all', 'Všech 500', 0, 500], ['a', '1–50', 0, 50], ['b', '51–100', 50, 100], ['c', '101–200', 100, 200], ['d', '201–300', 200, 300], ['e', '301–400', 300, 400], ['f', '401–500', 400, 500]];
+
+/* ===== state ===== */
+const LS_KEY = 'verbos.v1';
+const DEF_SET = { vos: true, strict: true, mode: 'auto', len: 20, goal: 30, band: 'all', tts: false };
+let S = { v: 1, items: {}, days: {}, set: { ...DEF_SET } };
+function loadLocal() { try { const d = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); if (d && d.items) S = { v: 1, items: d.items, days: d.days || {}, set: { ...DEF_SET, ...(d.set || {}) } }; } catch (e) { } }
+let saveT = null;
+function saveLocal() { clearTimeout(saveT); saveT = setTimeout(() => { try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) { } }, 150); }
+const nowMin = () => Math.floor(Date.now() / 60000);
+const dayKey = (d = new Date()) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+const st = key => S.items[key] || [0, 0, 0, 0, 0, 0]; // [box, dueMin, lapses, wrongMask, lastMin, seenMask]
+const isSeen = key => !!S.items[key];
+const isDue = key => { const s = S.items[key]; return !!s && s[1] <= nowMin(); };
+const isMistake = key => { const s = S.items[key]; return !!s && (s[3] > 0 || (s[2] > 0 && s[0] <= 2)); };
+const isKnown = key => { const s = S.items[key]; return !!s && s[0] >= 3; };
+const INTERVAL_D = [0, 1, 3, 7, 16, 35];
+function grade(key, ok, person, typed, retry) {
+  const s = st(key).slice(), now = nowMin(), bit = person == null ? 1 : (1 << person);
+  if (ok) { if (retry) s[0] = 1; else if (!isSeen(key)) s[0] = typed ? 2 : 1; else s[0] = Math.min(5, s[0] + 1); s[1] = now + INTERVAL_D[s[0]] * 1440 - 240; s[3] &= ~bit; }
+  else { s[0] = 1; s[1] = now; s[2]++; s[3] |= bit; }
+  s[4] = now; s[5] |= bit; S.items[key] = s;
+  if (!retry) { const d = S.days[dayKey()] || [0, 0]; d[0]++; if (ok) d[1]++; S.days[dayKey()] = d; }
+  saveLocal();
+}
+function streak() { let n = 0; const d = new Date(); const hit = k => S.days[k] && S.days[k][0] >= 10; if (!hit(dayKey(d))) d.setDate(d.getDate() - 1); while (hit(dayKey(d))) { n++; d.setDate(d.getDate() - 1); } return n; }
+
+/* ===== pools ===== */
+const band = () => BANDS.find(b => b[0] === S.set.band) || BANDS[0];
+const inBand = v => v.rank >= band()[2] && v.rank < band()[3];
+const sentOk = v => S.set.vos || v.p !== 4;
+function levelPool(n, all) { return VERBS.filter(v => (all || inBand(v)) && (n < 3 || sentOk(v))).map(v => n + ':' + v.inf); }
+function personsFor(v) { let ps = ONLY[E.base(v.inf)] || ONLY[v.inf] || [0, 1, 2, 3, 4, 5]; if (!S.set.vos) ps = ps.filter(p => p !== 4); return ps; }
+function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; } return a; }
+function spread(keys) { const out = keys.slice(), id = k => k.slice(2); for (let i = 1; i < out.length; i++) if (id(out[i]) === id(out[i - 1])) { const j = out.findIndex((k, n) => n > i && id(k) !== id(out[i - 1])); if (j > 0) [out[i], out[j]] = [out[j], out[i]]; } return out; }
+const rankOf = k => VMAP[k.slice(2)].rank;
+function pick(mist, due, fresh, rest, n) {
+  const minNew = Math.min(fresh.length, Math.ceil(n * 0.3));
+  let out = mist.concat(due).slice(0, n - minNew); out = out.concat(fresh.slice(0, n - out.length));
+  if (out.length < n) out = out.concat(mist.concat(due).filter(k => !out.includes(k)).slice(0, n - out.length));
+  if (out.length < n) out = out.concat(rest.slice(0, n - out.length));
+  return spread(shuffle(out));
+}
+function buildLevel(n, len) {
+  const pool = levelPool(n);
+  return pick(pool.filter(isMistake).sort((a, b) => st(b)[2] - st(a)[2]), pool.filter(k => isDue(k) && !isMistake(k)).sort((a, b) => st(a)[1] - st(b)[1]),
+    pool.filter(k => !isSeen(k)).sort((a, b) => rankOf(a) - rankOf(b)), pool.filter(k => isSeen(k) && !isDue(k) && !isMistake(k)).sort((a, b) => st(a)[0] - st(b)[0] || st(a)[1] - st(b)[1]), len);
+}
+function buildDaily(len) { // guided path: a verb climbs level 1 → 4; next level unlocks once the previous one was answered correctly
+  const all = [1, 2, 3, 4].flatMap(n => levelPool(n));
+  const mist = all.filter(isMistake).sort((a, b) => st(b)[2] - st(a)[2]);
+  const due = all.filter(k => isDue(k) && !isMistake(k)).sort((a, b) => st(a)[1] - st(b)[1]);
+  const climb = [], start = [];
+  for (const v of VERBS.filter(inBand)) for (let n = 1; n <= 4; n++) {
+    const k = n + ':' + v.inf; if (isSeen(k)) continue; if (n >= 3 && !sentOk(v)) break;
+    if (n === 1) start.push(k); else { const prev = (n - 1) + ':' + v.inf; if (isSeen(prev) && !isMistake(prev)) climb.push(k); } break;
+  }
+  const fresh = []; while (climb.length || start.length) { fresh.push(...climb.splice(0, 3), ...start.splice(0, 2)); }
+  const rest = all.filter(k => isSeen(k) && !isDue(k) && !isMistake(k)).sort((a, b) => st(a)[0] - st(b)[0]);
+  return pick(mist, due, fresh, rest, len);
+}
+function buildMistakes(len) { return spread(shuffle(Object.keys(S.items).filter(isMistake).sort((a, b) => st(b)[2] - st(a)[2]).slice(0, len))); }
+function buildVerb(inf) { const v = VMAP[inf]; return ['1:' + inf, '2:' + inf, '2:' + inf + '#b', ...(sentOk(v) ? ['3:' + inf, '4:' + inf] : [])]; }
+function counts() { let due = 0; for (const k in S.items) if (S.items[k][1] <= nowMin() || isMistake(k)) due++; return { due, mist: Object.keys(S.items).filter(isMistake).length }; }
+
+/* ===== cards ===== */
+const norm = s => s.toLowerCase().replace(/[.,;:!?¡¿"]/g, ' ').replace(/\s+/g, ' ').trim();
+const glossTokens = cz => cz.toLowerCase().replace(/\([^)]*\)/g, ' ').split(/[^a-záčďéěíňóřšťúůýž]+/).filter(w => w.length >= 4);
+function choosePerson(key, v) {
+  const ps = personsFor(v), s = st(key); const wrong = ps.filter(p => s[3] & (1 << p)); if (wrong.length) return wrong[Math.floor(Math.random() * wrong.length)];
+  const irr = E.irregularPersons(v.inf); let cand = ps.filter(p => !(s[5] & (1 << p))); if (!cand.length) cand = ps;
+  const w = cand.flatMap(p => irr.includes(p) ? [p, p, p] : [p]); return w[Math.floor(Math.random() * w.length)];
+}
+function makeCard(rawKey, retry, force) {
+  force = force || {}; const key = rawKey.split('#')[0], lvl = +key[0], v = VMAP[key.slice(2)];
+  const c = { key, lvl, v, retry: !!retry, confirm: !!force.confirm, isNew: !isSeen(key), prefix: '' };
+  if (lvl === 1) { c.person = null; c.answers = [v.inf]; c.mode = 'mc'; }
+  else if (lvl === 2) { c.person = force.person != null ? force.person : choosePerson(key, v); c.answers = E.forms(v.inf, c.person); c.prefix = E.isRefl(v.inf) ? E.REFL[c.person] : ''; c.mode = 'mc'; }
+  else {
+    c.person = v.p; c.answers = v.ans ? [v.ans] : E.forms(v.inf, v.p); c.es = v.es; c.czs = v.czs;
+    if (lvl === 4) { c.translate = !force.cloze; c.mode = 'type'; }
+    else { const m = S.set.mode, box = st(key)[0]; c.mode = m === 'mc' ? 'mc' : m === 'type' ? 'type' : (retry || force.confirm) ? 'type' : box <= 1 ? 'mc' : 'type'; }
+  }
+  c.correct = c.answers[0]; c.irregular = E.klass(v.inf) !== 'reg';
+  if (c.mode === 'mc') c.options = makeOptions(c);
+  return c;
+}
+function makeOptions(c) {
+  const v = c.v, okSet = new Set(c.answers.map(norm)), out = [];
+  const push = x => { if (!x || x === 'pedo') return; const n = norm(x); if (okSet.has(n) || out.some(o => norm(o) === n)) return; out.push(x); };
+  if (c.lvl === 1) {
+    const mine = new Set(glossTokens(v.cz)), b = E.base(v.inf), cl = E.cls(b), refl = E.isRefl(v.inf);
+    const okv = w => w !== v && E.base(w.inf) !== b && !glossTokens(w.cz).some(t => mine.has(t));
+    const near = VERBS.filter(w => okv(w) && Math.abs(w.rank - v.rank) <= 60);
+    const best = shuffle(near.filter(w => E.cls(E.base(w.inf)) === cl && E.isRefl(w.inf) === refl));
+    best.concat(shuffle(near), shuffle(VERBS.filter(okv))).forEach(w => { if (out.length < 3) push(w.inf); });
+  } else {
+    const p = c.person, others = shuffle([0, 1, 2, 3, 4, 5].filter(q => q !== p && (q !== 4 || S.set.vos)));
+    if (c.v.ans && c.lvl >= 3) { ['ha', 'está', 'es', 'han', 'tiene'].forEach(push); }
+    const tr = E.traps(v.inf, p); if (E.base(v.inf).length > 3) tr.slice(0, 2).forEach(push);
+    if (c.lvl === 3) push(E.base(v.inf));
+    others.forEach(q => push(E.pres(v.inf, q)));
+  }
+  return shuffle([c.correct, ...out.slice(0, 3)]);
+}
+function check(c, input) {
+  let u = norm(input); const oks = c.answers.map(norm);
+  if (c.translate) {
+    const pad = ' ' + u + ' ', model = norm(c.es.replace('___', c.correct));
+    if (oks.some(o => pad.includes(' ' + o + ' '))) return { ok: true, full: E.deaccent(u) === E.deaccent(model) };
+    const dp = ' ' + E.deaccent(u) + ' '; if (oks.some(o => dp.includes(' ' + E.deaccent(o) + ' '))) return { ok: !S.set.strict, accent: true };
+    return { ok: false };
+  }
+  u = u.replace(/^(yo|tú|tu|él|el|ella|usted|nosotros|nosotras|vosotros|vosotras|ellos|ellas|ustedes) /, '');
+  if (c.prefix && u.startsWith(c.prefix + ' ')) u = u.slice(c.prefix.length + 1);
+  if (oks.includes(u)) return { ok: true };
+  if (u && oks.map(E.deaccent).includes(E.deaccent(u))) return { ok: !S.set.strict, accent: true };
+  return { ok: false };
+}
+
+/* ===== explanations ===== */
+const BOOT = 'Mění se jen v „botě“: yo, tú, él a ellos. V nosotros a vosotros zůstává původní kmen';
+function note(inf) {
+  const b = E.base(inf), k = E.klass(inf), f = p => E.pres(inf, p);
+  if (b === 'haber') return 'Jako pomocné sloveso: he, has, ha, hemos, habéis, han. Ve významu „je / jsou někde“ existuje jen neosobní tvar hay.';
+  if (k === 'full') return 'Zcela nepravidelné sloveso, tvary je potřeba umět zpaměti: ' + [0, 1, 2, 3, 4, 5].map(f).join(', ') + '.';
+  if (k === 'go') return 'V 1. osobě přibývá -g-: ' + f(0) + '.' + (f(1) !== E.naive(inf, 1) ? ' Navíc změna kmene v botě: ' + f(1) + ', ' + f(2) + ', ' + f(5) + '.' : ' Ostatní osoby jsou pravidelné: ' + f(1) + ', ' + f(3) + '.');
+  if (k === 'reir') return 'e → i s přízvukem: ' + f(0) + ', ' + f(1) + ', ' + f(2) + ', ' + f(5) + '; ale ' + f(3) + ', ' + f(4) + '.';
+  if (k === 'ie') return 'Změna kmene e → ie' + (b === 'adquirir' ? ' (tady i → ie)' : '') + '. ' + BOOT + ': ' + f(0) + ' × ' + f(3) + '.';
+  if (k === 'ue') return 'Změna kmene ' + (b === 'jugar' ? 'u → ue (jediné takové sloveso)' : 'o → ue') + '. ' + BOOT + ': ' + f(0) + ' × ' + f(3) + '.';
+  if (k === 'i') return 'Změna kmene e → i (jen slovesa na -ir). ' + BOOT + ': ' + f(0) + ' × ' + f(3) + '.' + (f(0) !== f(1).replace(/es$/, 'o') ? ' V 1. osobě navíc pravopis: ' + f(0) + '.' : '');
+  if (k === 'uir') return 'Slovesa na -uir vkládají -y- v botě: ' + f(0) + ', ' + f(1) + ', ' + f(5) + '; ale ' + f(3) + '.';
+  if (k === 'acc') return 'V botě se přízvuk přesouvá na ' + (/ú/.test(f(0)) ? 'ú' : 'í') + ' a píše se čárka: ' + f(0) + ', ' + f(1) + ', ' + f(5) + '; ale ' + f(3) + '.';
+  if (k === 'zco') return 'Slovesa na samohláska + -cer / -cir mají v 1. osobě -zco: ' + f(0) + '. Ostatní osoby pravidelně: ' + f(1) + '.';
+  if (k === 'orth') return 'Pravopisná změna jen v 1. osobě, aby zůstala výslovnost: ' + f(0) + ' (ale ' + f(1) + '). -ger/-gir → -jo, -guir → -go, souhláska + -cer → -zo.';
+  return { ar: 'Pravidelné -ar: -o, -as, -a, -amos, -áis, -an.', er: 'Pravidelné -er: -o, -es, -e, -emos, -éis, -en.', ir: 'Pravidelné -ir: -o, -es, -e, -imos, -ís, -en.' }[E.cls(b)];
+}
+
+/* ===== helpers ===== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function toast(msg, ms = 2200) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), ms); }
+const ICON_SAY = '<svg viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+let esVoice = null;
+function initVoices() { try { const vs = speechSynthesis.getVoices(); esVoice = vs.find(v => /^es[-_]ES/i.test(v.lang)) || vs.find(v => /^es/i.test(v.lang)) || null; } catch (e) { } }
+const canSpeak = () => 'speechSynthesis' in window;
+function speak(text) { if (!canSpeak()) return; try { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = esVoice ? esVoice.lang : 'es-ES'; if (esVoice) u.voice = esVoice; u.rate = 0.92; speechSynthesis.speak(u); } catch (e) { } }
+const plural = (n, a, b, c) => n === 1 ? a : (n >= 2 && n <= 4 ? b : c);
+const PRON_S = ['yo', 'tú', 'él', 'nosotros', 'vosotros', 'ellos'];
+const capIf = (c, f) => (c.es && /^[¿¡]?___/.test(c.es)) ? f.charAt(0).toUpperCase() + f.slice(1) : f;
+const filled = c => c.es.replace('___', capIf(c, c.correct));
+
+/* ===== navigation ===== */
+let screen = 'home', session = null;
+function show(name) {
+  screen = name; document.body.classList.toggle('in-session', name === 'session' || name === 'summary');
+  document.querySelectorAll('.screen').forEach(el => el.hidden = el.id !== 's-' + name);
+  document.querySelectorAll('nav.tabs button').forEach(b => b.getAttribute('data-go') === name ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
+  ({ home: renderHome, mosaic: renderMosaic, sheet: renderCheat, settings: renderSettings }[name] || (() => { }))(); window.scrollTo(0, 0);
+}
+
+/* ===== home ===== */
+function renderHome() {
+  const today = (S.days[dayKey()] || [0, 0])[0], goal = S.set.goal, sk = streak(), c = counts();
+  let h = `<div class="masthead"><div><h1>Español: slovesa</h1><p>${VERBS.length} nejčastějších sloves v přítomném čase</p></div><div class="streak"><b>${sk}</b>${plural(sk, 'den', 'dny', 'dní')} v řadě</div></div>
+  <div class="today"><div class="row"><span>Dnes zodpovězeno</span><span>${today} / ${goal}</span></div><div class="bar gold"><i style="width:${Math.min(100, today / goal * 100)}%"></i></div></div>
+  <div class="cta-row"><button class="btn primary" data-act="daily"><span class="stack">Spustit denní trénink<small>${c.due ? c.due + ' k zopakování + nová slovesa' : 'každé sloveso postupně projde úrovně 1 až 4'} · ${S.set.len} položek</small></span></button>
+  ${c.mist ? `<button class="btn danger" data-act="mistakes"><span class="stack">Opravit moje chyby<small>${c.mist} ${plural(c.mist, 'položka, kde jsi nedávno chyboval', 'položky, kde jsi nedávno chyboval', 'položek, kde jsi nedávno chyboval')}</small></span></button>` : ''}</div>
+  <div class="chips" role="group" aria-label="Rozsah sloves podle frekvence">${BANDS.map(b => `<button class="chip" data-band="${b[0]}" aria-pressed="${S.set.band === b[0]}">${b[1]}</button>`).join('')}</div>
+  <section class="group"><h2>Čtyři úrovně</h2><p>Můžeš trénovat kteroukoli zvlášť. Denní trénink je míchá sám a sloveso pustí výš, až zvládneš úroveň pod ní.</p>`;
+  for (const L of LEVELS) {
+    const pool = levelPool(L.n); let known = 0, due = 0, mist = 0; for (const k of pool) { if (isKnown(k)) known++; if (isMistake(k)) mist++; else if (isDue(k)) due++; }
+    h += `<button class="deck" data-level="${L.n}"><div class="top"><span class="name"><span class="lvln">${L.n}</span>${L.name}${mist ? `<span class="badge red">${mist} ${plural(mist, 'chyba', 'chyby', 'chyb')}</span>` : ''}${due ? `<span class="badge">${due} k opakování</span>` : ''}</span><span class="meta">${known} / ${pool.length}</span></div>
+      <div class="sub">${L.sub}</div><div class="ex">${esc(L.ex)}</div><div class="bar"><i style="width:${pool.length ? known / pool.length * 100 : 0}%"></i></div></button>`;
+  }
+  h += `</section>${HUB_LINK ? `<p style="margin-top:28px;text-align:center"><a href="${HUB_LINK}" style="color:var(--muted)">← zpět na úvod</a></p>` : ''}`;
+  $('#s-home .wrap').innerHTML = h;
+}
+
+/* ===== session ===== */
+function startSession(title, keys, again) {
+  if (!keys.length) return toast('V tomhle rozsahu teď není co procvičovat.');
+  session = { title, queue: keys.map(k => ({ k, retry: false })), done: 0, total: keys.length, first: 0, firstOk: 0, misses: [], again: again || null };
+  show('session'); nextCard();
+}
+function nextCard() { if (!session.queue.length) return endSession(); const q = session.queue.shift(); session.card = makeCard(q.k, q.retry, q.force); session.cardRaw = q.k; session.answered = false; renderCard(); }
+function hintPills(c) { return `<span class="pill">${esc(c.v.inf)}</span><span class="pill person">${E.PRON[c.person]}</span><span class="muted" style="font-size:14.5px">${esc(c.v.cz)}</span>`; }
+function renderCard() {
+  const c = session.card, L = LEVELS[c.lvl - 1];
+  const tag = c.retry ? '<span class="retry-tag">ještě jednou</span>' : c.confirm ? '<span class="retry-tag" style="color:var(--cobalt)">a teď to napiš</span>' : c.isNew ? '<span class="retry-tag" style="color:var(--muted);font-weight:400">nové</span>' : '';
+  let h = `<div class="s-head"><button class="x" data-act="quit" aria-label="Ukončit trénink">×</button><div class="bar"><i style="width:${session.done / session.total * 100}%"></i></div><span class="count">${session.done} / ${session.total}</span></div><div class="card">${tag}<div class="tense">Úroveň ${c.lvl} <span>${c.lvl === 4 && !c.translate ? 'doplň sloveso (s nápovědou)' : L.name.toLowerCase()}</span></div>`;
+  if (c.lvl === 1) h += `<div class="inf czprompt">${esc(c.v.cz)}</div><div class="cz">Jak se to řekne španělsky?</div>`;
+  else if (c.lvl === 2) h += `<div class="inf czprompt">${esc(c.v.cz)}</div><div class="who">${E.PRON_CZ[c.person]} <span class="muted" style="font-style:normal;font-size:16px">(${E.PRON[c.person]})</span></div>`;
+  else if (c.translate) h += `<div class="sentence czbig">${esc(c.czs)}</div><div class="hintline" id="hints">${c.hintVerb ? hintPills(c) : ''}</div>`;
+  else h += `<div class="sentence" id="sent">${esc(c.es).replace('___', '<span class="gap">&nbsp;</span>')}</div><div class="cz">${esc(c.czs)}</div><div class="hintline">${hintPills(c)}</div>`;
+  h += '</div><div class="answer" id="answer">';
+  if (c.mode === 'mc') h += '<div class="opts">' + c.options.map((o, i) => `<button class="opt" data-opt="${i}"><kbd>${i + 1}</kbd><span>${esc((c.prefix ? c.prefix + ' ' : '') + o)}</span></button>`).join('') + '</div><button class="linkbtn" data-act="dunno">Nevím, ukaž odpověď</button>';
+  else h += `<div class="typed" id="typed"><input id="inp" type="text" lang="es" enterkeyhint="done" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="${c.translate ? 'napiš celou větu španělsky' : 'napiš tvar slovesa'}" aria-label="Tvoje odpověď"></div>
+    <div class="accents">${['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ'].map(a => `<button type="button" data-acc="${a}" tabindex="-1">${a}</button>`).join('')}</div>
+    <div class="actions"><button class="btn ghost" data-act="dunno">Nevím</button><button class="btn primary" data-act="submit">Zkontrolovat</button></div>${c.translate ? `<div class="hintrow">${c.hintVerb ? '' : '<button class="linkbtn" data-act="hint-verb">Napovědět sloveso</button>'}<button class="linkbtn" data-act="hint-cloze">Ukázat španělskou větu s mezerou</button></div>` : ''}`;
+  h += '</div><div id="fb"></div>'; $('#s-session .wrap').innerHTML = h; const inp = $('#inp'); if (inp) inp.focus({ preventScroll: true });
+}
+function answer(input, viaOption) {
+  if (session.answered) return; const c = session.card; session.answered = true;
+  const res = input == null ? { ok: false, dunno: true } : check(c, input);
+  grade(c.key, res.ok, c.person, c.mode === 'type', c.retry);
+  if (!c.retry) { session.first++; if (res.ok) session.firstOk++; }
+  const shown = (c.prefix ? c.prefix + ' ' : '') + c.correct;
+  if (!res.ok) {
+    if (!session.misses.some(m => m.key === c.key)) session.misses.push({ key: c.key, raw: session.cardRaw, show: c.es ? filled(c) : shown, what: 'úroveň ' + c.lvl + ' · ' + c.v.inf + ' (' + c.v.cz + ')' + (c.lvl === 2 ? ' · ' + E.PRON[c.person] : ''), yours: input || '' });
+    session.queue.splice(Math.min(3, session.queue.length), 0, { k: session.cardRaw, retry: true, force: { person: c.person } }); session.total++;
+  } else if (c.lvl === 3 && c.isNew && c.mode === 'mc' && S.set.mode === 'auto' && !c.retry) { session.queue.splice(Math.min(5, session.queue.length), 0, { k: session.cardRaw, retry: false, force: { confirm: true } }); session.total++; }
+  session.done++;
+  if (c.mode === 'mc') { document.querySelectorAll('.opt').forEach((b, i) => { b.disabled = true; if (c.answers.map(norm).includes(norm(c.options[i]))) b.classList.add('ok'); else if (i === viaOption) b.classList.add('bad'); else b.classList.add('dim'); }); const l = document.querySelector('#answer .linkbtn'); if (l) l.remove(); }
+  else { $('#typed').classList.add(res.ok ? 'ok' : 'bad'); const ip = $('#inp'); ip.dataset.locked = ip.value;['.actions', '.accents', '.hintrow'].forEach(s => { const e = document.querySelector(s); if (e) e.remove(); }); }
+  const gap = document.querySelector('#sent .gap'); if (gap) { gap.textContent = capIf(c, c.correct); gap.classList.add(res.ok ? 'ok' : 'shown'); }
+  const kind = res.ok ? (res.accent ? 'warn' : '') : (res.accent ? 'warn bad' : 'bad');
+  const verdict = res.dunno ? 'Správná odpověď' : (c.translate && res.ok && !res.accent) ? (res.full ? 'Správně, celá věta sedí' : 'Sloveso správně. Zbytek věty porovnej se vzorem') : res.ok ? (res.accent ? 'Uznáno, ale pozor na čárku' : ['Správně', 'Přesně tak', 'Sedí'][Math.floor(Math.random() * 3)]) : (res.accent ? 'Skoro – chybí nebo přebývá čárka' : 'Špatně');
+  const sayText = c.es ? filled(c) : shown;
+  let h = `<div class="fb ${kind}"><div class="verdict">${verdict}</div><div class="right"><span>${esc(shown)}</span>${canSpeak() ? `<button class="say" data-say="${esc(sayText)}" aria-label="Přehrát výslovnost">${ICON_SAY}</button>` : ''}</div>`;
+  if (c.translate) {
+    const mine = new Set(norm(input || '').split(' ').map(E.deaccent));
+    const parts = c.es.split('___').map(seg => seg.split(/(\s+)/).map(w => { const n = E.deaccent(norm(w)); return (!n || mine.has(n) || res.full || !input || !res.ok) ? esc(w) : `<u class="lack">${esc(w)}</u>`; }).join(''));
+    h += `<div class="full">${parts[0]}<b>${esc(capIf(c, c.correct))}</b>${parts[1] || ''}</div>`;
+    if (input && !res.full) h += `<div class="yours">Tvoje věta: <span class="es" style="font-size:18px">${esc(input)}</span></div>` + (res.ok ? '<div class="yours muted">Podtržená slova ve vzoru ve tvé větě chybí nebo jsou jinak.</div>' : '');
+  } else if (!res.ok && input) h += `<div class="yours">Tvoje odpověď: <s>${esc(input)}</s></div>`;
+  if (c.answers.length > 1) h += `<div class="yours">Správně je i: <span class="es">${c.answers.slice(1).map(esc).join(', ')}</span></div>`;
+  if (c.lvl === 1) h += `<div class="full">${esc(filled({ es: c.v.es, correct: c.v.ans || E.pres(c.v.inf, c.v.p) }))}</div><div class="yours muted">${esc(c.v.czs)}</div>`;
+  else h += `<div class="note">${esc(note(c.v.inf))}</div>`;
+  const irrP = E.irregularPersons(c.v.inf);
+  h += `<details class="conj"><summary>Celé časování: ${esc(c.v.inf)}</summary><table class="ct">` + [0, 1, 2, 3, 4, 5].filter(p => p !== 4 || S.set.vos).map(p => `<tr class="${p === c.person && c.lvl > 1 ? 'me' : ''}"><td>${PRON_S[p]}</td><td class="${irrP.includes(p) ? 'irr' : ''}">${esc((E.isRefl(c.v.inf) ? E.REFL[p] + ' ' : '') + E.pres(c.v.inf, p))}</td></tr>`).join('') + '</table></details>';
+  h += `</div><button class="btn primary next" data-act="next" id="nextbtn">${session.queue.length ? 'Další' : 'Dokončit'}</button>`;
+  $('#fb').innerHTML = h; if (S.set.tts) speak(sayText);
+  const nb = $('#nextbtn'); if (c.mode === 'mc' || !('ontouchstart' in window)) nb.focus({ preventScroll: true }); nb.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+}
+function endSession() {
+  const s = session, pct = s.first ? Math.round(s.firstOk / s.first * 100) : 0;
+  let h = `<div class="sum"><h2>${pct >= 90 ? 'Výborně' : pct >= 70 ? 'Dobrá práce' : 'Tohle chce ještě dřinu'}</h2><p class="muted">${esc(s.title)}</p><div class="score">${pct} %<small> napoprvé</small></div><p class="muted">${s.firstOk} z ${s.first} správně na první pokus${s.misses.length ? '. Chyby sis hned opravil, zůstávají ale v seznamu „Moje chyby“, dokud je nedáš dvakrát po sobě' : ''}.</p>`;
+  if (s.misses.length) h += `<h3 style="margin-top:22px">Na čem jsi zaváhal</h3>` + s.misses.map(m => `<div class="miss"><div class="f">${esc(m.show)}</div><div class="w">${esc(m.what)}${m.yours ? ' · tvoje odpověď: ' + esc(m.yours) : ''}</div></div>`).join('') + `<button class="btn primary" data-act="redo" style="margin-top:12px">Projet chyby ještě jednou</button>`;
+  h += `<button class="btn ghost" data-act="more" style="margin-top:10px">Dalších ${S.set.len} položek</button><button class="btn ghost" data-act="home" style="margin-top:10px">Zpět na přehled</button></div>`;
+  $('#s-summary .wrap').innerHTML = h; show('summary');
+}
+
+/* ===== mosaic ===== */
+function qLevel(k) { if (!isSeen(k)) return ''; if (isMistake(k)) return 'qx'; const b = st(k)[0]; return b >= 5 ? 'q3' : b >= 3 ? 'q2' : 'q1'; }
+function renderMosaic() {
+  const keys = Object.keys(S.items), known = keys.filter(isKnown).length, total = [1, 2, 3, 4].reduce((n, l) => n + levelPool(l, true).length, 0);
+  const hard = {}; keys.forEach(k => { const s = S.items[k], id = k.slice(2); if (s[2] > 0 && VMAP[id]) hard[id] = (hard[id] || 0) + s[2]; });
+  const hardest = Object.entries(hard).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  let h = `<div class="doc"><h2>Mozaika</h2></div><p class="muted" style="margin:0">Každá dlaždice je jedno sloveso, čtyři lístky jsou čtyři úrovně. Klepni na dlaždici a uvidíš časování.</p>
+  <div class="stats"><div class="stat"><b>${known}</b><span>položek umíš</span></div><div class="stat"><b>${keys.length}</b><span>už jsi viděl</span></div><div class="stat"><b>${total}</b><span>celkem</span></div></div>
+  <div class="keybox"><div class="tile" aria-hidden="true"><i class="q3"></i><i class="q2"></i><i class="q1"></i><i></i></div><ul><li>↖ 1 · význam</li><li>↗ 2 · osoby</li><li>↙ 3 · ve větě</li><li>↘ 4 · překlad</li></ul></div>
+  <div class="legend"><span><i style="background:var(--line)"></i>neviděno</span><span><i style="background:var(--pale)"></i>učím se</span><span><i style="background:var(--cobalt)"></i>umím</span><span><i style="background:var(--saffron)"></i>umím dlouhodobě</span><span><i style="background:var(--bad)"></i>chyba k opravě</span></div>
+  <input class="search" id="vsearch" type="search" placeholder="Najdi sloveso (španělsky nebo česky)" autocomplete="off" autocapitalize="none" spellcheck="false"><div id="vresults"></div>`;
+  for (const b of BANDS.slice(1)) { const vs = VERBS.slice(b[2], b[3]); const done = vs.filter(v => [1, 2, 3].every(n => isKnown(n + ':' + v.inf))).length; h += `<div class="bandtitle"><span>${b[1]}</span><span>${done} / ${vs.length} umíš do úrovně 3</span></div><div class="mosaic">${vs.map(v => `<button class="tile" data-verb="${esc(v.inf)}" title="${esc(v.inf)}" aria-label="${esc(v.inf)}">${[1, 2, 3, 4].map(n => `<i class="${qLevel(n + ':' + v.inf)}"></i>`).join('')}</button>`).join('')}</div>`; }
+  if (hardest.length) h += `<div class="group"><h2>Tvoje nejtěžší slovesa</h2><p>Klepnutím spustíš trénink jen na to sloveso.</p>${hardest.map(([inf, n]) => `<button class="hard" data-drill="${esc(inf)}"><span><span class="v">${esc(inf)}</span> <span class="muted">${esc(VMAP[inf].cz)}</span></span><span class="n">${n}× špatně</span></button>`).join('')}</div>`;
+  $('#s-mosaic .wrap').innerHTML = h;
+}
+function openVerb(inf) {
+  const v = VMAP[inf]; if (!v) return; const irr = E.irregularPersons(inf);
+  $('#sheet').innerHTML = `<button class="closer" data-act="close-sheet" aria-label="Zavřít">×</button><h2>${esc(inf)}</h2><div class="cz">${esc(v.cz)} · ${v.rank + 1}. v pořadí</div><h3>Presente</h3>
+  <table class="ct">${[0, 1, 2, 3, 4, 5].map(p => `<tr><td>${E.PRON[p]}</td><td class="${irr.includes(p) ? 'irr' : ''}">${esc((E.isRefl(inf) ? E.REFL[p] + ' ' : '') + E.pres(inf, p))}</td></tr>`).join('')}</table>
+  <div class="muted" style="font-size:15px;margin-top:10px">${esc(note(inf))}</div><h3>Ve větě</h3><div class="es" style="font-size:19px">${esc(filled({ es: v.es, correct: v.ans || E.pres(inf, v.p) }))}</div><div class="muted">${esc(v.czs)}</div>
+  <button class="btn primary" data-drill="${esc(inf)}" style="margin-top:16px">Procvičit jen tohle sloveso</button>`; $('#sheet-bg').hidden = false;
+}
+
+/* ===== forms cheat sheet (generated from the verb list) ===== */
+function renderCheat() {
+  const el = $('#s-sheet .wrap'); if (el.dataset.done) return;
+  const by = k => VERBS.filter(v => E.klass(v.inf) === k && !E.isRefl(v.inf));
+  const list = (vs, p) => vs.map(v => `<span class="vchip" data-verb="${esc(v.inf)}">${esc(v.inf)} → <b>${esc(E.pres(v.inf, p == null ? 0 : p))}</b></span>`).join(' ');
+  const tbl = inf => `<td class="es">${[0, 1, 2, 3, 4, 5].map(p => E.pres(inf, p)).join('<br>')}</td>`;
+  el.innerHTML = `<div class="doc"><h2>Tvary</h2><p class="muted" style="margin:0 0 14px">Přítomný čas (presente de indicativo). Seznamy jsou vytažené přímo z pětistovky sloves v aplikaci; klepnutím na sloveso otevřeš jeho časování.</p>
+  <details open><summary>Pravidelné koncovky</summary><div class="body"><div class="tbl"><table><tr><th></th><th>-ar · hablar</th><th>-er · comer</th><th>-ir · vivir</th></tr>${[0, 1, 2, 3, 4, 5].map(p => `<tr><td>${E.PRON[p]}</td><td class="es">habl<b>${E.pres('hablar', p).slice(4)}</b></td><td class="es">com<b>${E.pres('comer', p).slice(3)}</b></td><td class="es">viv<b>${E.pres('vivir', p).slice(3)}</b></td></tr>`).join('')}</table></div><p style="margin-top:10px">-er a -ir se liší jen v nosotros a vosotros. Osobní zájmeno se většinou vynechává, osobu nese koncovka.</p></div></details>
+  <details><summary>Bota: změna kmene e → ie (${by('ie').length})</summary><div class="body"><p>Kmen se mění jen v yo, tú, él a ellos: <span class="es">pienso, piensas, piensa, <b>pensamos, pensáis</b>, piensan.</span></p><p class="chipsflow">${list(by('ie'))}</p></div></details>
+  <details><summary>Bota: změna kmene o → ue (${by('ue').length})</summary><div class="body"><p><span class="es">puedo, puedes, puede, <b>podemos, podéis</b>, pueden.</span> Patří sem i jugar (u → ue).</p><p class="chipsflow">${list(by('ue'))}</p></div></details>
+  <details><summary>Bota: změna kmene e → i (${by('i').length + by('reir').length})</summary><div class="body"><p>Jen slovesa na -ir: <span class="es">pido, pides, pide, <b>pedimos, pedís</b>, piden.</span></p><p class="chipsflow">${list(by('i').concat(by('reir')))}</p></div></details>
+  <details><summary>První osoba na -go (${by('go').length})</summary><div class="body"><p>Nepravidelné je hlavně yo. Tener, venir a decir mají navíc změnu v botě.</p><p class="chipsflow">${list(by('go'))}</p></div></details>
+  <details><summary>První osoba na -zco (${by('zco').length})</summary><div class="body"><p>Samohláska + -cer / -cir: <span class="es">conozco, conoces, conoce…</span></p><p class="chipsflow">${list(by('zco'))}</p></div></details>
+  <details><summary>Pravopis v první osobě: -jo, -go, -zo (${by('orth').length})</summary><div class="body"><p>Výslovnost zůstává, mění se jen písmeno: <span class="es">coger → cojo, seguir → sigo, vencer → venzo.</span></p><p class="chipsflow">${list(by('orth'))}</p></div></details>
+  <details><summary>-uir → -y- a přízvuk na í / ú (${by('uir').length + by('acc').length})</summary><div class="body"><p><span class="es">construyo, construyes… construimos</span> · <span class="es">envío, envías… enviamos</span> · <span class="es">continúo… continuamos</span></p><p class="chipsflow">${list(by('uir').concat(by('acc')))}</p></div></details>
+  <details><summary>Zcela nepravidelná</summary><div class="body"><div class="tbl"><table><tr><th>ser</th><th>estar</th><th>ir</th><th>haber</th><th>dar</th></tr><tr>${['ser', 'estar', 'ir', 'haber', 'dar'].map(tbl).join('')}</tr></table></div><div class="tbl" style="margin-top:12px"><table><tr><th>ver</th><th>saber</th><th>caber</th><th>oír</th><th>oler</th></tr><tr>${['ver', 'saber', 'caber', 'oír', 'oler'].map(tbl).join('')}</tr></table></div><p style="margin-top:10px">„Je / jsou někde“ se řekne neosobním <span class="es"><b>hay</b></span>: <span class="es">Hay mucha gente.</span></p></div></details>
+  <details><summary>Zvratná slovesa</summary><div class="body"><p>Zájmeno stojí před slovesem a mění se podle osoby: <span class="es"><b>me</b> levanto, <b>te</b> levantas, <b>se</b> levanta, <b>nos</b> levantamos, <b>os</b> levantáis, <b>se</b> levantan.</span> V aplikaci je zájmeno vždy předepsané, doplňuješ jen sloveso.</p></div></details>
+  <details><summary>Jak aplikace funguje</summary><div class="body"><p>Každé sloveso má čtyři úrovně a každá úroveň vlastní rozvrh opakování: po správné odpovědi se vrátí za 1, 3, 7, 16 a 35 dní. Chyba položku vrátí na začátek, v tréninku se objeví znovu o pár karet později a trénink neskončí, dokud ji nedáš správně.</p><p>Na úrovni 3 nové sloveso poprvé vybíráš ze čtyř možností a hned potom ho píšeš. Na úrovni 4 píšeš celou větu; aplikace hlídá sloveso ve správném tvaru a zbytek věty ti ukáže k porovnání. „Umím“ znamená správně napoprvé a znovu s odstupem dní.</p></div></details></div>`;
+  el.dataset.done = 1;
+}
+
+/* ===== settings ===== */
+function renderSettings() {
+  const seg = (key, opts) => `<div class="seg" role="group">${opts.map(([v, l]) => `<button data-set="${key}" data-val="${v}" aria-pressed="${String(S.set[key]) === String(v)}">${l}</button>`).join('')}</div>`;
+  const sw = key => `<button class="switch" role="switch" aria-checked="${!!S.set[key]}" data-toggle="${key}" aria-label="přepnout"></button>`;
+  $('#s-settings .wrap').innerHTML = `<div class="doc"><h2>Nastavení</h2></div>
+  <div class="set"><div class="line"><div>Úroveň 3: způsob odpovídání<small>Chytrý mix = nové sloveso výběrem, pak psaním. Úrovně 1 a 2 jsou vždy výběr, úroveň 4 vždy psaní.</small></div></div><div class="line" style="justify-content:flex-start">${seg('mode', [['auto', 'Chytrý mix'], ['mc', 'Jen výběr'], ['type', 'Jen psaní']])}</div>
+  <div class="line"><div>Délka tréninku<small>Chyby se přidávají navíc.</small></div>${seg('len', [[10, '10'], [20, '20'], [40, '40']])}</div>
+  <div class="line"><div>Denní cíl<small>Série se počítá od 10 odpovědí za den.</small></div>${seg('goal', [[20, '20'], [30, '30'], [60, '60'], [100, '100']])}</div></div>
+  <div class="set"><div class="line"><div>Přísně na čárky<small>está × esta, sé × se. Když vypneš, chybná čárka se uzná s upozorněním.</small></div>${sw('strict')}</div>
+  <div class="line"><div>Zkoušet i vosotros<small>Vypni pro latinskoamerickou španělštinu.</small></div>${sw('vos')}</div>
+  ${canSpeak() ? `<div class="line"><div>Po odpovědi přečíst nahlas</div>${sw('tts')}</div>` : ''}</div>
+  <div class="set"><div class="line" style="display:block"><div>Záloha a přenos postupu<small>Postup se ukládá jen v tomto prohlížeči. Kódem ho přeneseš na jiné zařízení; při vložení se sloučí.</small></div>
+  <textarea class="code" id="code" placeholder="Sem vlož kód se zálohou" spellcheck="false"></textarea><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px"><button class="chip" data-act="export">Vytvořit a zkopírovat kód</button><button class="chip" data-act="import">Načíst vložený kód</button></div></div></div>
+  <button class="btn danger" data-act="reset">Smazat veškerý postup</button><p class="muted" style="font-size:14px;margin-top:14px">Pořadí sloves vychází z frekvence v korpusu filmových titulků a je ručně upravené. Tvary jsou ověřené proti databázi časování Freda Jehleho.</p>`;
+}
+function mergeIn(data) { for (const k in data.items || {}) { const r = data.items[k], l = S.items[k]; if (Array.isArray(r) && (!l || (r[4] || 0) > (l[4] || 0))) S.items[k] = r; } for (const d in data.days || {}) { const r = data.days[d], l = S.days[d]; if (!l || r[0] > l[0]) S.days[d] = r; } }
+
+/* ===== events ===== */
+function setSetting(k, v) { S.set[k] = v; saveLocal(); }
+document.addEventListener('click', e => {
+  const t = e.target.closest('button,[data-act],[data-verb]'); if (!t) { if (e.target.id === 'sheet-bg') $('#sheet-bg').hidden = true; return; } const d = t.dataset;
+  if (d.go) return show(d.go);
+  if (d.band) { setSetting('band', d.band); return renderHome(); }
+  if (d.level) { const n = +d.level; return startSession('Úroveň ' + n + ' · ' + LEVELS[n - 1].name, buildLevel(n, S.set.len), () => buildLevel(n, S.set.len)); }
+  if (d.verb) return openVerb(d.verb);
+  if (d.drill) { $('#sheet-bg').hidden = true; return startSession('Sloveso ' + d.drill, buildVerb(d.drill)); }
+  if (d.opt != null) return answer(session.card.options[+d.opt], +d.opt);
+  if (d.say) return speak(d.say);
+  if (d.acc) { const inp = $('#inp'); if (!inp || session.answered) return; const s = inp.selectionStart ?? inp.value.length, en = inp.selectionEnd ?? s; inp.value = inp.value.slice(0, s) + d.acc + inp.value.slice(en); inp.focus(); inp.setSelectionRange(s + 1, s + 1); return; }
+  if (d.set) { setSetting(d.set, isNaN(+d.val) ? d.val : +d.val); return renderSettings(); }
+  if (d.toggle) { setSetting(d.toggle, !S.set[d.toggle]); return renderSettings(); }
+  switch (d.act) {
+    case 'daily': return startSession('Denní trénink', buildDaily(S.set.len), () => buildDaily(S.set.len));
+    case 'mistakes': return startSession('Oprava chyb', buildMistakes(Math.max(S.set.len, 10)));
+    case 'submit': { const v = $('#inp').value; if (!v.trim()) { $('#inp').focus(); return toast('Napiš odpověď, nebo zvol „Nevím“.'); } return answer(v); }
+    case 'dunno': return answer(null);
+    case 'hint-verb': session.card.hintVerb = true; $('#hints').innerHTML = hintPills(session.card); t.remove(); $('#inp').focus(); return;
+    case 'hint-cloze': session.card.translate = false; return renderCard();
+    case 'next': return nextCard();
+    case 'quit': if (!session || !session.done || confirm('Ukončit trénink? Odpovědi, které už máš, zůstanou uložené.')) show('home'); return;
+    case 'home': return show('home');
+    case 'redo': return startSession('Oprava chyb z tréninku', session.misses.map(m => m.raw));
+    case 'more': return session.again ? startSession(session.title, session.again(), session.again) : show('home');
+    case 'close-sheet': $('#sheet-bg').hidden = true; return;
+    case 'export': { const code = btoa(unescape(encodeURIComponent(JSON.stringify({ items: S.items, days: S.days })))); $('#code').value = code; $('#code').select(); (navigator.clipboard ? navigator.clipboard.writeText(code) : Promise.reject()).then(() => toast('Kód je ve schránce'), () => toast('Kód je připravený, zkopíruj ho ručně')); return; }
+    case 'import': { try { const data = JSON.parse(decodeURIComponent(escape(atob($('#code').value.trim())))); if (!data.items) throw 0; mergeIn(data); saveLocal(); toast('Postup načten a sloučen'); } catch (err) { toast('Tenhle kód se nepodařilo přečíst. Zkopíruj ho znovu celý.'); } return; }
+    case 'reset': if (confirm('Opravdu smazat veškerý postup? Tohle nejde vrátit.')) { S.items = {}; S.days = {}; saveLocal(); toast('Postup smazán'); renderSettings(); } return;
+  }
+});
+document.addEventListener('pointerdown', e => { if (e.target.closest('[data-acc]')) e.preventDefault(); });
+document.addEventListener('keydown', e => {
+  if (screen !== 'session' || !session) return;
+  if (e.key === 'Enter') { e.preventDefault(); if (session.answered) return nextCard(); const inp = $('#inp'); if (inp && inp.value.trim()) answer(inp.value); return; }
+  if (!session.answered && session.card.mode === 'mc' && /^[1-4]$/.test(e.key)) { const i = +e.key - 1; if (session.card.options[i]) answer(session.card.options[i], i); }
+});
+document.addEventListener('input', e => {
+  if (e.target.id === 'inp' && session && session.answered) e.target.value = e.target.dataset.locked ?? e.target.value;
+  if (e.target.id === 'vsearch') { const deCz = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase(), q = deCz(e.target.value.trim()); const res = q.length < 2 ? [] : VERBS.filter(v => deCz(v.inf).startsWith(q) || deCz(v.cz).includes(q)).slice(0, 8); $('#vresults').innerHTML = res.map(v => `<button class="hard" data-verb="${esc(v.inf)}"><span><span class="v">${esc(v.inf)}</span> <span class="muted">${esc(v.cz)}</span></span><span class="muted" style="font-size:14px">#${v.rank + 1}</span></button>`).join('') + (q.length >= 2 && !res.length ? '<div class="empty">Tohle sloveso v seznamu není.</div>' : ''); }
+});
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') { try { localStorage.setItem(LS_KEY, JSON.stringify(S)); } catch (e) { } } });
+
+/* ===== boot ===== */
+document.body.classList.add('nav-top'); loadLocal(); if (canSpeak()) { initVoices(); try { speechSynthesis.onvoiceschanged = initVoices; } catch (e) { } }
+show('home');
+
+if (/[?&]dyhtest/.test(location.search)) { const g = { session: () => session, S: () => S, filled: () => filled, isMistake: () => isMistake, LS_KEY: () => LS_KEY }; for (const k in g) Object.defineProperty(window, k, { get: g[k], configurable: true }); }
+})();
+</script>
+</body>
+</html>
