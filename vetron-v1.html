@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Větroň nad krajinou</title>
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#8fb46a;}
+  canvas{display:block;}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+(() => {
+'use strict';
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+let W = 0, H = 0, DPR = 1, TDPR = 1;
+
+// ================= měřítka a projekce =================
+const M = 2.5;          // metrů na pixel (vodorovně)
+const TILT = 0.62;      // zkrácení hloubky (šikmý pohled)
+const COSB = Math.sqrt(1 - TILT * TILT);
+const KZ = 0.12;        // px na metr výšky (výška nad terénem)
+const HZ = 0.30;        // px na metr – vertikální tvar mraku
+const SPR = 6.6;        // px na metr – model větroně (zvětšená miniatura)
+const TS = 256;         // velikost dlaždice krajiny
+const BASE = 1150;      // základna kumulů [m]
+const SHX = 0.07, SHY = -0.05; // posun stínu na metr výšky (slunce vysoko od SZ)
+const G = 9.81, DEG = Math.PI / 180;
+const TIME_SCALES = [1, 2, 3, 5];
+
+// ================= rychlostní polára (odečteno z grafu, 350 kg) =================
+const POLAR = [[70,0.60],[75,0.55],[80,0.55],[85,0.57],[90,0.62],[95,0.68],[100,0.74],[105,0.80],[110,0.87],[115,0.96],[120,1.06],[125,1.16],[130,1.27],[135,1.38],[140,1.50],[145,1.63],[150,1.76],[155,1.90],[160,2.06],[165,2.22],[170,2.40],[175,2.58],[180,2.76],[185,2.95],[190,3.15],[195,3.40],[200,3.65]];
+function polar(v) {
+  if (v <= POLAR[0][0]) return POLAR[0][1];
+  for (let i = 1; i < POLAR.length; i++) {
+    if (v <= POLAR[i][0]) {
+      const a = POLAR[i - 1], b = POLAR[i];
+      return a[1] + (b[1] - a[1]) * (v - a[0]) / (b[0] - a[0]);
+    }
+  }
+  return POLAR[POLAR.length - 1][1];
+}
+const SINK90 = polar(90);           // 0,62 m/s
+// mezi mraky: vzduch mírně klesá, aby větroň při 90 km/h ztrácel 1 m/s
+
+const rand = (a, b) => a + Math.random() * (b - a);
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const lerp = (a, b, t) => a + (b - a) * t;
+
+// ================= šum =================
+function hash(ix, iy, s) {
+  let h = (Math.imul(ix, 0x27d4eb2d) ^ Math.imul(iy, 0x165667b1) ^ Math.imul(s, 0x9e3779b1)) | 0;
+  h = Math.imul(h ^ (h >>> 15), 0x85ebca6b);
+  h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35);
+  h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
+}
+function vnoise(x, y, s) {
+  const ix = Math.floor(x), iy = Math.floor(y);
+  let fx = x - ix, fy = y - iy;
+  fx = fx * fx * (3 - 2 * fx); fy = fy * fy * (3 - 2 * fy);
+  const a = hash(ix, iy, s), b = hash(ix + 1, iy, s), c = hash(ix, iy + 1, s), d = hash(ix + 1, iy + 1, s);
+  return (a + (b - a) * fx + (c - a) * fy + (a - b - c + d) * fx * fy) * 2 - 1;
+}
+function fbm(x, y, o, s) {
+  let sum = 0, amp = 1, norm = 0;
+  for (let i = 0; i < o; i++) {
+    sum += vnoise(x, y, s + i * 17) * amp; norm += amp; amp *= 0.5; x *= 2.03; y *= 2.03;
+  }
+  return sum / norm;
+}
+
+// ================= krajina =================
+const WATER_T = 0.36, RIVER_W = 0.011, ROAD_W = 0.0045, TOWN_T = 0.2, FOREST_T = 0.15;
+function elev(x, y) { return fbm(x / 2600, y / 2600, 3, 11); }
+// 0 pole, 1 les, 2 obec, 3 voda, 4 silnice, 5 řeka
+const rvF = (x, y) => fbm(x / 6000, y / 6000, 3, 37) + fbm(x / 800, y / 800, 2, 41) * 0.03;
+const r1F = (x, y) => fbm(x / 4200, y / 4200, 2, 53);
+const r2F = (x, y) => fbm(x / 3300 + 77, y / 3300, 2, 59);
+// přibližná vzdálenost [m] od nulové vrstevnice šumu (řeky, silnice mají stálou šířku)
+function lineDist(f, x, y, v, lim) {
+  if (Math.abs(v) > lim) return 1e9;
+  const gx = (f(x + 6, y) - v) / 6, gy = (f(x, y + 6) - v) / 6;
+  return Math.abs(v) / Math.max(1e-7, Math.hypot(gx, gy));
+}
+const RIVER_HW = 15, ROAD_HW = 5.5;
+function roadDist(x, y) {
+  return Math.min(lineDist(r1F, x, y, r1F(x, y), 0.03), lineDist(r2F, x, y, r2F(x, y), 0.03));
+}
+function townVal(x, y, rdm) { return fbm(x / 1800, y / 1800, 2, 61) - clamp(rdm / 700, 0, 1) * 0.55; }
+// 0 pole, 1 les, 2 obec, 3 voda, 4 silnice, 5 řeka
+function landAt(x, y) {
+  const e = elev(x, y);
+  const wl = fbm(x / 1300, y / 1300, 3, 23) * 0.9 - e * 0.5;
+  if (wl > WATER_T) return 3;
+  if (lineDist(rvF, x, y, rvF(x, y), 0.04) < RIVER_HW) return 5;
+  const rdm = roadDist(x, y);
+  if (rdm < ROAD_HW) return 4;
+  if (townVal(x, y, rdm) > TOWN_T) return 2;
+  const fo = fbm(x / 1100, y / 1100, 4, 71) + e * 0.3;
+  if (fo > FOREST_T) return 1;
+  return 0;
+}
+function townDensity(x, y) { return townVal(x, y, roadDist(x, y)); }
+
+const FIELD_PAL = [[146,184,82],[172,200,98],[120,168,74],[214,196,110],[226,208,122],[190,152,100],[160,196,100],[236,214,84],[137,176,90],[196,182,120],[110,158,70],[205,178,112]];
+
+const tiles = new Map();
+let job = null;
+const tkey = (tx, ty) => tx + ',' + ty;
+
+function newJob(tx, ty) {
+  return { tx, ty, stage: 0, row: 0, E: new Float32Array((TS + 1) * (TS + 1)), img: null, small: null };
+}
+function stepJob(j) {
+  const S1 = TS + 1;
+  if (j.stage === 0) { // výšková mapa
+    const end = Math.min(S1, j.row + 48);
+    for (let v = j.row; v < end; v++) {
+      const y = -(j.ty * TS + v + 0.5) * M / TILT;
+      for (let u = 0; u < S1; u++) j.E[v * S1 + u] = elev((j.tx * TS + u + 0.5) * M, y);
+    }
+    j.row = end;
+    if (end >= S1) { j.stage = 1; j.row = 0; j.small = document.createElement('canvas'); j.small.width = TS; j.small.height = TS; j.img = j.small.getContext('2d').createImageData(TS, TS); }
+    return;
+  }
+  if (j.stage === 1) { // barvy terénu
+    const D = j.img.data;
+    const end = Math.min(TS, j.row + 20);
+    for (let v = j.row; v < end; v++) {
+      const y = -(j.ty * TS + v + 0.5) * M / TILT;
+      for (let u = 0; u < TS; u++) {
+        const x = (j.tx * TS + u + 0.5) * M;
+        const e = j.E[v * S1 + u];
+        const ex = (j.E[v * S1 + u + 1] - e) / M, ey = (j.E[(v + 1) * S1 + u] - e) / (M / TILT);
+        let shade = clamp(1 + (ex + ey) * 750 + e * 0.14, 0.72, 1.22);
+        let r, g, b;
+        const wl = fbm(x / 1300, y / 1300, 3, 23) * 0.9 - e * 0.5;
+        if (wl > WATER_T) {
+          const dp = clamp((wl - WATER_T) / 0.07, 0, 1);
+          r = lerp(104, 48, dp); g = lerp(166, 118, dp); b = lerp(190, 164, dp);
+          const gl = vnoise(x / 30, y / 14, 5);
+          if (gl > 0.8) { r += 14; g += 16; b += 14; }
+          shade = 1;
+        } else if (wl > WATER_T - 0.018) {
+          r = 104; g = 138; b = 74;           // rákosí
+        } else {
+          const rvd = lineDist(rvF, x, y, rvF(x, y), 0.04);
+          if (rvd < RIVER_HW) { r = 72; g = 140; b = 176; shade = 1; }
+          else if (rvd < RIVER_HW * 2.2) { r = 96; g = 150; b = 72; }   // pobřežní louka
+          else {
+            const rd = roadDist(x, y);
+            if (rd < ROAD_HW) {
+              if (rd < ROAD_HW * 0.62) { r = 200; g = 194; b = 180; } else { r = 142; g = 140; b = 128; }
+            } else {
+              const tn = townVal(x, y, rd);
+              if (tn > TOWN_T) {
+                const gn = vnoise(x / 22, y / 22, 9);
+                if (gn > 0.15) { r = 128; g = 170; b = 96; } else { r = 186; g = 182; b = 168; }
+              } else {
+                const fo = fbm(x / 1100, y / 1100, 4, 71) + e * 0.3;
+                if (fo > FOREST_T) {
+                  const n = vnoise(x / 9, y / 9, 13) * 0.08;
+                  r = 52 * (1 + n); g = 92 * (1 + n); b = 48 * (1 + n);
+                } else {
+                  // pole – mozaika
+                  const ang = fbm(x / 7000, y / 7000, 1, 83) * 1.3;
+                  const ca = Math.cos(ang), sa = Math.sin(ang);
+                  const fu = x * ca + y * sa, fv = -x * sa + y * ca;
+                  const rowH = 150, row = Math.floor(fv / rowH);
+                  const cw = 200 + hash(row, 1, 97) * 170, off = hash(row, 0, 89) * 400;
+                  const col = Math.floor((fu + off) / cw);
+                  const P = FIELD_PAL[Math.floor(hash(col, row, 101) * FIELD_PAL.length)];
+                  r = P[0]; g = P[1]; b = P[2];
+                  const du = (fu + off) / cw - col, dv = fv / rowH - row;
+                  const stripe = Math.sin(fu * 0.9) * 0.035;
+                  r *= 1 + stripe; g *= 1 + stripe; b *= 1 + stripe;
+                  if (du < 0.012 || dv < 0.02) { r = r * 0.72; g = g * 0.8; b = b * 0.7; } // meze
+                }
+              }
+            }
+          }
+        }
+        const i = (v * TS + u) * 4;
+        D[i] = clamp(r * shade, 0, 255); D[i + 1] = clamp(g * shade, 0, 255); D[i + 2] = clamp(b * shade, 0, 255); D[i + 3] = 255;
+      }
+    }
+    j.row = end;
+    if (end >= TS) { j.small.getContext('2d').putImageData(j.img, 0, 0); j.stage = 2; }
+    return;
+  }
+  // stage 2: sestavení + stromy a domy
+  const c = document.createElement('canvas');
+  c.width = Math.round(TS * TDPR); c.height = Math.round(TS * TDPR);
+  const t = c.getContext('2d');
+  t.imageSmoothingEnabled = true;
+  t.drawImage(j.small, 0, 0, c.width, c.height);
+  t.setTransform(TDPR, 0, 0, TDPR, 0, 0);
+  drawSprites(t, j.tx, j.ty);
+  tiles.set(tkey(j.tx, j.ty), { canvas: c, tx: j.tx, ty: j.ty, used: 0 });
+  j.stage = 3;
+}
+
+function drawSprites(t, tx, ty) {
+  const items = [];
+  const x0 = (tx * TS - 10) * M, x1 = ((tx + 1) * TS + 10) * M;
+  const yTop = -(ty * TS - 6) * M / TILT, yBot = -((ty + 1) * TS + 18) * M / TILT;
+  // stromy
+  const st = 13;
+  for (let gx = Math.floor(x0 / st); gx <= Math.ceil(x1 / st); gx++) {
+    for (let gy = Math.floor(yBot / st); gy <= Math.ceil(yTop / st); gy++) {
+      const r = hash(gx, gy, 7);
+      if (r > 0.9) continue;
+      const x = (gx + hash(gx, gy, 3)) * st, y = (gy + hash(gx, gy, 5)) * st;
+      const code = landAt(x, y);
+      let ok = false;
+      if (code === 1) ok = r < 0.86;
+      else if (code === 2) ok = r < 0.1;
+      else if (code === 0) ok = r < 0.004;
+      if (!ok) continue;
+      items.push({ k: 0, u: x / M - tx * TS, v: -y / M * TILT - ty * TS, h: hash(gx, gy, 11), con: code === 1 && hash(gx, gy, 13) < 0.45 });
+    }
+  }
+  // domy
+  const sh = 27;
+  for (let gx = Math.floor(x0 / sh); gx <= Math.ceil(x1 / sh); gx++) {
+    for (let gy = Math.floor(yBot / sh); gy <= Math.ceil(yTop / sh); gy++) {
+      const r = hash(gx, gy, 17);
+      if (r > 0.62) continue;
+      const x = (gx + 0.2 + hash(gx, gy, 19) * 0.4) * sh, y = (gy + 0.2 + hash(gx, gy, 23) * 0.4) * sh;
+      if (landAt(x, y) !== 2) continue;
+      const dens = townDensity(x, y);
+      const kind = r < 0.018 ? 2 : (dens > TOWN_T + 0.13 && hash(gx, gy, 29) < 0.35 ? 3 : 1);
+      items.push({ k: kind, u: x / M - tx * TS, v: -y / M * TILT - ty * TS, h: hash(gx, gy, 31), rot: hash(gx, gy, 37) < 0.5 });
+    }
+  }
+  items.sort((a, b) => a.v - b.v);
+  for (const it of items) {
+    if (it.k === 0) drawTree(t, it); else drawHouse(t, it);
+  }
+}
+function drawTree(t, it) {
+  const x = it.u, y = it.v, s = 0.85 + it.h * 0.45;
+  t.fillStyle = 'rgba(20,40,20,0.33)';
+  t.beginPath(); t.ellipse(x + 2.4 * s, y + 0.4, 3.4 * s, 1.5 * s, 0, 0, Math.PI * 2); t.fill();
+  if (it.con) {
+    t.fillStyle = it.h < 0.5 ? '#2c5a36' : '#35663c';
+    t.beginPath(); t.moveTo(x, y - 8 * s); t.lineTo(x + 2.6 * s, y); t.lineTo(x - 2.6 * s, y); t.closePath(); t.fill();
+    t.fillStyle = 'rgba(160,210,140,0.25)';
+    t.beginPath(); t.moveTo(x, y - 8 * s); t.lineTo(x - 2.6 * s, y); t.lineTo(x - 0.4 * s, y); t.closePath(); t.fill();
+  } else {
+    const cols = ['#3f7a38', '#4a8a3c', '#5a9442', '#3a6f35', '#6a9c46'];
+    t.fillStyle = cols[Math.floor(it.h * cols.length)];
+    t.beginPath(); t.arc(x, y - 3.2 * s, 3.4 * s, 0, Math.PI * 2); t.fill();
+    t.fillStyle = 'rgba(200,235,150,0.35)';
+    t.beginPath(); t.arc(x - 1 * s, y - 4.2 * s, 1.7 * s, 0, Math.PI * 2); t.fill();
+  }
+}
+const ROOFS = ['#c4502e', '#b5452b', '#9c3b2a', '#d06a3a', '#a84a30', '#7a6e6a', '#c85a34'];
+function drawHouse(t, it) {
+  const x = it.u, y = it.v;
+  if (it.k === 3) { // panelák
+    const w = 11, d = 4, hh = 10;
+    t.fillStyle = 'rgba(20,30,20,0.3)';
+    t.beginPath(); t.moveTo(x - w / 2, y); t.lineTo(x + w / 2, y); t.lineTo(x + w / 2 + 7, y + 3); t.lineTo(x - w / 2 + 7, y + 3); t.closePath(); t.fill();
+    t.fillStyle = '#ddd8cf'; t.fillRect(x - w / 2, y - hh, w, hh);
+    t.fillStyle = '#b9b3aa'; t.fillRect(x + w / 2 - 1, y - hh - d, 1.2, hh + d);
+    t.fillStyle = '#9d9993'; t.fillRect(x - w / 2, y - hh - d, w, d);
+    t.fillStyle = 'rgba(70,90,110,0.55)';
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 5; c++) t.fillRect(x - w / 2 + 1 + c * 2, y - hh + 1 + r * 2.3, 1, 1);
+    return;
+  }
+  if (it.k === 2) { // kostel
+    t.fillStyle = 'rgba(20,30,20,0.3)'; t.fillRect(x - 3, y, 14, 3);
+    t.fillStyle = '#f2ede2'; t.fillRect(x - 5, y - 4, 10, 4);
+    t.fillStyle = '#b5452b'; t.fillRect(x - 5, y - 8, 10, 4);
+    t.fillStyle = '#f7f3ea'; t.fillRect(x - 8, y - 9, 3.5, 9);
+    t.fillStyle = '#3f7d6a'; t.beginPath(); t.moveTo(x - 6.25, y - 17); t.lineTo(x - 4.3, y - 9); t.lineTo(x - 8.2, y - 9); t.closePath(); t.fill();
+    return;
+  }
+  const w = it.rot ? 5.5 + it.h * 2.5 : 3.8 + it.h * 1.5, d = it.rot ? 3 : 4.5, hh = 2.4;
+  t.fillStyle = 'rgba(20,30,20,0.3)';
+  t.beginPath(); t.moveTo(x - w / 2, y); t.lineTo(x + w / 2, y); t.lineTo(x + w / 2 + 3, y + 1.5); t.lineTo(x - w / 2 + 3, y + 1.5); t.closePath(); t.fill();
+  t.fillStyle = it.h < 0.3 ? '#efe4cc' : it.h < 0.6 ? '#f4efe4' : '#e8d9b8';
+  t.fillRect(x - w / 2, y - hh, w, hh);
+  const roof = ROOFS[Math.floor(it.h * 97) % ROOFS.length];
+  t.fillStyle = roof;
+  if (it.rot) {
+    t.fillRect(x - w / 2 - 0.3, y - hh - d, w + 0.6, d);
+    t.fillStyle = 'rgba(255,255,255,0.22)'; t.fillRect(x - w / 2 - 0.3, y - hh - d, w + 0.6, d * 0.45);
+  } else {
+    t.fillRect(x - w / 2 - 0.3, y - hh - d, w + 0.6, d);
+    t.fillStyle = 'rgba(0,0,0,0.2)'; t.fillRect(x, y - hh - d, w / 2 + 0.3, d);
+  }
+}
+
+function workTiles(budget, need) {
+  const t0 = performance.now();
+  while (performance.now() - t0 < budget) {
+    if (!job) {
+      let best = null, bd = 1e9;
+      for (const n of need) {
+        if (tiles.has(n.k)) continue;
+        if (n.d < bd) { bd = n.d; best = n; }
+      }
+      if (!best) return true;
+      job = newJob(best.tx, best.ty);
+    }
+    stepJob(job);
+    if (job.stage === 3) job = null;
+  }
+  return false;
+}
+
+// ================= mraky =================
+function makePuffSprite(soft, base) {
+  const s = 128, c = document.createElement('canvas'); c.width = c.height = s;
+  const t = c.getContext('2d');
+  const g = t.createRadialGradient(s * 0.36, s * 0.3, 2, s * 0.5, s * 0.5, s * 0.52);
+  g.addColorStop(0, '#ffffff'); g.addColorStop(0.65, '#fbfcfe'); g.addColorStop(0.88, '#eef2f7'); g.addColorStop(1, '#dfe6ee');
+  t.fillStyle = g; t.beginPath(); t.arc(s / 2, s / 2, s / 2 - 1, 0, Math.PI * 2); t.fill();
+  // stín na spodní straně
+  t.globalCompositeOperation = 'source-atop';
+  const sh = t.createLinearGradient(0, s * 0.35, 0, s);
+  sh.addColorStop(0, 'rgba(110,128,150,0)'); sh.addColorStop(1, base ? 'rgba(96,112,134,0.6)' : 'rgba(130,146,168,0.16)');
+  t.fillStyle = sh; t.fillRect(0, 0, s, s);
+  t.globalCompositeOperation = 'source-over';
+  t.globalCompositeOperation = 'destination-in';
+  const m = t.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+  if (soft) { m.addColorStop(0, 'rgba(0,0,0,1)'); m.addColorStop(0.45, 'rgba(0,0,0,0.85)'); m.addColorStop(1, 'rgba(0,0,0,0)'); }
+  else { m.addColorStop(0, 'rgba(0,0,0,1)'); m.addColorStop(0.86, 'rgba(0,0,0,1)'); m.addColorStop(1, 'rgba(0,0,0,0)'); }
+  t.fillStyle = m; t.fillRect(0, 0, s, s);
+  return c;
+}
+const PUFF = { sharp: makePuffSprite(false, false), soft: makePuffSprite(true, false), sharpB: makePuffSprite(false, true), softB: makePuffSprite(true, true) };
+
+let clouds = [];
+function makeCloud(x, y, phase, big) {
+  const Rmax = big ? rand(560, 700) : rand(320, 700);
+  const c = { x, y, Rmax, tG: rand(170, 260) * (0.6 + Rmax / 1000), tM: rand(60, 140), tD: rand(150, 230), t: 0, puffs: [], fade: 1 };
+  const add = (n, dmax, z0, z1, r0, r1) => {
+    for (let i = 0; i < n; i++) {
+      const a = rand(0, Math.PI * 2), d = Math.sqrt(Math.random()) * dmax;
+      const z = rand(z0, z1) * (1 - d * 0.5);
+      c.puffs.push({ dx: Math.cos(a) * d, dy: Math.sin(a) * d * 0.85, z, r: rand(r0, r1), ox: rand(-1, 1), oy: rand(-1, 1) });
+    }
+  };
+  add(24, 0.82, 0, 0.08, 0.2, 0.3);
+  add(20, 0.58, 0.14, 0.7, 0.18, 0.28);
+  add(12, 0.34, 0.66, 1.0, 0.13, 0.22);
+  c.total = c.tG + c.tM + c.tD;
+  c.t = phase * c.total;
+  cloudState(c);
+  return c;
+}
+function cloudState(c) {
+  const t = c.t;
+  if (t < c.tG) {
+    const g = t / c.tG, e = 1 - (1 - g) * (1 - g);
+    c.phase = 0; c.R = c.Rmax * (0.14 + 0.86 * e); c.V = 0.12 + 0.88 * g; c.op = Math.min(1, g / 0.07); c.sharp = 1; c.dd = 0;
+    c.net = 0.5 + 3.5 * clamp(c.R / 700, 0, 1) * c.sharp; c.rr = c.R * 0.75;
+  } else if (t < c.tG + c.tM) {
+    const m = (t - c.tG) / c.tM;
+    c.phase = 1; c.R = c.Rmax; c.V = 1 - 0.1 * m; c.op = 1; c.sharp = 1 - 0.3 * m; c.dd = 0;
+    c.net = 0.5 + 3.5 * clamp(c.R / 700, 0, 1) * c.sharp; c.rr = c.R * 0.75;
+  } else {
+    const d = clamp((t - c.tG - c.tM) / c.tD, 0, 1);
+    c.phase = 2; c.dd = d; c.R = c.Rmax * (1 + 0.3 * d); c.V = Math.max(0.05, 0.9 * (1 - d));
+    c.op = Math.pow(1 - d, 1.2); c.sharp = clamp(0.7 * (1 - d / 0.55), 0, 1);
+    const liftStart = 0.5 + 3.5 * clamp(c.Rmax / 700, 0, 1) * 0.7;
+    if (d < 0.15) c.net = lerp(liftStart, -1, d / 0.15);
+    else if (d < 0.85) c.net = lerp(-1, -5, clamp((d - 0.15) / 0.45, 0, 1));
+    else c.net = lerp(-5, -1, (d - 0.85) / 0.15);
+    c.rr = c.R * 0.9;
+  }
+}
+// výsledné stoupání/klesání při 90 km/h pod daným místem
+function net90At(x, y, alt) {
+  let net = -1;
+  for (const c of clouds) {
+    const dx = x - c.x, dy = y - c.y, d2 = dx * dx + dy * dy;
+    if (d2 < c.rr * c.rr) net += (c.net + 1) * (1 - d2 / (c.rr * c.rr));
+  }
+  net = clamp(net, -5, 4);
+  if (net > -1) net = -1 + (net + 1) * clamp((BASE - 30 - alt) / 200, 0, 1);
+  return net;
+}
+function placeFree(x, y, R) {
+  for (const c of clouds) if (Math.hypot(c.x - x, c.y - y) < (c.Rmax + R) * 0.95) return false;
+  return true;
+}
+function spawnCloud(nearX, nearY, heading, minD, maxD, phase) {
+  for (let k = 0; k < 20; k++) {
+    const a = heading + rand(-1.9, 1.9), d = rand(minD, maxD);
+    const x = nearX + Math.cos(a) * d, y = nearY + Math.sin(a) * d;
+    const c = makeCloud(x, y, phase);
+    if (placeFree(x, y, c.Rmax)) { clouds.push(c); return c; }
+  }
+  return null;
+}
+function setupClouds(x, y, psi) {
+  clouds = [];
+  // jistota: mladý rostoucí kumulus kousek před větroněm
+  const c0 = makeCloud(x + Math.cos(psi) * 1300, y + Math.sin(psi) * 1300, 0.12, true);
+  clouds.push(c0);
+  for (let i = 0; i < 40 && clouds.length < 10; i++) {
+    const a = rand(0, Math.PI * 2), d = rand(900, 4200);
+    const cx = x + Math.cos(a) * d, cy = y + Math.sin(a) * d;
+    const c = makeCloud(cx, cy, rand(0.02, 0.85));
+    if (placeFree(cx, cy, c.Rmax)) clouds.push(c);
+  }
+}
+let spawnT = 0;
+function updateClouds(dtS) {
+  for (const c of clouds) { c.t += dtS; cloudState(c); }
+  clouds = clouds.filter(c => c.t < c.total && Math.hypot(c.x - S.x, c.y - S.y) < 8000);
+  spawnT -= dtS;
+  const near = clouds.filter(c => Math.hypot(c.x - S.x, c.y - S.y) < 4800).length;
+  if (spawnT <= 0 && near < 10) { spawnT = rand(6, 16); spawnCloud(S.x, S.y, S.psi, 1000, 4200, 0); }
+}
+
+// ================= stav větroně =================
+const S = { x: 0, y: 0, psi: 0.3, alt: 650, ias: 90, target: 90, bank: 0, bankCmd: 0, stall: false, stallT: 0,
+  vz: 0, varioD: 0, iasD: 90, altD: 650, dist: 0, time: 0, maxAlt: 200, pitch: 0 };
+let state = 'loading';   // loading | menu | play | paused | over
+let tsIdx = 2;           // rychlost času ×3
+let best = 0, overT = 0, newBest = false, landCode = 0;
+try { best = parseFloat(localStorage.getItem('vetron-rekord-km') || '0') || 0; } catch (e) {}
+
+function startFlight() {
+  S.alt = 200; S.ias = 90; S.target = 90; S.bank = 0; S.bankCmd = 0; S.stall = false;
+  S.vz = -1; S.varioD = -1; S.iasD = 90; S.altD = 200; S.dist = 0; S.time = 0; S.maxAlt = 200;
+  setupClouds(S.x, S.y, S.psi);
+  spawnT = 8;
+  state = 'play';
+}
+
+const keys = { L: false, R: false };
+window.addEventListener('keydown', e => {
+  const k = e.code;
+  if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space'].includes(k)) e.preventDefault();
+  initAudio();
+  if (k === 'ArrowLeft') keys.L = true;
+  if (k === 'ArrowRight') keys.R = true;
+  if (k === 'Space' && !e.repeat) {
+    if (state === 'menu') startFlight();
+    else if (state === 'over' && overT > 1) startFlight();
+    else if (state === 'paused') state = 'play';
+  }
+  if (state === 'play' && !e.repeat) {
+    if (k === 'ArrowUp') {
+      if (S.stall) { S.stall = false; S.ias = 72; S.target = 75; blip(660, 0.08); }
+      else { S.target = Math.min(200, S.target + 5); blip(720, 0.04); }
+    }
+    if (k === 'ArrowDown' && !S.stall) { S.target = Math.max(70, S.target - 5); blip(480, 0.04); }
+  }
+  if (k === 'KeyT' && !e.repeat) tsIdx = (tsIdx + 1) % TIME_SCALES.length;
+  if ((k === 'KeyP' || k === 'Escape') && !e.repeat) { if (state === 'play') state = 'paused'; else if (state === 'paused') state = 'play'; }
+  if (k === 'KeyM' && !e.repeat) muted = !muted;
+});
+window.addEventListener('keyup', e => {
+  if (e.code === 'ArrowLeft') keys.L = false;
+  if (e.code === 'ArrowRight') keys.R = false;
+});
+window.addEventListener('blur', () => { keys.L = keys.R = false; if (state === 'play') state = 'paused'; });
+
+// ================= zvuk =================
+let AC = null, muted = false, master, vOsc, vGain, wGain, wFilt, bOsc, bGain, beepPh = 0;
+function initAudio() {
+  if (AC) { if (AC.state === 'suspended') AC.resume(); return; }
+  try {
+    AC = new (window.AudioContext || window.webkitAudioContext)();
+    master = AC.createGain(); master.gain.value = 0.6; master.connect(AC.destination);
+    vOsc = AC.createOscillator(); vOsc.type = 'triangle'; vOsc.frequency.value = 600;
+    vGain = AC.createGain(); vGain.gain.value = 0; vOsc.connect(vGain); vGain.connect(master); vOsc.start();
+    const n = AC.sampleRate * 2, buf = AC.createBuffer(1, n, AC.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    const src = AC.createBufferSource(); src.buffer = buf; src.loop = true;
+    wFilt = AC.createBiquadFilter(); wFilt.type = 'bandpass'; wFilt.frequency.value = 700; wFilt.Q.value = 0.7;
+    wGain = AC.createGain(); wGain.gain.value = 0;
+    src.connect(wFilt); wFilt.connect(wGain); wGain.connect(master); src.start();
+    bOsc = AC.createOscillator(); bOsc.type = 'square'; bOsc.frequency.value = 92;
+    bGain = AC.createGain(); bGain.gain.value = 0; bOsc.connect(bGain); bGain.connect(master); bOsc.start();
+  } catch (e) { AC = null; }
+}
+function blip(f, d) {
+  if (!AC || muted) return;
+  const t = AC.currentTime, o = AC.createOscillator(), g = AC.createGain();
+  o.frequency.value = f; g.gain.setValueAtTime(0.06, t); g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+  o.connect(g); g.connect(master); o.start(t); o.stop(t + d + 0.02);
+}
+function audioUpdate(dtR) {
+  if (!AC) return;
+  const t = AC.currentTime, on = state === 'play' && !muted;
+  let vg = 0, vf = 400;
+  const v = S.varioD;
+  if (on && !S.stall && v > 0.15) {
+    beepPh += dtR * (1.4 + v * 1.1);
+    vg = (beepPh % 1) < 0.45 ? 0.08 : 0; vf = 540 + v * 140;
+  } else if (on && !S.stall && v < -2.2) { vg = 0.035; vf = 300 + v * 22; }
+  vGain.gain.setTargetAtTime(vg, t, 0.008);
+  vOsc.frequency.setTargetAtTime(vf, t, 0.02);
+  const wv = on || state === 'menu' ? 0.012 + clamp((S.ias - 70) / 130, 0, 1) * 0.06 : 0;
+  wGain.gain.setTargetAtTime(muted ? 0 : wv, t, 0.2);
+  wFilt.frequency.setTargetAtTime(350 + S.ias * 7, t, 0.2);
+  bGain.gain.setTargetAtTime(on && S.stall && (performance.now() % 400 < 220) ? 0.05 : 0, t, 0.01);
+}
+
+// ================= fyzika =================
+function update(dtR) {
+  if (state === 'paused' || state === 'loading') return;
+  S.iasD += (S.ias - S.iasD) * Math.min(1, dtR * 5);
+  S.altD += (S.alt - S.altD) * Math.min(1, dtR * 6);
+  const dtS = dtR * (state === 'menu' ? 3 : TIME_SCALES[tsIdx]);
+  if (state === 'over') { overT += dtR; S.varioD += (0 - S.varioD) * Math.min(1, dtR * 3); updateClouds(dtS); return; }
+
+  if (state === 'menu') {
+    S.bank += (26 - S.bank) * Math.min(1, dtR * 2); S.ias = 85; S.stall = false;
+    const v = S.ias / 3.6;
+    S.psi -= G * Math.tan(S.bank * DEG) / v * dtS;
+    S.x += Math.cos(S.psi) * v * dtS; S.y += Math.sin(S.psi) * v * dtS;
+    S.alt = 650; S.pitch = 0;
+    for (const c of clouds) { c.t += dtS; cloudState(c); }
+    clouds = clouds.filter(c => c.t < c.total);
+    spawnT -= dtS;
+    if (spawnT <= 0 && clouds.length < 9) { spawnT = rand(5, 12); spawnCloud(S.x, S.y, S.psi, 600, 3500, 0); }
+    return;
+  }
+
+  // --- let ---
+  S.time += dtS;
+  const turn = (keys.R ? 1 : 0) - (keys.L ? 1 : 0);
+  if (!S.stall) {
+    if (turn) S.bankCmd = clamp(S.bankCmd + turn * 55 * dtR, -45, 45);
+    else S.bankCmd += clamp(-S.bankCmd, -80 * dtR, 80 * dtR);
+    S.bank += (S.bankCmd - S.bank) * Math.min(1, dtR * 6);
+    S.ias += clamp(S.target - S.ias, -8 * dtS, 8 * dtS);
+    if (S.target <= 70 && S.ias <= 70.5) { S.stall = true; S.stallT = 0; S.bankCmd = 0; blip(200, 0.3); }
+  }
+  let v;
+  if (S.stall) {
+    S.stallT += dtS;
+    v = 18;
+    S.bank = Math.sin(S.stallT * 2.2) * 22;
+    S.psi += 0.18 * dtS;
+    S.ias = 63 + Math.sin(S.stallT * 3.1) * 4;
+    S.pitch = lerp(S.pitch, 0.55, Math.min(1, dtR * 4));
+  } else {
+    v = S.ias / 3.6;
+    S.psi -= G * Math.tan(S.bank * DEG) / v * dtS;
+    S.pitch = lerp(S.pitch, (S.ias - 90) / 110 * 0.14, Math.min(1, dtR * 3));
+  }
+  S.x += Math.cos(S.psi) * v * dtS; S.y += Math.sin(S.psi) * v * dtS;
+  const w = net90At(S.x, S.y, S.alt) + SINK90;      // vertikální pohyb vzduchu
+  S.vz = S.stall ? -10 : w - polar(S.ias);
+  S.alt = Math.min(BASE - 25, S.alt + S.vz * dtS);
+  S.varioD += (S.vz - S.varioD) * Math.min(1, dtS / 1.1);
+  S.dist += v * dtS; S.maxAlt = Math.max(S.maxAlt, S.alt);
+  updateClouds(dtS);
+  if (S.alt <= 0) {
+    S.alt = 0; S.stall = false; S.bank = 0; S.pitch = 0; S.ias = 0; S.target = 90;
+    landCode = landAt(S.x, S.y);
+    state = 'over'; overT = 0;
+    const km = S.dist / 1000;
+    newBest = km > best; if (newBest) { best = km; try { localStorage.setItem('vetron-rekord-km', best.toFixed(2)); } catch (e) {} }
+  }
+}
+
+// ================= kamera a vykreslení =================
+let camX = 0, camY = 0, anchorY = 0, camInit = false;
+const shadowCv = document.createElement('canvas'), shx = shadowCv.getContext('2d');
+const tsA = document.createElement('canvas'), tsAx = tsA.getContext('2d');
+const tsB = document.createElement('canvas'), tsBx = tsB.getContext('2d');
+const tsM = document.createElement('canvas'), tsMx = tsM.getContext('2d');
+const SHQ = 5;
+
+function resize() {
+  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  const nt = Math.min(DPR, 1.5);
+  if (nt !== TDPR) { TDPR = nt; tiles.clear(); job = null; }
+  W = window.innerWidth; H = window.innerHeight;
+  cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
+  cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  shadowCv.width = Math.ceil(W / SHQ); shadowCv.height = Math.ceil(H / SHQ);
+  tsA.width = Math.ceil(W / 3); tsA.height = Math.ceil(H / 3);
+  tsB.width = Math.ceil(W / 8); tsB.height = Math.ceil(H / 8);
+  tsM.width = Math.ceil(W / 4); tsM.height = Math.ceil(H / 4);
+  buildVignette();
+}
+window.addEventListener('resize', resize);
+
+const sx = x => W / 2 + (x - camX) / M;
+const sy = (y, z) => anchorY - (y - camY) / M * TILT - (z || 0) * KZ;
+
+function neededTiles(margin) {
+  const wx0 = camX / M - W / 2, wy0 = -camY / M * TILT - anchorY;
+  const tx0 = Math.floor(wx0 / TS) - margin, tx1 = Math.floor((wx0 + W) / TS) + margin;
+  const ty0 = Math.floor(wy0 / TS) - margin, ty1 = Math.floor((wy0 + H) / TS) + margin;
+  const cxT = (wx0 + W / 2) / TS, cyT = (wy0 + H / 2) / TS;
+  const out = [];
+  for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++)
+    out.push({ tx, ty, k: tkey(tx, ty), d: Math.hypot(tx + 0.5 - cxT, ty + 0.5 - cyT) });
+  return out;
+}
+let frameNo = 0;
+function drawGround() {
+  ctx.fillStyle = '#8fb46a'; ctx.fillRect(0, 0, W, H);
+  const wx0 = camX / M - W / 2, wy0 = -camY / M * TILT - anchorY;
+  const tx0 = Math.floor(wx0 / TS), tx1 = Math.floor((wx0 + W) / TS);
+  const ty0 = Math.floor(wy0 / TS), ty1 = Math.floor((wy0 + H) / TS);
+  for (let ty = ty0; ty <= ty1; ty++) for (let tx = tx0; tx <= tx1; tx++) {
+    const t = tiles.get(tkey(tx, ty));
+    if (!t) continue;
+    t.used = frameNo;
+    const px = Math.round((tx * TS - wx0) * DPR) / DPR, py = Math.round((ty * TS - wy0) * DPR) / DPR;
+    ctx.drawImage(t.canvas, px, py, TS + 0.6, TS + 0.6);
+  }
+  if (tiles.size > 90) {
+    const arr = [...tiles.values()].sort((a, b) => a.used - b.used);
+    for (let i = 0; i < arr.length - 80; i++) tiles.delete(tkey(arr[i].tx, arr[i].ty));
+  }
+}
+
+// ---------- větroň Grob G-102 Astir ----------
+const WING_R = [[0.62, 0.4, 0], [0.3, 7.5, 0.45], [-0.2, 7.5, 0.47], [-0.78, 0.4, 0]];
+const WING_L = WING_R.map(p => [p[0], -p[1], p[2]]);
+const FIN = [[-4.3, 0, 0.15], [-5.2, 0, 0.15], [-5.42, 0, 1.5], [-4.92, 0, 1.5]];
+const STAB_R = [[-4.85, 0.05, 1.5], [-4.98, 1.65, 1.5], [-5.3, 1.65, 1.5], [-5.45, 0.05, 1.5]];
+const STAB_L = STAB_R.map(p => [p[0], -p[1], p[2]]);
+const FUS = [[3.05, 0.06, 0], [2.85, 0.2, 0], [2.5, 0.32, 0.02], [2.0, 0.4, 0.04], [1.3, 0.43, 0.05], [0.5, 0.42, 0.04], [-0.3, 0.36, 0.03], [-1.2, 0.27, 0.05], [-2.2, 0.2, 0.08], [-3.3, 0.15, 0.12], [-4.4, 0.12, 0.16], [-5.2, 0.1, 0.18]];
+const CAN = [[2.4, 0.07, 0.3], [2.1, 0.2, 0.36], [1.7, 0.26, 0.42], [1.25, 0.25, 0.43], [0.85, 0.16, 0.4], [0.6, 0.07, 0.36]];
+function interp(st, n) {
+  const out = [];
+  for (let i = 0; i < st.length - 1; i++) for (let k = 0; k < n; k++) {
+    const t = k / n, a = st[i], b = st[i + 1];
+    out.push([lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)]);
+  }
+  out.push(st[st.length - 1]); return out;
+}
+const FUS_I = interp(FUS, 3), CAN_I = interp(CAN, 3);
+const LIGHT = (() => { const l = [-0.5, 0.5, 0.8], n = Math.hypot(...l); return l.map(v => v / n); })();
+
+function makeXf(psi, bank, pitch) {
+  const cp = Math.cos(pitch), sp = Math.sin(pitch), cb = Math.cos(bank), sb = Math.sin(bank), ch = Math.cos(psi), sh = Math.sin(psi);
+  return p => {
+    const x1 = p[0] * cp + p[2] * sp, z1 = p[2] * cp - p[0] * sp;
+    const y2 = p[1] * cb + z1 * sb, z2 = z1 * cb - p[1] * sb;
+    return [x1 * ch + y2 * sh, x1 * sh - y2 * ch, z2];
+  };
+}
+function drawGlider(gx, gy, psi, bankDeg, pitch) {
+  const xf = makeXf(psi, bankDeg * DEG, pitch);
+  const P = w => [gx + w[0] * SPR, gy - w[1] * SPR * TILT - w[2] * SPR * COSB];
+  const depth = w => w[1] * COSB - w[2] * TILT;
+  const parts = [];
+  const poly = (pts, base) => {
+    const w = pts.map(xf);
+    const a = [w[1][0] - w[0][0], w[1][1] - w[0][1], w[1][2] - w[0][2]], b = [w[2][0] - w[0][0], w[2][1] - w[0][1], w[2][2] - w[0][2]];
+    let n = [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+    const nl = Math.hypot(...n) || 1; n = n.map(v => v / nl);
+    const facing = -n[1] * COSB + n[2] * TILT;
+    let under = false;
+    if (facing < 0) { n = n.map(v => -v); }
+    if (n[2] < 0) under = true;
+    const lum = clamp(0.74 + 0.3 * (n[0] * LIGHT[0] + n[1] * LIGHT[1] + n[2] * LIGHT[2]) - (under ? 0.12 : 0), 0.55, 1);
+    const d = w.reduce((s, q) => s + depth(q), 0) / w.length;
+    parts.push({ d: d + (base || 0), draw: () => {
+      ctx.fillStyle = `rgb(${Math.round(255 * lum)},${Math.round(255 * lum)},${Math.round(258 * lum)})`;
+      ctx.strokeStyle = 'rgba(90,100,115,0.55)'; ctx.lineWidth = 0.6;
+      ctx.beginPath(); w.forEach((q, i) => { const s = P(q); i ? ctx.lineTo(s[0], s[1]) : ctx.moveTo(s[0], s[1]); }); ctx.closePath(); ctx.fill(); ctx.stroke();
+    } });
+  };
+  poly(WING_R); poly(WING_L); poly(FIN); poly(STAB_R); poly(STAB_L);
+  const fus = FUS_I.map(p => [xf([p[0], 0, p[2]]), p[1]]);
+  const can = CAN_I.map(p => [xf([p[0], 0, p[2]]), p[1]]);
+  parts.push({ d: depth(xf([0, 0, 0])) - 0.01, draw: () => {
+    ctx.fillStyle = '#9aa6b3';
+    ctx.beginPath(); for (const [q, r] of fus) { const s = P(q); ctx.moveTo(s[0] + r * SPR + 0.6, s[1]); ctx.arc(s[0], s[1], r * SPR + 0.6, 0, Math.PI * 2); } ctx.fill();
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); for (const [q, r] of fus) { const s = P(q); ctx.moveTo(s[0] - 0.3 + r * SPR * 0.85, s[1] - 0.5); ctx.arc(s[0] - 0.3, s[1] - 0.5, r * SPR * 0.85, 0, Math.PI * 2); } ctx.fill();
+    ctx.fillStyle = '#2c4660';
+    ctx.beginPath(); for (const [q, r] of can) { const s = P(q); ctx.moveTo(s[0] + r * SPR, s[1]); ctx.arc(s[0], s[1], r * SPR, 0, Math.PI * 2); } ctx.fill();
+    ctx.fillStyle = 'rgba(210,235,255,0.75)';
+    const s1 = P(can[2][0]); ctx.beginPath(); ctx.arc(s1[0] - 0.5, s1[1] - 0.6, 0.7, 0, Math.PI * 2); ctx.fill();
+  } });
+  parts.sort((a, b) => b.d - a.d);
+  for (const p of parts) p.draw();
+}
+function drawGliderShadow(gx, gy, psi, bankDeg, pitch, alpha) {
+  const xf = makeXf(psi, bankDeg * DEG, pitch);
+  const P = w => [gx + w[0] * SPR, gy - w[1] * SPR * TILT];
+  ctx.fillStyle = `rgba(15,30,15,${alpha})`;
+  ctx.beginPath();
+  for (const pts of [WING_R, WING_L, STAB_R, STAB_L]) {
+    pts.map(xf).forEach((q, i) => { const s = P(q); i ? ctx.lineTo(s[0], s[1]) : ctx.moveTo(s[0], s[1]); }); ctx.closePath();
+  }
+  for (const p of FUS_I) { const s = P(xf([p[0], 0, p[2]])); ctx.moveTo(s[0] + p[1] * SPR, s[1]); ctx.ellipse(s[0], s[1], p[1] * SPR, p[1] * SPR * TILT + 0.3, 0, 0, Math.PI * 2); }
+  ctx.fill('nonzero');
+}
+
+// ---------- mraky ----------
+function cloudPuffs(c) {
+  const R = c.R, V = c.V, sp = 1 + 0.35 * c.dd, shrink = 1 - 0.4 * c.dd;
+  const out = [];
+  for (const p of c.puffs) {
+    if (p.z > V + 0.05) continue;
+    const grow = clamp((V + 0.05 - p.z) / 0.14, 0, 1);
+    const X = c.x + (p.dx * sp + p.ox * 0.04 * c.dd) * R, Y = c.y + (p.dy * sp + p.oy * 0.04 * c.dd) * R;
+    const rad = p.r * R / M * grow * shrink;
+    if (rad < 1) continue;
+    out.push({ X, Y, z: p.z, rad, lift: p.z * R * HZ, base: p.z < 0.12 });
+  }
+  return out;
+}
+function drawCloudShadows(list) {
+  shx.setTransform(1, 0, 0, 1, 0, 0);
+  shx.clearRect(0, 0, shadowCv.width, shadowCv.height);
+  shx.setTransform(1 / SHQ, 0, 0, 1 / SHQ, 0, 0);
+  for (const { c, puffs } of list) {
+    if (c.op < 0.02) continue;
+    shx.fillStyle = `rgba(10,25,40,${0.30 * c.op})`;
+    shx.beginPath();
+    for (const p of puffs) {
+      if (p.z > 0.55) continue;
+      const x = sx(p.X + BASE * SHX), y = sy(p.Y + BASE * SHY, 0);
+      const rx = p.rad * 1.05, ry = p.rad * TILT * 1.05;
+      shx.moveTo(x + rx, y); shx.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+    }
+    shx.fill();
+  }
+  ctx.drawImage(shadowCv, 0, 0, W, H);
+}
+function drawCloud(c, puffs, gsx, gsy) {
+  const op = c.op * c.fade;
+  if (op < 0.01) return;
+  const arr = puffs.map(p => ({ p, x: sx(p.X), y: sy(p.Y, BASE) - p.lift, d: p.Y * COSB - (BASE + p.z * c.R) * TILT }));
+  arr.sort((a, b) => b.d - a.d);
+  for (const { p, x, y } of arr) {
+    const r = p.rad;
+    ctx.globalAlpha = op;
+    ctx.drawImage(p.base ? PUFF.softB : PUFF.soft, x - r * 1.3, y - r * 1.3, r * 2.6, r * 2.6);
+    if (c.sharp > 0.02) {
+      ctx.globalAlpha = op * c.sharp * 0.8;
+      ctx.drawImage(p.base ? PUFF.sharpB : PUFF.sharp, x - r * 0.94, y - r * 0.94, r * 1.88, r * 1.88);
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+
+// ---------- tilt-shift ----------
+const vig = document.createElement('canvas');
+function buildVignette() {
+  vig.width = Math.ceil(W / 4); vig.height = Math.ceil(H / 4);
+  const t = vig.getContext('2d'), w = vig.width, h = vig.height;
+  const v = t.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.4, w / 2, h / 2, Math.max(w, h) * 0.75);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(10,20,40,0.28)');
+  t.fillStyle = v; t.fillRect(0, 0, w, h);
+}
+function tiltShift() {
+  const mw = tsM.width, mh = tsM.height;
+  tsAx.drawImage(cv, 0, 0, tsA.width, tsA.height);
+  tsBx.drawImage(tsA, 0, 0, tsB.width, tsB.height);
+  tsMx.globalCompositeOperation = 'source-over';
+  tsMx.clearRect(0, 0, mw, mh);
+  tsMx.drawImage(tsB, 0, 0, mw, mh);
+  tsMx.globalCompositeOperation = 'destination-in';
+  const g = tsMx.createLinearGradient(0, 0, 0, mh);
+  g.addColorStop(0, 'rgba(0,0,0,1)'); g.addColorStop(0.3, 'rgba(0,0,0,0)');
+  g.addColorStop(0.7, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,0.95)');
+  tsMx.fillStyle = g; tsMx.fillRect(0, 0, mw, mh);
+  ctx.drawImage(tsM, 0, 0, W, H);
+  ctx.drawImage(vig, 0, 0, W, H);
+}
+
+// ================= přístroje =================
+function plate(cx, cy, r) {
+  const s = r * 1.13;
+  ctx.fillStyle = '#1d2024';
+  ctx.beginPath(); ctx.roundRect(cx - s, cy - s, s * 2, s * 2, r * 0.16); ctx.fill();
+  for (const [dx, dy] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) {
+    const x = cx + dx * s * 0.84, y = cy + dy * s * 0.84;
+    ctx.fillStyle = '#50555c'; ctx.beginPath(); ctx.arc(x, y, r * 0.06, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#222'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x - r * 0.04, y - r * 0.02); ctx.lineTo(x + r * 0.04, y + r * 0.02); ctx.stroke();
+  }
+  const bz = ctx.createLinearGradient(cx - r, cy - r, cx + r, cy + r);
+  bz.addColorStop(0, '#80858d'); bz.addColorStop(0.5, '#34383d'); bz.addColorStop(1, '#101214');
+  ctx.fillStyle = bz; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = '#0b0c0e'; ctx.beginPath(); ctx.arc(cx, cy, r * 0.9, 0, Math.PI * 2); ctx.fill();
+}
+function tick(cx, cy, a, r0, r1, w, col) {
+  ctx.strokeStyle = col || '#f2f2f2'; ctx.lineWidth = w;
+  ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0); ctx.lineTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1); ctx.stroke();
+}
+function num(cx, cy, a, rr, txt, size) {
+  ctx.fillStyle = '#f2f2f2'; ctx.font = `600 ${size}px system-ui, -apple-system, "Segoe UI", sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(txt, cx + Math.cos(a) * rr, cy + Math.sin(a) * rr);
+}
+function needle(cx, cy, a, len, w, col) {
+  ctx.save(); ctx.translate(cx, cy); ctx.rotate(a);
+  ctx.fillStyle = col || '#f7f7f2';
+  ctx.beginPath(); ctx.moveTo(-len * 0.2, -w); ctx.lineTo(len * 0.86, -w * 0.55); ctx.lineTo(len, 0); ctx.lineTo(len * 0.86, w * 0.55); ctx.lineTo(-len * 0.2, w); ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+function glass(cx, cy, r) {
+  ctx.fillStyle = '#2a2d31'; ctx.beginPath(); ctx.arc(cx, cy, r * 0.09, 0, Math.PI * 2); ctx.fill();
+  const g = ctx.createLinearGradient(cx - r, cy - r, cx + r * 0.3, cy + r * 0.3);
+  g.addColorStop(0, 'rgba(255,255,255,0.14)'); g.addColorStop(0.5, 'rgba(255,255,255,0.03)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r * 0.9, 0, Math.PI * 2); ctx.fill();
+}
+function label(cx, cy, txt, size, col) {
+  ctx.fillStyle = col || '#bfc5cc'; ctx.font = `600 ${size}px system-ui, -apple-system, "Segoe UI", sans-serif`;
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(txt, cx, cy);
+}
+const asiA = v => -Math.PI / 2 + clamp(v, 0, 250) / 250 * (Math.PI * 2 * 0.917);
+function gaugeASI(cx, cy, r, v) {
+  plate(cx, cy, r);
+  const arc = (v0, v1, col) => { ctx.strokeStyle = col; ctx.lineWidth = r * 0.075; ctx.beginPath(); ctx.arc(cx, cy, r * 0.82, asiA(v0), asiA(v1)); ctx.stroke(); };
+  arc(75, 150, '#2fae4a'); arc(150, 200, '#e8c22a');
+  for (let s = 0; s <= 250; s += 10) tick(cx, cy, asiA(s), r * (s % 50 === 0 ? 0.68 : 0.75), r * 0.87, s % 50 === 0 ? 2 : 1);
+  tick(cx, cy, asiA(200), r * 0.62, r * 0.88, 3, '#e23a2e');
+  tick(cx, cy, asiA(70), r * 0.7, r * 0.88, 2.5, '#e23a2e');
+  const ta = asiA(90);
+  ctx.fillStyle = '#f2c230'; ctx.beginPath();
+  ctx.moveTo(cx + Math.cos(ta) * r * 0.88, cy + Math.sin(ta) * r * 0.88);
+  ctx.lineTo(cx + Math.cos(ta - 0.06) * r * 0.99, cy + Math.sin(ta - 0.06) * r * 0.99);
+  ctx.lineTo(cx + Math.cos(ta + 0.06) * r * 0.99, cy + Math.sin(ta + 0.06) * r * 0.99); ctx.closePath(); ctx.fill();
+  for (let s = 40; s <= 240; s += 40) num(cx, cy, asiA(s), r * 0.52, String(s), r * 0.15);
+  label(cx, cy - r * 0.3, 'km/h', r * 0.12);
+  needle(cx, cy, asiA(v), r * 0.8, r * 0.045);
+  glass(cx, cy, r);
+}
+const varA = m => Math.PI + clamp(m, -5.25, 5.25) / 5 * (Math.PI * 0.83);
+function gaugeVario(cx, cy, r, m) {
+  plate(cx, cy, r);
+  ctx.strokeStyle = 'rgba(60,180,90,0.9)'; ctx.lineWidth = r * 0.05; ctx.beginPath(); ctx.arc(cx, cy, r * 0.84, varA(0), varA(5)); ctx.stroke();
+  ctx.strokeStyle = 'rgba(220,70,60,0.9)'; ctx.beginPath(); ctx.arc(cx, cy, r * 0.84, varA(-5), varA(0)); ctx.stroke();
+  for (let s = -5; s <= 5.001; s += 0.5) tick(cx, cy, varA(s), r * (Math.abs(s % 1) < 0.01 ? 0.68 : 0.76), r * 0.87, Math.abs(s % 1) < 0.01 ? 2 : 1);
+  for (let s = -5; s <= 5; s++) if (s !== 0) num(cx, cy, varA(s), r * 0.53, String(Math.abs(s)), r * 0.14);
+  num(cx, cy, varA(0), r * 0.53, '0', r * 0.16);
+  label(cx + r * 0.55, cy - r * 0.2, '▲', r * 0.1, '#6fd08a'); label(cx + r * 0.55, cy + r * 0.2, '▼', r * 0.1, '#e57b72');
+  label(cx + r * 0.58, cy, 'm/s', r * 0.12);
+  needle(cx, cy, varA(m), r * 0.8, r * 0.045);
+  glass(cx, cy, r);
+}
+function gaugeAlt(cx, cy, r, alt) {
+  plate(cx, cy, r);
+  for (let s = 0; s < 50; s++) { const a = -Math.PI / 2 + s / 50 * Math.PI * 2; tick(cx, cy, a, r * (s % 5 === 0 ? 0.68 : 0.77), r * 0.87, s % 5 === 0 ? 2 : 1); }
+  for (let s = 0; s < 10; s++) num(cx, cy, -Math.PI / 2 + s / 10 * Math.PI * 2, r * 0.53, String(s), r * 0.16);
+  // okénko s číselnou výškou
+  const txt = String(Math.max(0, Math.round(alt))).padStart(4, '0');
+  ctx.fillStyle = '#1b1d20'; ctx.fillRect(cx - r * 0.27, cy + r * 0.14, r * 0.54, r * 0.19);
+  ctx.strokeStyle = '#555'; ctx.lineWidth = 1; ctx.strokeRect(cx - r * 0.27, cy + r * 0.14, r * 0.54, r * 0.19);
+  ctx.fillStyle = '#f2f2f2'; ctx.font = `600 ${r * 0.14}px ui-monospace, Menlo, monospace`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(txt + ' m', cx, cy + r * 0.24);
+  label(cx, cy - r * 0.26, '×100 m', r * 0.09, '#8a929b');
+  needle(cx, cy, -Math.PI / 2 + (alt / 10000) * Math.PI * 2, r * 0.5, r * 0.07, '#e6e6de');
+  needle(cx, cy, -Math.PI / 2 + ((alt % 1000) / 1000) * Math.PI * 2, r * 0.82, r * 0.04);
+  glass(cx, cy, r);
+}
+
+function infoText(txt, x, y, size, col, align, weight) {
+  ctx.font = `${weight || 600} ${size}px system-ui, -apple-system, "Segoe UI", sans-serif`;
+  ctx.textAlign = align || 'left'; ctx.textBaseline = 'middle';
+  ctx.lineWidth = Math.max(3, size / 5); ctx.strokeStyle = 'rgba(15,35,60,0.6)'; ctx.lineJoin = 'round';
+  ctx.strokeText(txt, x, y); ctx.fillStyle = col || '#fff'; ctx.fillText(txt, x, y);
+}
+function card(x, y, w, h) {
+  ctx.fillStyle = 'rgba(14,32,54,0.62)';
+  ctx.beginPath(); ctx.roundRect(x, y, w, h, 14); ctx.fill();
+}
+const fmtTime = s => { s = Math.floor(s); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+const fmtKm = m => (m / 1000).toFixed(1).replace('.', ',');
+
+function drawHUD() {
+  // přístrojová deska
+  const r = clamp(Math.min(H * 0.085, W * 0.06), 46, 80);
+  const s = r * 1.13, gap = r * 0.18;
+  const px = 16, py = H - 16 - s * 2 - gap;
+  ctx.fillStyle = 'rgba(28,30,34,0.9)';
+  ctx.beginPath(); ctx.roundRect(px - 8, py - 8, s * 6 + gap * 2 + 16, s * 2 + 16 + gap * 0.5, 16); ctx.fill();
+  const cy = py + s;
+  gaugeASI(px + s, cy, r, S.iasD);
+  gaugeVario(px + s * 3 + gap, cy, r, S.varioD);
+  gaugeAlt(px + s * 5 + gap * 2, cy, r, S.altD);
+
+  if (state === 'play' || state === 'paused' || state === 'over') {
+    card(16, 16, 250, 146);
+    const rows = [['Čas letu', fmtTime(S.time)], ['Uletěno', fmtKm(S.dist) + ' km'], ['Max. výška', Math.round(S.maxAlt) + ' m'],
+      ['Nastaveno', S.target + ' km/h'], ['Zrychlení času (T)', '×' + TIME_SCALES[tsIdx]]];
+    rows.forEach((rw, i) => { infoText(rw[0], 32, 38 + i * 24, 14, '#cfe3f7'); infoText(rw[1], 250, 38 + i * 24, 15, '#fff', 'right', 700); });
+    if (best > 0) infoText('rekord ' + best.toFixed(1).replace('.', ',') + ' km', W - 20, 28, 14, '#fff', 'right', 700);
+  }
+  if (muted) infoText('zvuk vypnutý (M)', W - 20, H - 20, 12, '#fff', 'right');
+
+  if (state === 'play' && S.stall && Math.floor(performance.now() / 280) % 2 === 0) {
+    infoText('PÁD!', W / 2, H * 0.3, 46, '#ff5146', 'center', 900);
+    infoText('vyber šipkou ↑', W / 2, H * 0.3 + 40, 20, '#fff', 'center', 700);
+  }
+  if (state === 'play' && !S.stall && S.target <= 75) infoText('pozor, blízko pádové rychlosti', W / 2, H * 0.3, 16, '#ffe08a', 'center', 700);
+
+  if (state === 'menu') {
+    const w = Math.min(560, W - 32), h = 340, x = (W - w) / 2, y = Math.max(16, H * 0.14);
+    card(x, y, w, h);
+    infoText('VĚTROŇ', W / 2, y + 48, 44, '#fff', 'center', 900);
+    infoText('Grob G-102 Astir · plachtění pod kumuly', W / 2, y + 86, 16, '#d7ecff', 'center', 600);
+    const L = ['←  →   držením zatáčíš', '↑   +5 km/h      ↓   −5 km/h (70 km/h = pád)', 'T   zrychlení času      P   pauza      M   zvuk'];
+    L.forEach((l, i) => infoText(l, W / 2, y + 132 + i * 28, 15, '#eef6ff', 'center', 600));
+    infoText('Stoupáš pod rostoucími kumuly s ostrými okraji,', W / 2, y + 232, 13, '#cfe3f7', 'center', 500);
+    infoText('pod rozpadajícími se mraky padáš. Start ve 200 m.', W / 2, y + 252, 13, '#cfe3f7', 'center', 500);
+    if (Math.floor(performance.now() / 500) % 2 === 0) infoText('MEZERNÍK = vzlet', W / 2, y + 300, 20, '#ffe45e', 'center', 800);
+  }
+  if (state === 'paused') {
+    const w = Math.min(360, W - 32); card((W - w) / 2, H * 0.3, w, 110);
+    infoText('PAUZA', W / 2, H * 0.3 + 42, 34, '#fff', 'center', 900);
+    infoText('P nebo MEZERNÍK = pokračovat', W / 2, H * 0.3 + 82, 14, '#eef6ff', 'center');
+  }
+  if (state === 'over') {
+    const w = Math.min(440, W - 32), x = (W - w) / 2, y = H * 0.18;
+    card(x, y, w, 230);
+    infoText(['PŘISTÁNÍ DO POLE', 'PŘISTÁNÍ DO LESA', 'PŘISTÁNÍ NA NÁVSI', 'PŘISTÁNÍ DO RYBNÍKA', 'PŘISTÁNÍ NA SILNICI', 'PŘISTÁNÍ DO ŘEKY'][landCode], W / 2, y + 44, 30, '#fff', 'center', 900);
+    infoText('uletěno ' + fmtKm(S.dist) + ' km', W / 2, y + 92, 26, '#ffe45e', 'center', 800);
+    infoText('čas letu ' + fmtTime(S.time) + '  ·  max. výška ' + Math.round(S.maxAlt) + ' m', W / 2, y + 128, 15, '#eef6ff', 'center');
+    infoText(newBest ? 'nový rekord!' : 'rekord ' + best.toFixed(1).replace('.', ',') + ' km', W / 2, y + 156, 15, newBest ? '#b6f5ff' : '#cfe3f7', 'center', 700);
+    if (overT > 1 && Math.floor(performance.now() / 500) % 2 === 0) infoText('MEZERNÍK = nový let', W / 2, y + 200, 18, '#fff', 'center', 800);
+  }
+}
+
+function draw(dtR) {
+  frameNo++;
+  // kamera
+  const look = state === 'menu' ? 0 : 320;
+  const tx = S.x + Math.cos(S.psi) * look, ty = S.y + Math.sin(S.psi) * look;
+  const ta = H * 0.5 + S.alt * KZ;
+  if (!camInit) { camX = tx; camY = ty; anchorY = ta; camInit = true; }
+  const k = Math.min(1, dtR * 1.5);
+  camX += (tx - camX) * k; camY += (ty - camY) * k; anchorY += (ta - anchorY) * Math.min(1, dtR * 2);
+
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  drawGround();
+
+  const list = clouds.map(c => ({ c, puffs: cloudPuffs(c) }));
+  drawCloudShadows(list);
+
+  // větroň
+  const gs = [sx(S.x), sy(S.y, 0)];
+  const bank = S.bank;
+  const shxp = sx(S.x + S.alt * SHX), shyp = sy(S.y + S.alt * SHY, 0);
+  drawGliderShadow(shxp, shyp, S.psi, bank, S.pitch, clamp(0.34 - S.alt / 5000, 0.12, 0.34));
+  const gx = gs[0], gy = gs[1] - S.alt * KZ;
+  drawGlider(gx, gy, S.psi, bank, S.pitch);
+
+  // mraky (vzdálenější první); průhlednost, když zakrývají větroň
+  list.sort((a, b) => b.c.y - a.c.y);
+  for (const it of list) {
+    const c = it.c;
+    const ccx = sx(c.x), ccy = sy(c.y, BASE) - c.R * c.V * HZ * 0.4;
+    const cover = Math.hypot(gx - ccx, (gy - ccy) * 1.4) < c.R / M * 1.05;
+    c.fade += ((cover ? 0.4 : 1) - c.fade) * Math.min(1, dtR * 4);
+    drawCloud(c, it.puffs);
+  }
+  tiltShift();
+  drawHUD();
+}
+
+// ================= smyčka =================
+resize();
+let last = performance.now();
+function frame(now) {
+  const dtR = Math.min(0.05, (now - last) / 1000); last = now;
+  if (state === 'loading') {
+    if (!camInit) { camX = S.x; camY = S.y; anchorY = H * 0.5 + S.alt * KZ; camInit = true; }
+    const need = neededTiles(0);
+    const done = workTiles(40, need);
+    const have = need.filter(n => tiles.has(n.k)).length;
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    drawGround();
+    card(W / 2 - 170, H / 2 - 50, 340, 100);
+    infoText('Stavím krajinu…', W / 2, H / 2 - 16, 22, '#fff', 'center', 800);
+    ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.fillRect(W / 2 - 130, H / 2 + 18, 260, 8);
+    ctx.fillStyle = '#ffe45e'; ctx.fillRect(W / 2 - 130, H / 2 + 18, 260 * have / need.length, 8);
+    if (done) { state = 'menu'; setupClouds(S.x, S.y, S.psi); }
+    requestAnimationFrame(frame);
+    return;
+  }
+  update(dtR);
+  audioUpdate(dtR);
+  draw(dtR);
+  workTiles(state === 'paused' ? 12 : 7, neededTiles(1));
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+window.__S = S; window.__clouds = () => clouds; window.__net = net90At; window.__land = landAt; window.__tp = (x, y) => { S.x = x; S.y = y; camInit = false; }; window.__state = () => state; window.__setState = s => { state = s; };
+})();
+</script>
+</body>
+</html>
