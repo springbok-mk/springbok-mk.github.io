@@ -763,6 +763,7 @@
       const img = tr.album && tr.album.images && tr.album.images.length
         ? tr.album.images[tr.album.images.length - 1].url : null;
       $('spArt').src = img || BLANK;
+      $('spNote').textContent = paused ? 'Pozastaveno.' : 'Hraje. Zvukový výstup do auta můžeš změnit níže.';
     }
     drawPos();
     startTicker();
