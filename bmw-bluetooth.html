@@ -4,6 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BMW test">
+<meta name="theme-color" content="#1E44B5">
+<link rel="manifest" href="bmw.webmanifest">
+<link rel="apple-touch-icon" href="bmw-icon-180.png">
 <title>BMW Bluetooth test</title>
 <style>
   :root{
@@ -62,6 +67,15 @@
   details{margin-top:10px} summary{cursor:pointer;color:var(--cobalt);font-size:15px}
   ol{padding-left:20px;margin:0} ol li{margin-bottom:6px}
   .back{font-size:14px;color:var(--cobalt);text-decoration:none}
+  .np{display:flex;gap:12px;align-items:center;background:var(--surface2);border-radius:12px;padding:10px;margin:10px 0}
+  .np img{width:64px;height:64px;border-radius:8px;object-fit:cover;background:var(--line);flex:none}
+  .np .meta{min-width:0}
+  .np .t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .np .a{font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .times{display:flex;justify-content:space-between;font:12px ui-monospace,Menlo,monospace;color:var(--muted);margin:-2px 0 6px}
+  .transport{display:flex;gap:8px;align-items:center;margin:8px 0}
+  .transport button{flex:1;min-width:0}
+  .transport button.big{flex:1.6}
 </style>
 </head>
 <body>
@@ -69,8 +83,9 @@
   <a class="back" href="index.html">← springbok-mk</a>
   <h1>BMW Bluetooth test</h1>
   <p class="lead">Experiment: dostat zvuk z webové stránky do staré BMW handsfree jednotky, která umí jen telefonní profil (HFP).
-  Stránka požádá o „hovorový“ zvukový režim Safari a pak přehraje testovací tón nebo tvoje MP3. Přepnutí zvuku do BMW závisí na iOS a handsfree jednotce; stránka ho neumí vynutit ani potvrdit.
+  Stránka požádá o „hovorový“ zvukový režim Safari a přehraje testovací tón, tvoje MP3 nebo Spotify. Přenos do BMW závisí na iOS a handsfree jednotce; ověř ho poslechem.
   Mikrofon se zapne, ale nic se nenahrává ani neodesílá.</p>
+
 
   <section>
     <h2>Stav</h2>
@@ -82,6 +97,7 @@
       <dt>Vstup (mikrofon)</dt><dd id="inputLabel">–</dd>
       <dt>Výstup (sinkId)</dt><dd id="sinkLabel">výchozí (systém)</dd>
       <dt>Přehrávač</dt><dd id="playState">zastaveno</dd>
+      <dt>Spotify</dt><dd id="spState"><span class="pill off">nepřipojeno</span></dd>
     </dl>
   </section>
 
@@ -124,20 +140,76 @@
     <label><input type="checkbox" id="chkWake"> Držet obrazovku rozsvícenou (Wake Lock)</label>
   </section>
 
+  <section id="spotify">
+    <h2><span class="n">4</span>Spotify (pokus)</h2>
+    <p class="note">Hudbu dodá Spotify, ale přehraje ji <b>tato stránka</b> – takže zvuk vzniká tady a jde stejnou cestou jako testovací tón.
+    Potřebuje <b>Premium</b> (tarif „mobile only“ Spotify výslovně nepustí), vlastní <b>Client ID</b> a <b>signál</b>.
+    Spotify se přehrává pouze online; hudba se do telefonu pro offline přehrávání neukládá.</p>
+    <dl class="status">
+      <dt>SDK</dt><dd id="spSdk"><span class="pill off">nenačteno</span></dd>
+      <dt>Přihlášení</dt><dd id="spAuth"><span class="pill off">nepřihlášeno</span></dd>
+      <dt>Účet</dt><dd id="spAcct">–</dd>
+      <dt>Zařízení</dt><dd id="spDev">–</dd>
+      <dt>Hraje</dt><dd id="spTrack">–</dd>
+    </dl>
+    <details>
+      <summary>Nastavení (jednorázově)</summary>
+      <ol>
+        <li>Client ID už je ve stránce předvyplněné – tohle řeš jen, kdyby přestalo platit.</li>
+        <li>Na <code>developer.spotify.com/dashboard</code> otevři svou aplikaci.</li>
+        <li>Do <b>Redirect URI</b> vlož přesně tuhle adresu:</li>
+      </ol>
+      <input type="text" id="spRedir" readonly>
+      <div class="row"><button id="spCopyRedir" class="secondary">Kopírovat adresu</button></div>
+      <label for="spClient">Client ID z té aplikace</label>
+      <input type="text" id="spClient" placeholder="např. 3a9f…" autocomplete="off" spellcheck="false">
+      <div class="row"><button id="spSaveClient" class="secondary">Uložit Client ID</button></div>
+      <p class="note">Client ID je veřejný identifikátor aplikace. Přihlašuješ se přímo u Spotify (PKCE),
+      heslo se do stránky nezadává a já ho nevidím.</p>
+    </details>
+    <div class="row">
+      <button id="spLogin">Přihlásit se ke Spotify</button>
+      <button id="spLogout" class="secondary">Odhlásit</button>
+    </div>
+    <label for="spUri">Playlist, album nebo skladba (odkaz nebo URI) – nepovinné</label>
+    <input type="text" id="spUri" placeholder="https://open.spotify.com/playlist/… nebo spotify:playlist:…" autocomplete="off" spellcheck="false">
+    <div class="row">
+      <button id="spPlay" disabled>Hrát v autě</button>
+    </div>
+
+    <div class="np">
+      <img id="spArt" alt="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjQ0JENUVBIi8+PC9zdmc+">
+      <div class="meta">
+        <div class="t" id="spTitle">Nic nehraje</div>
+        <div class="a" id="spArtist">—</div>
+      </div>
+    </div>
+    <input type="range" id="spSeek" min="0" max="1000" value="0" step="1" disabled>
+    <div class="times"><span id="spPos">0:00</span><span id="spDur">0:00</span></div>
+    <div class="transport">
+      <button id="spPrev" class="secondary" disabled>◀◀</button>
+      <button id="spToggle" class="big" disabled>▶</button>
+      <button id="spNext" class="secondary" disabled>▶▶</button>
+    </div>
+    <label for="spVol">Hlasitost Spotify</label>
+    <input type="range" id="spVol" min="0" max="1" step="0.05" value="1" disabled>
+    <p class="note" id="spNote">Nejdřív krok 1 (HFP režim), teprve pak Hrát – jinak iOS pošle zvuk mimo auto.</p>
+    <p class="note"><b>Spotify na iPhonu otevři v Safari a nech připojení k internetu zapnuté.</b> Ikonu si můžeš přidat přes Sdílet → Přidat na plochu. Pokud se přihlášení z ikony nevrátí do aplikace, dokonči ho přímo v Safari.</p>
+  </section>
+
   <section>
-    <h2><span class="n">4</span>Postup v autě</h2>
+    <h2><span class="n">5</span>Postup v autě</h2>
     <ol>
       <li>iPhone spárovaný s BMW jako telefon, zapalování zapnuté, rádio na zdroji „Telefon“ nebo kdekoli, kde se obvykle ozývá hovor.</li>
       <li>Krok 1: zapnout HFP režim, povolit mikrofon. Sleduj, zda BMW ukáže „aktivní hovor“ a zda se změnil vstup na BMW.</li>
       <li>Krok 3: pustit tón. Zvuk má jít z reproduktorů auta, ne z iPhonu.</li>
       <li>Pokud zvuk jde z iPhonu: zkus krok 2 (výběr výstupu), pak přepnout checkbox echoCancellation, vypnout a znovu zapnout HFP, případně v Ovládacím centru ručně přepnout výstup na BMW.</li>
-      <li>Teprve když tón hraje v autě: zamknout displej, přepnout do jiné aplikace, spustit Spotify a sledovat, co se stane (log níže).</li>
+      <li>Když tón hraje v autě, zastav ho. V kroku 4 se přihlas ke Spotify a klepni na Hrát v autě. Přehrávání běží přes SDK přímo na této stránce.</li>
     </ol>
     <details>
       <summary>Co od toho čekat</summary>
       <p class="note">HFP je hlasový profil: mono, 8 nebo 16 kHz. I při úspěchu bude kvalita na úrovni telefonního hovoru.
-      Přesměrování Spotify je nejistý krok: Safari v režimu play-and-record může přehrávání jiné aplikace pozastavit, a Audio Session API neumí převzít zvuk cizí aplikace.
-      Tato stránka přehrává vlastní MP3/stream; přenos do BMW je potřeba ověřit poslechem. Zvuk Spotify ani jiné aplikace tato stránka přesměrovat neumí.</p>
+      Spotify zde hraje přes Web Playback SDK a vyžaduje internet i podporovaný účet Premium. Přesměrování do konkrétní BMW jednotky musíš ověřit přímo v autě; stránka ho nemůže zaručit.</p>
     </details>
   </section>
 
@@ -370,6 +442,317 @@
     try { await navigator.clipboard.writeText(logEl.innerText); log('log zkopírován'); } catch (e) { err(e); }
   };
   $('btnClear').onclick = () => logEl.textContent = '';
+})();
+</script>
+
+
+<script>
+// ---------- Spotify Web Playback SDK (pokus) ----------
+(() => {
+  const $ = id => document.getElementById(id);
+  const logEl = $('log');
+  const log = (msg, cls) => {
+    const line = document.createElement('div');
+    if (cls) line.className = cls;
+    line.textContent = '[' + new Date().toTimeString().slice(0, 8) + '] SP: ' + msg;
+    logEl.appendChild(line);
+    logEl.scrollTop = logEl.scrollHeight;
+  };
+  const pill = (el, cls, txt) => { $(el).innerHTML = '<span class="pill ' + cls + '">' + txt + '</span>'; };
+
+  // Client ID tvojí aplikace ze developer.spotify.com. Není to tajný údaj (PKCE žádné
+  // tajemství v prohlížeči nepoužívá); co ho chrání, je povolená Redirect URI.
+  const DEFAULT_CLIENT = 'a7000b47f7de4d85aa1452503d008a10';
+  const SCOPES = 'streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state';
+  const REDIR = location.origin + location.pathname;
+  const K = { client: 'sp-client', ver: 'sp-verifier', tok: 'sp-token' };
+  const ls = {
+    get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} },
+    del: k => { try { localStorage.removeItem(k); } catch (e) {} }
+  };
+
+  $('spRedir').value = REDIR;
+  $('spClient').value = ls.get(K.client) || DEFAULT_CLIENT;
+  // kdyby Client ID chybělo, nech Nastavení rozbalené – jinak se nedá nikde začít
+  if (!$('spClient').value.trim()) { const d = document.querySelector('#spotify details'); if (d) d.open = true; }
+
+  let player = null, deviceId = null, connected = false;
+
+  const clientId = () => (ls.get(K.client) || DEFAULT_CLIENT || '').trim();
+  const tokens = () => { try { return JSON.parse(ls.get(K.tok) || 'null'); } catch (e) { return null; } };
+  const setTokens = t => ls.set(K.tok, JSON.stringify(t));
+
+  // ---------- PKCE ----------
+  const b64url = buf => btoa(String.fromCharCode.apply(null, new Uint8Array(buf)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const randomVerifier = () => {
+    const a = new Uint8Array(48); crypto.getRandomValues(a);
+    return b64url(a);
+  };
+
+  async function login() {
+    const cid = clientId();
+    if (!cid) { log('chybí Client ID – rozbal Nastavení a vlož ho', 'e'); $('spNote').textContent = 'Nejdřív vlož Client ID v Nastavení.'; return; }
+    if (!navigator.onLine) { log('telefon je offline, přihlášení potřebuje signál', 'w'); return; }
+    const ver = randomVerifier();
+    ls.set(K.ver, ver);
+    const chal = b64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ver)));
+    const u = new URL('https://accounts.spotify.com/authorize');
+    u.search = new URLSearchParams({
+      client_id: cid, response_type: 'code', redirect_uri: REDIR,
+      code_challenge_method: 'S256', code_challenge: chal, scope: SCOPES
+    }).toString();
+    log('přesměrovávám na přihlášení Spotify');
+    location.assign(u.toString());
+  }
+
+  async function tokenRequest(body) {
+    const r = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(body).toString()
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error((d.error || r.status) + ': ' + (d.error_description || ''));
+    setTokens({ access: d.access_token, refresh: d.refresh_token || (tokens() || {}).refresh, exp: Date.now() + (d.expires_in - 60) * 1000 });
+    return d.access_token;
+  }
+
+  async function exchangeCode(code) {
+    const ver = ls.get(K.ver);
+    if (!ver) throw new Error('chybí code_verifier (přihlášení začni znovu v téže záložce)');
+    await tokenRequest({ client_id: clientId(), grant_type: 'authorization_code', code, redirect_uri: REDIR, code_verifier: ver });
+    ls.del(K.ver);
+    log('přihlášeno', 'g');
+  }
+
+  async function token() {
+    const t = tokens();
+    if (!t || !t.access) throw new Error('nepřihlášeno');
+    if (Date.now() < t.exp) return t.access;
+    if (!t.refresh) throw new Error('vypršelo přihlášení, přihlas se znovu');
+    log('obnovuji přístupový token');
+    return tokenRequest({ client_id: clientId(), grant_type: 'refresh_token', refresh_token: t.refresh });
+  }
+
+  async function api(path, method, body) {
+    const t = await token();
+    const r = await fetch('https://api.spotify.com/v1' + path, {
+      method: method || 'GET',
+      headers: { Authorization: 'Bearer ' + t, 'Content-Type': 'application/json' },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if (r.status === 204 || r.status === 202) return null;
+    if (!r.ok) {
+      const txt = await r.text().catch(() => '');
+      throw new Error(r.status + ' ' + txt.slice(0, 180));
+    }
+    return (r.headers.get('content-type') || '').indexOf('json') >= 0 ? r.json() : null;
+  }
+
+  // ---------- SDK ----------
+  function loadSdk() {
+    if (window.Spotify) return Promise.resolve();
+    return new Promise((res, rej) => {
+      window.onSpotifyWebPlaybackSDKReady = () => { pill('spSdk', 'ok', 'načteno'); res(); };
+      const s = document.createElement('script');
+      s.src = 'https://sdk.scdn.co/spotify-player.js';
+      s.onerror = () => rej(new Error('SDK se nepodařilo stáhnout (potřebuje signál)'));
+      document.head.appendChild(s);
+      pill('spSdk', 'warn', 'stahuje se…');
+    });
+  }
+
+  async function connect() {
+    if (connected) return;
+    await loadSdk();
+    const t = await token();
+    player = new Spotify.Player({
+      name: 'BMW test (Safari)',
+      getOAuthToken: cb => token().then(cb).catch(e => log('token: ' + e.message, 'e')),
+      volume: 1
+    });
+    player.addListener('ready', ({ device_id }) => {
+      deviceId = device_id; connected = true;
+      $('spDev').textContent = device_id.slice(0, 12) + '…';
+      pill('spState', 'ok', 'připojeno');
+      CTRLS.forEach(b => $(b).disabled = false);
+      log('přehrávač je v seznamu zařízení Spotify', 'g');
+    });
+    player.addListener('not_ready', () => { connected = false; pill('spState', 'warn', 'odpojeno'); log('zařízení zmizelo ze sítě', 'w'); });
+    player.addListener('player_state_changed', renderState);
+    player.addListener('initialization_error', e => { pill('spState', 'bad', 'nepodporováno'); log('initialization_error: ' + e.message + ' – tenhle prohlížeč SDK nerozjede', 'e'); });
+    player.addListener('authentication_error', e => { pill('spAuth', 'bad', 'chyba'); log('authentication_error: ' + e.message, 'e'); });
+    player.addListener('account_error', e => { pill('spState', 'bad', 'účet'); log('account_error: ' + e.message + ' – chce to Premium (ne „mobile only“)', 'e'); });
+    player.addListener('playback_error', e => log('playback_error: ' + e.message, 'e'));
+    player.addListener('autoplay_failed', () => log('iOS nepustil zvuk sám – ťukni na Hrát v autě ještě raz', 'w'));
+    const ok = await player.connect();
+    log(ok ? 'SDK připojeno' : 'SDK se nepřipojilo', ok ? 'g' : 'e');
+  }
+
+  // ---------- vykreslení přehrávače ----------
+  const CTRLS = ['spPlay', 'spToggle', 'spPrev', 'spNext', 'spSeek', 'spVol'];
+  const BLANK = $('spArt').src;
+  let dur = 0, pos = 0, paused = true, seeking = false, ticker = null;
+
+  const mmss = ms => {
+    if (!ms || ms < 0) ms = 0;
+    const t = Math.floor(ms / 1000);
+    return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
+  };
+  const drawPos = () => {
+    $('spPos').textContent = mmss(pos);
+    $('spDur').textContent = mmss(dur);
+    if (!seeking) $('spSeek').value = dur ? Math.round(pos / dur * 1000) : 0;
+  };
+  function startTicker() {
+    clearInterval(ticker);
+    ticker = setInterval(() => {
+      if (paused || seeking) return;
+      pos = Math.min(pos + 500, dur || pos + 500);
+      drawPos();
+    }, 500);
+  }
+  function renderState(st) {
+    if (!st) {
+      $('spTrack').textContent = '–'; $('spTitle').textContent = 'Nic nehraje';
+      $('spArtist').textContent = '—'; $('spArt').src = BLANK;
+      $('spToggle').textContent = '▶'; dur = pos = 0; paused = true; drawPos();
+      return;
+    }
+    const tr = st.track_window && st.track_window.current_track;
+    paused = !!st.paused;
+    dur = st.duration || (tr && tr.duration_ms) || 0;
+    pos = st.position || 0;
+    $('spToggle').textContent = paused ? '▶' : '❚❚';
+    if (tr) {
+      const who = (tr.artists || []).map(a => a.name).join(', ');
+      $('spTitle').textContent = tr.name;
+      $('spArtist').textContent = who || '—';
+      $('spTrack').textContent = tr.name + ' – ' + who + (paused ? ' (pauza)' : '');
+      const img = tr.album && tr.album.images && tr.album.images.length
+        ? tr.album.images[tr.album.images.length - 1].url : null;
+      $('spArt').src = img || BLANK;
+    }
+    drawPos();
+    startTicker();
+  }
+
+  function parseUri(v) {
+    v = (v || '').trim();
+    if (!v) return null;
+    let m = v.match(/^spotify:(track|album|playlist|artist):([A-Za-z0-9]+)/);
+    if (!m) m = v.match(/open\.spotify\.com\/(?:intl-[a-z-]+\/)?(track|album|playlist|artist)\/([A-Za-z0-9]+)/);
+    if (!m) { log('odkazu nerozumím, nechávám hrát to, co máš ve Spotify rozehrané', 'w'); return null; }
+    const uri = 'spotify:' + m[1] + ':' + m[2];
+    return m[1] === 'track' ? { uris: [uri] } : { context_uri: uri };
+  }
+
+  async function play() {
+    try {
+      if ($('btnHfpOff').disabled || $('inputLabel').textContent === '–')
+        log('HFP režim není zapnutý – zvuk pravděpodobně půjde mimo auto (krok 1)', 'w');
+      await connect();
+      if (player.activateElement) { try { await player.activateElement(); log('activateElement OK (iOS)'); } catch (e) { log('activateElement: ' + e.message, 'w'); } }
+      if (!deviceId) { log('ještě nemám device_id, zkus Hrát znovu za chvíli', 'w'); return; }
+      await api('/me/player', 'PUT', { device_ids: [deviceId], play: false });
+      log('přehrávání převedeno na tuhle stránku');
+      const what = parseUri($('spUri').value);
+      if (what) await api('/me/player/play?device_id=' + deviceId, 'PUT', what);
+      else await player.resume();
+      $('spNote').textContent = 'Hraje. Jestli je zvuk v telefonu a ne v autě, vypni a znovu zapni krok 1 a ťukni na Hrát.';
+    } catch (e) { log('hraní: ' + e.message, 'e'); }
+  }
+
+  // ---------- obsluha ----------
+  $('spSaveClient').onclick = () => {
+    const v = $('spClient').value.trim();
+    if (!v) { ls.del(K.client); log('Client ID smazáno'); return; }
+    ls.set(K.client, v); log('Client ID uloženo', 'g');
+    $('spNote').textContent = 'Client ID uloženo. Teď Přihlásit se ke Spotify.';
+  };
+  $('spCopyRedir').onclick = async () => {
+    try { await navigator.clipboard.writeText(REDIR); log('adresa zkopírována', 'g'); }
+    catch (e) { $('spRedir').select(); log('zkopíruj ručně z pole výše', 'w'); }
+  };
+  $('spLogin').onclick = () => login().catch(e => log('přihlášení: ' + e.message, 'e'));
+  $('spLogout').onclick = () => {
+    ls.del(K.tok); ls.del(K.ver);
+    if (player) { try { player.disconnect(); } catch (e) {} }
+    player = null; deviceId = null; connected = false;
+    pill('spAuth', 'off', 'nepřihlášeno'); pill('spState', 'off', 'nepřipojeno');
+    $('spLogin').style.display = '';
+    $('spAcct').textContent = '–'; $('spDev').textContent = '–';
+    clearInterval(ticker); renderState(null);
+    CTRLS.forEach(b => $(b).disabled = true);
+    log('odhlášeno');
+  };
+  $('spPlay').onclick = play;
+  $('spToggle').onclick = async () => {
+    if (!player) return;
+    try {
+      // první spuštění musí projít přes activateElement, jinak iOS zvuk nepustí
+      if (paused && player.activateElement) { try { await player.activateElement(); } catch (e) {} }
+      await player.togglePlay();
+    } catch (e) { log('togglePlay: ' + e.message, 'e'); }
+  };
+  $('spNext').onclick = () => player && player.nextTrack().catch(e => log(e.message, 'e'));
+  $('spPrev').onclick = () => player && player.previousTrack().catch(e => log(e.message, 'e'));
+  const seek = $('spSeek');
+  const seekStart = () => { seeking = true; };
+  const seekEnd = async () => {
+    seeking = false;                       // platí i pro posun klávesnicí, kde pointerdown nepřijde
+    if (!player || !dur) return;
+    pos = Math.round(seek.value / 1000 * dur);
+    drawPos();
+    try { await player.seek(pos); } catch (e) { log('seek: ' + e.message, 'e'); }
+  };
+  seek.addEventListener('pointerdown', seekStart);
+  seek.addEventListener('touchstart', seekStart, { passive: true });
+  seek.addEventListener('input', () => { if (dur) { $('spPos').textContent = mmss(Math.round(seek.value / 1000 * dur)); } });
+  seek.addEventListener('change', seekEnd);
+  $('spVol').addEventListener('input', () => {
+    if (player && player.setVolume) player.setVolume(parseFloat($('spVol').value)).catch(() => {});
+  });
+
+  // ---------- start ----------
+  (async () => {
+    const q = new URLSearchParams(location.search);
+    if (q.get('error')) {
+      log('Spotify přihlášení odmítlo: ' + q.get('error'), 'e');
+      history.replaceState(null, '', REDIR);
+    } else if (q.get('code')) {
+      try {
+        await exchangeCode(q.get('code'));
+        history.replaceState(null, '', REDIR);
+      } catch (e) {
+        log('výměna kódu: ' + e.message, 'e');
+        history.replaceState(null, '', REDIR);
+      }
+    }
+    const standalone = navigator.standalone === true ||
+      (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+    if (standalone) {
+      log('běžíš z ikony na ploše – přihlášení ke Spotify sem iOS nemusí vrátit, zkoušej ho v Safari', 'w');
+      $('spNote').textContent = 'Z ikony na ploše se Spotify přihlásit nemusí podařit (iOS odskok otevře v Safari). Pro Spotify otevři stránku v Safari a nech internet zapnutý.';
+    }
+    const t = tokens();
+    if (!t || !t.access) { pill('spAuth', 'off', 'nepřihlášeno'); return; }
+    pill('spAuth', 'ok', 'přihlášeno');
+    $('spLogin').style.display = 'none';
+    if (!navigator.onLine) {
+      $('spNote').textContent = 'Telefon je offline – pro přehrávání Spotify obnov připojení k internetu.';
+      pill('spSdk', 'off', 'bez signálu');
+      return;
+    }
+    try {
+      const me = await api('/me');
+      $('spAcct').textContent = (me.display_name || me.id) + ' · ' + me.product;
+      if (me.product !== 'premium') log('účet není Premium (' + me.product + ') – SDK nepustí ani notu', 'e');
+    } catch (e) { log('/me: ' + e.message, 'w'); }
+    try { await connect(); } catch (e) { log('připojení: ' + e.message, 'e'); }
+  })();
 })();
 </script>
 </body>
