@@ -171,6 +171,85 @@ input[type=range]::-moz-range-thumb{clip-path:var(--corner-shape)}
 #audioRouteDialog::backdrop{background:#000B}
 #audioRouteDialog h2{margin-top:0}#audioRouteDialog .row{margin-bottom:0}#audioRouteDialog button{flex:1;font-size:12px}
 
+/* Focus refinement: compact player, direct audio tools and quiet botanical ornament. */
+.focus-nav,.focus-title,.source-tabs{display:none}
+.focus-mode body{background-color:#0b0b0b;background-image:url('bmw-arabesque.svg');background-size:360px 480px}
+.focus-mode .app-top{background:transparent}
+.focus-mode #spotify{grid-row:2;grid-column:1;background:#141414b8;border-color:#4b4d36;gap:8px}
+.focus-mode .player-core{flex:1;height:auto;min-height:0;justify-content:center;gap:clamp(5px,1.25vh,10px)}
+.focus-mode .player-core>.quick-actions{display:none}
+.focus-mode .np{flex:0 0 auto;height:76px;min-height:76px;gap:12px}
+.focus-mode .np img{width:58px;height:58px;max-height:none;object-fit:cover}
+.focus-mode .np .t{font-size:clamp(20px,4vw,27px)}
+.focus-mode .np .a{font-size:12px}
+.focus-mode .transport button{min-height:72px;height:72px}
+.focus-mode .mic-control{padding:2px 8px;background:#10101099;gap:0 8px}
+.focus-mode .mic-control .ios-switch{min-height:40px;font-size:11px;justify-content:flex-start;gap:10px}
+.focus-mode .mic-control .ios-switch input{left:0;right:auto;width:100%;height:40px}
+.focus-mode .mic-control .switch-track{width:40px;height:24px}
+.focus-mode .mic-control .switch-track:after{width:20px;height:20px}
+.focus-mode .mic-control input:checked+.switch-track:after{transform:translateX(16px)}
+.focus-mode #btnRestoreAudio{width:40px;height:40px;min-height:40px;padding:4px;font-size:18px}
+.focus-mode #btnRestoreAudio .restore-label{display:none}
+.focus-mode .mic-control .note{font-size:10px;line-height:13px;max-height:26px;margin:0 0 4px}
+.focus-mode .wake-control{min-height:32px}
+.focus-mode .focus-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;flex:none;margin-top:auto;padding-top:8px;border-top:1px solid var(--line)}
+.focus-nav button{min-width:0;min-height:44px;font-size:11px;padding:7px 5px;background:#25271edb;color:var(--ink);border-color:var(--line)}
+.focus-nav button[aria-pressed=true]{background:var(--cobalt);color:var(--on-cobalt)}
+.focus-mode .browse-options{display:flex;gap:6px}
+.focus-mode .browse-options>#spOrderRow,.focus-mode .browse-options>.row{flex:1;min-width:0;margin:0}
+.focus-mode .browse-options:has(#spOrderRow[hidden]):has(#spPlayList[hidden]){display:none}
+.focus-mode .browse-options #spOrder{font-size:12px;padding:8px 6px}
+.focus-mode .browse-options #spPlayList{font-size:12px}
+.focus-mode.compact-height .browse-options>.row{display:none}
+.focus-mode.show-output .player-core,.focus-mode.show-sources .player-core,.focus-mode.show-output .music-browser,.focus-mode.show-sources .music-browser{display:none}
+.focus-mode.show-output #btnBackPlayer,.focus-mode.show-sources #btnBackPlayer{display:block}
+.focus-mode.show-output #outputSettings,.focus-mode.show-sources #sourceSettings{display:flex;flex-direction:column;gap:10px;grid-row:2;grid-column:1;z-index:2;min-height:0;margin:1px 1px 62px;padding:14px;background:#151515e8;border:0;overflow:hidden;align-self:stretch}
+.focus-mode.show-output #outputSettings>summary,.focus-mode.show-sources #sourceSettings>summary{display:none}
+.focus-mode .focus-title{display:flex;justify-content:space-between;align-items:center;gap:8px;flex:none}
+.focus-title h2{font-size:18px;margin:0}.focus-title button{min-height:40px;font-size:11px;padding:6px 9px}
+.focus-mode #outputSettings p{margin:0;font-size:12px;line-height:1.5}
+.focus-mode #outputSettings select{margin:0;flex:none}
+.focus-mode #outputSettings>.row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;gap:6px}
+.focus-mode #outputSettings>.row button{min-width:0;font-size:11px;min-height:48px;padding:6px}
+.focus-mode #devices{font-size:12px;line-height:1.4;overflow-wrap:anywhere}
+.source-tabs{gap:6px}.focus-mode .source-tabs{display:flex;flex:none}
+.source-tabs button{flex:1;min-width:0;min-height:44px;font-size:12px;padding:8px}
+.source-tabs button[aria-pressed=true]{background:var(--cobalt);color:var(--on-cobalt)}
+.source-content{min-width:0}.source-common{min-width:0}
+.focus-mode .source-layout{display:flex;flex-direction:column;gap:16px;min-height:0}
+.focus-mode #sourceSettings .source-group{display:none}
+.focus-mode #sourceSettings[data-source-view=tone] .source-tone,.focus-mode #sourceSettings[data-source-view=file] .source-file,.focus-mode #sourceSettings[data-source-view=url] .source-url{display:block}
+.focus-mode #sourceSettings .source-group label{margin:0 0 6px;font-size:12px}
+.focus-mode #sourceSettings .source-group .note{font-size:12px;line-height:1.4;margin-bottom:10px}
+.focus-mode #sourceSettings input[type=file]{width:100%;min-height:44px;font-size:14px;margin:0}
+.focus-mode #sourceSettings input[type=url]{margin:0 0 6px}
+.focus-mode #btnTone,.focus-mode #btnUrl{width:100%;min-height:44px;font-size:13px}
+.source-playback{display:flex;align-items:center;gap:8px}.source-playback audio{flex:1;min-width:0}.source-playback button{flex:none}
+.focus-mode .source-playback audio{margin:0;height:48px}.focus-mode .source-playback button{min-height:44px;font-size:12px;padding:8px}
+.focus-mode .source-common>label{font-size:12px;margin:12px 0 0}
+.focus-mode #sourceSettings .source-file .note{margin:10px 0 0}
+.focus-mode #sourceSettings input[type=range]{margin-bottom:0}
+.focus-mode.compact-height .player-core{grid-template-rows:24px minmax(54px,1fr) auto;gap:4px 16px;justify-content:normal}
+.focus-mode.compact-height .np{grid-column:1;grid-row:2;height:auto;min-height:54px}
+.focus-mode.compact-height .np img{width:48px;height:48px}
+.focus-mode.compact-height .mic-control{grid-column:1;grid-row:3}
+.focus-mode.compact-height .player-core>.row{grid-column:1;grid-row:2}
+.focus-mode.compact-height .transport{grid-column:2;grid-row:2}
+.focus-mode.compact-height .transport button{height:60px;min-height:60px}
+.focus-mode.compact-height .shuffle-row{grid-column:2;grid-row:3}
+.focus-mode.compact-height .player-core>.quick-actions{display:none}
+.focus-mode.compact-height.show-library .player-core,.focus-mode.compact-height.show-output .player-core,.focus-mode.compact-height.show-sources .player-core{display:none}
+.focus-mode.compact-height .source-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.focus-mode.compact-height #outputSettings,.focus-mode.compact-height #sourceSettings{padding:8px 12px;gap:6px}
+.focus-mode.compact-height .focus-title h2{font-size:16px}
+.focus-mode.compact-height .source-common>label{margin-top:6px}
+.focus-mode.compact-height #sourceSettings .source-tone .note,.focus-mode.compact-height #sourceSettings .source-file .note{display:none}
+.focus-mode.compact-height .source-playback{flex-direction:column;align-items:stretch;gap:4px}.focus-mode.compact-height .source-playback audio{width:100%;flex:none;height:40px}.focus-mode.compact-height .source-playback button{min-height:36px;height:36px;padding:4px}
+.focus-mode.keyboard-open .focus-nav{padding-top:4px}.focus-mode.keyboard-open .focus-nav button{min-height:38px}
+.focus-mode.keyboard-open #sourceSettings{margin-bottom:52px;padding-top:4px;padding-bottom:4px}
+.focus-mode.keyboard-open #sourceSettings .focus-title{display:none}
+
 </style>
 </head>
 <body>
@@ -221,7 +300,7 @@ input[type=range]::-moz-range-thumb{clip-path:var(--corner-shape)}
     <div class="mic-control">
       <label class="ios-switch" for="hfpCompat"><span id="audioModeLabel">Bez mikrofonu</span><input type="checkbox" role="switch" id="hfpCompat" aria-label="Handsfree pro hudbu místo režimu bez mikrofonu" aria-describedby="micHint"><span class="switch-track" aria-hidden="true"></span></label>
       <p id="micHint" class="note" role="status">Nejdřív připoj handsfree. Mikrofon se nenahrává ani neodesílá.</p>
-      <button id="btnRestoreAudio" class="secondary" disabled>↻ Obnovit zvuk</button>
+      <button id="btnRestoreAudio" class="secondary" aria-label="Obnovit zvuk" disabled><span aria-hidden="true">↻</span> <span class="restore-label">Obnovit zvuk</span></button>
     </div>
     <label class="wake-control"><input type="checkbox" id="chkWake"> Nezhasínat displej</label>
     </div>
@@ -240,6 +319,7 @@ input[type=range]::-moz-range-thumb{clip-path:var(--corner-shape)}
       </div>
       <p class="note" id="spBrowseStatus" role="status" aria-live="polite">Přihlas se ke Spotify a vyhledej skladbu nebo otevři své oblíbené.</p>
       <button id="spReconnect" hidden>Povolit oblíbené ve Spotify</button>
+      <div class="browse-options">
       <div id="spOrderRow" hidden>
         <label for="spOrder">Pořadí oblíbených podle uložení</label>
         <select id="spOrder">
@@ -248,6 +328,7 @@ input[type=range]::-moz-range-thumb{clip-path:var(--corner-shape)}
         </select>
       </div>
       <div class="row"><button id="spPlayList" class="secondary" hidden>▶ Přehrát výběr</button></div>
+      </div>
       <div id="spTrackList">
       <ul id="spResults" class="track-list" aria-label="Skladby" aria-busy="false"></ul>
       <nav class="track-pager" id="spPager" aria-label="Stránky skladeb" hidden>
@@ -294,6 +375,11 @@ input[type=range]::-moz-range-thumb{clip-path:var(--corner-shape)}
     <p class="note"><b>Spotify na iPhonu otevři v Safari a nech připojení k internetu zapnuté.</b> Ikonu si můžeš přidat přes Sdílet → Přidat na plochu. Pokud se přihlášení z ikony nevrátí do aplikace, dokonči ho přímo v Safari.</p>
     <div class="row"><button id="spLogout" class="secondary">Odhlásit</button></div>
     </details>
+    <nav class="focus-nav" aria-label="Ovládání zvětšeného přehrávače">
+      <button id="focusMusic" aria-controls="musicLibrary" aria-pressed="false">♫ Hudba</button>
+      <button id="focusOutput" aria-controls="outputSettings" aria-pressed="false">Zvukový výstup</button>
+      <button id="focusSources" aria-controls="sourceSettings" aria-pressed="false">Zvuky a zdroje</button>
+    </nav>
   </section>
   <dialog id="audioRouteDialog" aria-labelledby="routeTitle">
     <h2 id="routeTitle">Zvuk do auta</h2>
@@ -343,8 +429,9 @@ input[type=range]::-moz-range-thumb{clip-path:var(--corner-shape)}
 
   <details class="panel" id="outputSettings">
     <summary>Zvukový výstup</summary>
-    <p class="note">Pokud zvuk nejde do auta, zkus výstup přepnout tady nebo v telefonu.</p>
-    <select id="selOutput"><option value="">Výchozí výstup (systém)</option></select>
+    <div class="focus-title"><h2>Zvukový výstup</h2><button id="focusRouteHelp" class="secondary">Jak připojit BMW</button></div>
+    <p class="note">Spotify: výstup do BMW zvol v telefonu. Volba níže ovládá testovací zvuk, MP3 a URL stream.</p>
+    <select id="selOutput" aria-label="Výstup testovacího zvuku a dalších zdrojů"><option value="">Výchozí výstup (systém)</option></select>
     <div class="row">
       <button id="btnEnumerate" class="secondary">Načíst zařízení</button>
       <button id="btnPickOutput" class="secondary" disabled>Vybrat výstup (dialog)</button>
@@ -353,20 +440,37 @@ input[type=range]::-moz-range-thumb{clip-path:var(--corner-shape)}
     <div id="devices" class="note"></div>
   </details>
 
-  <details class="panel">
+  <details class="panel" id="sourceSettings" data-source-view="tone">
     <summary>Testovací zvuk a další zdroje</summary>
-    <div class="row">
-      <button id="btnTone">Testovací tón (smyčka)</button>
-      <button id="btnStop" class="secondary">Stop</button>
+    <div class="focus-title"><h2>Zvuky a další zdroje</h2></div>
+    <div class="source-tabs" role="group" aria-label="Zdroj zvuku">
+      <button id="sourceTone" class="secondary" aria-pressed="true">Testovací tón</button>
+      <button id="sourceFile" class="secondary" aria-pressed="false">Soubor</button>
+      <button id="sourceUrl" class="secondary" aria-pressed="false">URL stream</button>
     </div>
-    <label for="fileIn">Vlastní MP3 / M4A ze Souborů</label>
-    <input type="file" id="fileIn" accept="audio/*">
-    <label for="urlIn">Nebo URL audio streamu (HTTPS)</label>
-    <input type="url" id="urlIn" placeholder="https://…/stream.mp3" inputmode="url">
-    <div class="row"><button id="btnUrl" class="secondary">Přehrát URL</button></div>
-    <audio id="player" controls playsinline preload="auto"></audio>
-    <label for="vol">Hlasitost stránky</label>
-    <input type="range" id="vol" min="0" max="1" step="0.05" value="1">
+    <div class="source-layout">
+      <div class="source-content">
+        <div class="source-group source-tone">
+          <p class="note">Ověř zvuk v reproduktorech auta krátkou tónovou smyčkou.</p>
+          <button id="btnTone">Spustit testovací tón</button>
+        </div>
+        <div class="source-group source-file">
+          <label for="fileIn">MP3 / M4A ze Souborů</label>
+          <input type="file" id="fileIn" accept="audio/*">
+          <p class="note">Vybraný soubor se spustí v přehrávači níže.</p>
+        </div>
+        <div class="source-group source-url">
+          <label for="urlIn">Adresa audio streamu (HTTPS)</label>
+          <input type="url" id="urlIn" placeholder="https://…/stream.mp3" inputmode="url">
+          <button id="btnUrl">Přehrát URL</button>
+        </div>
+      </div>
+      <div class="source-common">
+        <div class="source-playback"><audio id="player" controls playsinline preload="auto"></audio><button id="btnStop" class="secondary">Stop</button></div>
+        <label for="vol">Hlasitost tohoto zdroje</label>
+        <input type="range" id="vol" min="0" max="1" step="0.05" value="1">
+      </div>
+    </div>
   </details>
 
   <details class="panel">
@@ -1281,6 +1385,7 @@ input[type=range]::-moz-range-thumb{clip-path:var(--corner-shape)}
 (() => {
   const $ = id => document.getElementById(id), root = document.documentElement;
   let focusMode = false, usedFullscreen = false, fullscreenRequest = 0, savedScroll = 0;
+  let activeTool = null, previousToolOpen = false;
   const fullscreenElement = () => document.fullscreenElement || document.webkitFullscreenElement;
   const layout = () => document.dispatchEvent(new Event('bmw:layout'));
   function fitViewport() {
@@ -1291,16 +1396,49 @@ input[type=range]::-moz-range-thumb{clip-path:var(--corner-shape)}
     root.style.setProperty('--app-height', height + 'px');
     root.style.setProperty('--visual-top', (view ? view.offsetTop : 0) + 'px');
     root.classList.toggle('compact-height', height < 550);
-    root.classList.toggle('keyboard-open', document.activeElement === $('spSearch') && height < 600);
+    root.classList.toggle('keyboard-open', [$('spSearch'), $('urlIn')].includes(document.activeElement) && height < 600);
     layout();
   }
-  function library(open) {
-    root.classList.toggle('show-library', open);
-    $('btnShowMusic').setAttribute('aria-pressed', String(open));
-    if (!open) $('spSearch').blur();
+  function selectView(view) {
+    const tool = view === 'output' ? 'outputSettings' : view === 'sources' ? 'sourceSettings' : null;
+    if (activeTool && activeTool !== tool) {
+      $(activeTool).open = previousToolOpen;
+      activeTool = null;
+    }
+    if (tool && activeTool !== tool) {
+      previousToolOpen = $(tool).open;
+      activeTool = tool;
+      $(tool).open = true;
+    }
+    root.classList.toggle('show-library', view === 'music');
+    root.classList.toggle('show-output', view === 'output');
+    root.classList.toggle('show-sources', view === 'sources');
+    $('btnShowMusic').setAttribute('aria-pressed', String(view === 'music'));
+    $('focusMusic').setAttribute('aria-pressed', String(view === 'music'));
+    $('focusOutput').setAttribute('aria-pressed', String(view === 'output'));
+    $('focusSources').setAttribute('aria-pressed', String(view === 'sources'));
+    if (view !== 'music') $('spSearch').blur();
+    if (view !== 'sources') $('urlIn').blur();
     fitViewport();
-    layout();
   }
+  function library(open) { selectView(open ? 'music' : 'player'); }
+  function showTool(view) {
+    if (!focusMode) setFocus(true);
+    selectView(view);
+  }
+  $('focusMusic').onclick = () => showTool('music');
+  $('focusOutput').onclick = () => showTool('output');
+  $('focusSources').onclick = () => showTool('sources');
+  $('focusRouteHelp').onclick = () => $('btnQuickConnect').click();
+  function selectSource(source) {
+    $('sourceSettings').dataset.sourceView = source;
+    for (const [id, value] of [['sourceTone','tone'], ['sourceFile','file'], ['sourceUrl','url']]) $(id).setAttribute('aria-pressed', String(source === value));
+    if (source !== 'url') $('urlIn').blur();
+    fitViewport();
+  }
+  $('sourceTone').onclick = () => selectSource('tone');
+  $('sourceFile').onclick = () => selectSource('file');
+  $('sourceUrl').onclick = () => selectSource('url');
   function setFocus(active) {
     if (active && !focusMode) savedScroll = window.scrollY;
     focusMode = active;
@@ -1346,7 +1484,7 @@ input[type=range]::-moz-range-thumb{clip-path:var(--corner-shape)}
   document.addEventListener('keydown', event => {
     if ($('audioRouteDialog').open) return;
     if (event.key === 'Escape' && focusMode && !fullscreenElement()) {
-      if (root.classList.contains('show-library')) library(false);
+      if (root.classList.contains('show-library') || activeTool) library(false);
       else { fullscreenRequest++; setFocus(false); }
     }
   });
@@ -1391,6 +1529,7 @@ input[type=range]::-moz-range-thumb{clip-path:var(--corner-shape)}
     window.visualViewport.addEventListener('scroll', fitViewport);
   }
   $('spSearch').addEventListener('focus', fitViewport);
+  $('urlIn').addEventListener('focus', fitViewport);
   // Don't move a pressed search button between pointerdown (blur) and click.
   $('spSearchForm').addEventListener('submit', fitViewport);
   syncOverview(); cutCorners(); setFocus(false);
