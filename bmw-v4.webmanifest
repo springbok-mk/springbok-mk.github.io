@@ -1,0 +1,36 @@
+{
+  "name": "BMW · Spotify v4",
+  "short_name": "BMW v4",
+  "description": "Zvuk z webu do staré BMW handsfree jednotky přes HFP",
+  "lang": "cs",
+  "start_url": "./bmw-bluetooth-v4.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#10110E",
+  "theme_color": "#10110E",
+  "icons": [
+    {
+      "src": "./bmw-icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "./bmw-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./bmw-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "id": "./bmw-bluetooth-v4.html",
+  "display_override": [
+    "fullscreen",
+    "standalone"
+  ]
+}
