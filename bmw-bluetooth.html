@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>BMW Bluetooth test</title>
+<style>
+  :root{
+    --bg:#EEF2FA; --surface:#FFFFFF; --surface2:#E4EAF7; --ink:#12203F; --muted:#56638A; --line:#CBD5EA;
+    --cobalt:#1E44B5; --cobalt-deep:#142E80; --on-cobalt:#FFFFFF;
+    --ok:#1F7A4C; --ok-bg:#E1F3E8; --bad:#C2341F; --bad-bg:#FBE6E2; --warn:#8A5A00; --warn-bg:#FCF0D2;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --bg:#0B1230; --surface:#141E47; --surface2:#1C2960; --ink:#EAF0FF; --muted:#9CABD6; --line:#2A3A78;
+      --cobalt:#7C99FF; --cobalt-deep:#AFC1FF; --on-cobalt:#0B1230;
+      --ok:#6BD39A; --ok-bg:#12382A; --bad:#FF8A76; --bad-bg:#43191A; --warn:#F5C970; --warn-bg:#3B2F12;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0B1230; --surface:#141E47; --surface2:#1C2960; --ink:#EAF0FF; --muted:#9CABD6; --line:#2A3A78;
+    --cobalt:#7C99FF; --cobalt-deep:#AFC1FF; --on-cobalt:#0B1230;
+    --ok:#6BD39A; --ok-bg:#12382A; --bad:#FF8A76; --bad-bg:#43191A; --warn:#F5C970; --warn-bg:#3B2F12;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+       padding-bottom:env(safe-area-inset-bottom)}
+  main{max-width:600px;margin:0 auto;padding:28px 16px 48px}
+  h1{font:italic 32px/1.15 Georgia,'Times New Roman',serif;margin:0 0 4px}
+  .lead{color:var(--muted);margin:0 0 20px;font-size:15px}
+  .lead a{color:var(--cobalt)}
+  section{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px}
+  h2{font-size:15px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 10px}
+  h2 .n{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;border-radius:50%;
+        background:var(--cobalt);color:var(--on-cobalt);font-size:13px;margin-right:8px;letter-spacing:0}
+  p{margin:0 0 10px}
+  .note{font-size:14px;color:var(--muted)}
+  .row{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+  button{appearance:none;border:0;border-radius:10px;padding:12px 16px;font:600 16px system-ui,sans-serif;
+         background:var(--cobalt);color:var(--on-cobalt);cursor:pointer;min-height:44px}
+  button.secondary{background:var(--surface2);color:var(--ink)}
+  button.danger{background:var(--bad);color:#fff}
+  button:disabled{opacity:.45;cursor:default}
+  select,input[type=text],input[type=url],input[type=range]{width:100%;font:16px system-ui,sans-serif;padding:10px;border:1.5px solid var(--line);
+         border-radius:10px;background:var(--surface);color:var(--ink);margin:6px 0}
+  input[type=range]{padding:0;border:0}
+  input[type=file]{font-size:15px;margin:6px 0;max-width:100%}
+  label{display:block;font-size:14px;color:var(--muted);margin-top:6px}
+  .status{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;font-size:14px;margin:0}
+  .status dt{color:var(--muted)}
+  .status dd{margin:0;font-family:ui-monospace,Menlo,monospace;font-size:13px;word-break:break-all}
+  .pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:13px;font-weight:600}
+  .pill.ok{background:var(--ok-bg);color:var(--ok)}
+  .pill.bad{background:var(--bad-bg);color:var(--bad)}
+  .pill.warn{background:var(--warn-bg);color:var(--warn)}
+  .pill.off{background:var(--surface2);color:var(--muted)}
+  #log{font:12px/1.45 ui-monospace,Menlo,monospace;background:var(--surface2);border-radius:10px;padding:10px;
+       max-height:260px;overflow:auto;white-space:pre-wrap;word-break:break-word;margin:0}
+  #log .e{color:var(--bad)} #log .w{color:var(--warn)} #log .g{color:var(--ok)}
+  audio{width:100%;margin:8px 0}
+  details{margin-top:10px} summary{cursor:pointer;color:var(--cobalt);font-size:15px}
+  ol{padding-left:20px;margin:0} ol li{margin-bottom:6px}
+  .back{font-size:14px;color:var(--cobalt);text-decoration:none}
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="index.html">← springbok-mk</a>
+  <h1>BMW Bluetooth test</h1>
+  <p class="lead">Experiment: dostat zvuk z webové stránky do staré BMW handsfree jednotky, která umí jen telefonní profil (HFP).
+  Stránka požádá o „hovorový“ zvukový režim Safari a pak přehraje testovací tón nebo tvoje MP3. Přepnutí zvuku do BMW závisí na iOS a handsfree jednotce; stránka ho neumí vynutit ani potvrdit.
+  Mikrofon se zapne, ale nic se nenahrává ani neodesílá.</p>
+
+  <section>
+    <h2>Stav</h2>
+    <dl class="status">
+      <dt>Podpora</dt><dd id="support">…</dd>
+      <dt>Režim HFP</dt><dd id="hfpState"><span class="pill off">vypnuto</span></dd>
+      <dt>audioSession.type</dt><dd id="asType">–</dd>
+      <dt>audioSession.state</dt><dd id="asState">–</dd>
+      <dt>Vstup (mikrofon)</dt><dd id="inputLabel">–</dd>
+      <dt>Výstup (sinkId)</dt><dd id="sinkLabel">výchozí (systém)</dd>
+      <dt>Přehrávač</dt><dd id="playState">zastaveno</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h2><span class="n">1</span>Zapnout režim pro handsfree</h2>
+    <p class="note">Požádá o mikrofon a nastaví <code>navigator.audioSession.type = "play-and-record"</code>. Safari se zeptá na povolení; potvrď.</p>
+    <div class="row">
+      <button id="btnHfpOn">Zapnout HFP režim</button>
+      <button id="btnHfpOff" class="danger" disabled>Vypnout a uvolnit mikrofon</button>
+    </div>
+    <label><input type="checkbox" id="chkEcho"> Zapnout echoCancellation (jiný „voice“ profil, zkus obě varianty)</label>
+  </section>
+
+  <section>
+    <h2><span class="n">2</span>Vybrat zvukový výstup</h2>
+    <p class="note">Dostupné možnosti závisejí na podpoře <code>setSinkId()</code> a <code>selectAudioOutput()</code> v prohlížeči. Když jsou tlačítka šedá, příslušná funkce není dostupná; výstup pak vybírej v systému.</p>
+    <select id="selOutput"><option value="">Výchozí výstup (systém)</option></select>
+    <div class="row">
+      <button id="btnEnumerate" class="secondary">Načíst zařízení</button>
+      <button id="btnPickOutput" class="secondary" disabled>Vybrat výstup (dialog)</button>
+      <button id="btnApplySink" class="secondary" disabled>Použít vybraný výstup</button>
+    </div>
+    <div id="devices" class="note"></div>
+  </section>
+
+  <section>
+    <h2><span class="n">3</span>Přehrát zvuk</h2>
+    <div class="row">
+      <button id="btnTone">Testovací tón (smyčka)</button>
+      <button id="btnStop" class="secondary">Stop</button>
+    </div>
+    <label for="fileIn">Vlastní MP3 / M4A ze Souborů</label>
+    <input type="file" id="fileIn" accept="audio/*">
+    <label for="urlIn">Nebo URL audio streamu (HTTPS)</label>
+    <input type="url" id="urlIn" placeholder="https://…/stream.mp3" inputmode="url">
+    <div class="row"><button id="btnUrl" class="secondary">Přehrát URL</button></div>
+    <audio id="player" controls playsinline preload="auto"></audio>
+    <label for="vol">Hlasitost stránky</label>
+    <input type="range" id="vol" min="0" max="1" step="0.05" value="1">
+    <label><input type="checkbox" id="chkWake"> Držet obrazovku rozsvícenou (Wake Lock)</label>
+  </section>
+
+  <section>
+    <h2><span class="n">4</span>Postup v autě</h2>
+    <ol>
+      <li>iPhone spárovaný s BMW jako telefon, zapalování zapnuté, rádio na zdroji „Telefon“ nebo kdekoli, kde se obvykle ozývá hovor.</li>
+      <li>Krok 1: zapnout HFP režim, povolit mikrofon. Sleduj, zda BMW ukáže „aktivní hovor“ a zda se změnil vstup na BMW.</li>
+      <li>Krok 3: pustit tón. Zvuk má jít z reproduktorů auta, ne z iPhonu.</li>
+      <li>Pokud zvuk jde z iPhonu: zkus krok 2 (výběr výstupu), pak přepnout checkbox echoCancellation, vypnout a znovu zapnout HFP, případně v Ovládacím centru ručně přepnout výstup na BMW.</li>
+      <li>Teprve když tón hraje v autě: zamknout displej, přepnout do jiné aplikace, spustit Spotify a sledovat, co se stane (log níže).</li>
+    </ol>
+    <details>
+      <summary>Co od toho čekat</summary>
+      <p class="note">HFP je hlasový profil: mono, 8 nebo 16 kHz. I při úspěchu bude kvalita na úrovni telefonního hovoru.
+      Přesměrování Spotify je nejistý krok: Safari v režimu play-and-record může přehrávání jiné aplikace pozastavit, a Audio Session API neumí převzít zvuk cizí aplikace.
+      Tato stránka přehrává vlastní MP3/stream; přenos do BMW je potřeba ověřit poslechem. Zvuk Spotify ani jiné aplikace tato stránka přesměrovat neumí.</p>
+    </details>
+  </section>
+
+  <section>
+    <h2>Log</h2>
+    <div class="row">
+      <button id="btnCopy" class="secondary">Kopírovat log</button>
+      <button id="btnClear" class="secondary">Vymazat</button>
+    </div>
+    <pre id="log"></pre>
+  </section>
+</main>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const logEl = $('log');
+  const player = $('player');
+  let micStream = null;
+  let micRequest = 0;
+  let toneUrl = null;
+  let wakeLock = null;
+  let currentSink = '';
+
+  function log(msg, cls) {
+    const t = new Date().toTimeString().slice(0, 8);
+    const line = document.createElement('div');
+    if (cls) line.className = cls;
+    line.textContent = `[${t}] ${msg}`;
+    logEl.appendChild(line);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+  const err = e => log((e && (e.name ? e.name + ': ' : '') + (e.message || e)) || 'neznámá chyba', 'e');
+
+  // ---------- podpora ----------
+  const hasAS = 'audioSession' in navigator;
+  const hasGUM = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  const hasSink = typeof player.setSinkId === 'function';
+  const hasSelect = !!(navigator.mediaDevices && navigator.mediaDevices.selectAudioOutput);
+  const hasWake = 'wakeLock' in navigator;
+  $('support').textContent =
+    `audioSession ${hasAS ? '✓' : '✗'} · getUserMedia ${hasGUM ? '✓' : '✗'} · setSinkId ${hasSink ? '✓' : '✗'} · selectAudioOutput ${hasSelect ? '✓' : '✗'} · wakeLock ${hasWake ? '✓' : '✗'}`;
+  $('btnHfpOn').disabled = !hasGUM;
+  $('btnPickOutput').disabled = !(hasSelect && hasSink);
+  $('btnApplySink').disabled = !hasSink;
+  if (!hasWake) $('chkWake').disabled = true;
+  if (!window.isSecureContext) log('Stránka neběží v zabezpečeném kontextu; otevři ji přes HTTPS.', 'e');
+  log('UA: ' + navigator.userAgent);
+  log(`Podpora: audioSession=${hasAS} getUserMedia=${hasGUM} setSinkId=${hasSink} selectAudioOutput=${hasSelect} wakeLock=${hasWake}`);
+  if (!hasAS) log('navigator.audioSession chybí: stránka nemůže vyžádat play-and-record. Mikrofon samotný přesto může režim přepnout.', 'w');
+
+  function refreshAS() {
+    if (!hasAS) { $('asType').textContent = 'nepodporováno'; $('asState').textContent = 'nepodporováno'; return; }
+    $('asType').textContent = navigator.audioSession.type;
+    $('asState').textContent = navigator.audioSession.state || '–';
+  }
+  if (hasAS) {
+    navigator.audioSession.addEventListener && navigator.audioSession.addEventListener('statechange', () => { refreshAS(); log('audioSession.state → ' + navigator.audioSession.state); });
+  }
+  refreshAS();
+
+  function setAS(type) {
+    if (!hasAS) return;
+    try { navigator.audioSession.type = type; log('audioSession.type = ' + navigator.audioSession.type); }
+    catch (e) { err(e); }
+    refreshAS();
+  }
+
+  // ---------- 1. HFP režim ----------
+  async function hfpOn() {
+    if (micStream || $('btnHfpOn').disabled) return;
+    if (!hasGUM) { log('Přístup k mikrofonu není v tomto prohlížeči dostupný.', 'w'); return; }
+    const request = ++micRequest;
+    $('btnHfpOn').disabled = true;
+    $('btnHfpOff').disabled = false;
+    $('hfpState').innerHTML = '<span class="pill warn">čeká na mikrofon</span>';
+    try {
+      setAS('play-and-record');
+      const ec = $('chkEcho').checked;
+      const constraints = { audio: { echoCancellation: ec, noiseSuppression: ec, autoGainControl: ec }, video: false };
+      log('getUserMedia ' + JSON.stringify(constraints.audio));
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      if (request !== micRequest) { stream.getTracks().forEach(t => t.stop()); return; }
+      micStream = stream;
+      // zvuk z mikrofonu nikam nevedeme: žádný AudioContext, žádný recorder, žádné síťové spojení
+      const track = micStream.getAudioTracks()[0];
+      const s = track.getSettings ? track.getSettings() : {};
+      $('inputLabel').textContent = track.label || s.deviceId || 'mic';
+      log(`Mikrofon aktivní: "${track.label}" ` + JSON.stringify(s), 'g');
+      track.onended = () => { log('Mikrofonní stopa ukončena systémem', 'w'); hfpOff(); };
+      track.onmute = () => log('mic mute', 'w');
+      track.onunmute = () => log('mic unmute');
+      setAS('play-and-record');
+      $('hfpState').innerHTML = '<span class="pill ok">mikrofon aktivní; ověř zvuk v autě</span>';
+      $('btnHfpOn').disabled = true; $('btnHfpOff').disabled = false;
+      await enumerate();
+    } catch (e) { if (request === micRequest) { err(e); hfpOff(); } }
+  }
+  function hfpOff() {
+    micRequest++;
+    if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; log('Mikrofon uvolněn'); }
+    setAS('auto');
+    $('inputLabel').textContent = '–';
+    $('hfpState').innerHTML = '<span class="pill off">vypnuto</span>';
+    $('btnHfpOn').disabled = !hasGUM; $('btnHfpOff').disabled = true;
+  }
+  $('btnHfpOn').onclick = hfpOn;
+  $('btnHfpOff').onclick = hfpOff;
+
+  // ---------- 2. výstup ----------
+  async function enumerate() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) { log('enumerateDevices nepodporováno', 'w'); return; }
+    try {
+      const devs = await navigator.mediaDevices.enumerateDevices();
+      const sel = $('selOutput');
+      sel.innerHTML = '<option value="">Výchozí výstup (systém)</option>';
+      const lines = [];
+      devs.forEach(d => {
+        lines.push(`${d.kind}: "${d.label || '(bez názvu)'}" id=${(d.deviceId || '').slice(0, 12)}`);
+        if (d.kind === 'audiooutput') {
+          const o = document.createElement('option');
+          o.value = d.deviceId; o.textContent = d.label || ('výstup ' + d.deviceId.slice(0, 8));
+          if (d.deviceId === currentSink) o.selected = true;
+          sel.appendChild(o);
+        }
+      });
+      const outs = devs.filter(d => d.kind === 'audiooutput').length;
+      $('devices').textContent = devs.length ? `${devs.length} zařízení, z toho ${outs} výstupů (iOS výstupy obvykle vůbec nevypisuje).` : 'Žádná zařízení.';
+      log('Zařízení:\n' + (lines.join('\n') || '(nic)'));
+    } catch (e) { err(e); }
+  }
+  $('btnEnumerate').onclick = enumerate;
+  navigator.mediaDevices && navigator.mediaDevices.addEventListener && navigator.mediaDevices.addEventListener('devicechange', () => { log('devicechange'); enumerate(); });
+
+  async function applySink(id) {
+    if (!hasSink) { log('setSinkId nepodporováno', 'w'); return; }
+    try {
+      await player.setSinkId(id);
+      currentSink = id;
+      const opt = [...$('selOutput').options].find(o => o.value === id);
+      $('sinkLabel').textContent = id ? (opt ? opt.textContent : id) : 'výchozí (systém)';
+      log('setSinkId OK → ' + (id || 'default'), 'g');
+    } catch (e) { err(e); }
+  }
+  $('btnApplySink').onclick = () => applySink($('selOutput').value);
+  $('btnPickOutput').onclick = async () => {
+    try {
+      const d = await navigator.mediaDevices.selectAudioOutput();
+      log(`selectAudioOutput → "${d.label}" ${d.deviceId.slice(0, 12)}`, 'g');
+      await enumerate();
+      $('selOutput').value = d.deviceId;
+      await applySink(d.deviceId);
+    } catch (e) { err(e); }
+  };
+
+  // ---------- 3. přehrávání ----------
+  function makeToneWav(seconds = 4, rate = 16000) {
+    // 1 s A4 440 Hz + 1 s 1 kHz, 2× (hlasové pásmo, aby to HFP přeneslo)
+    const n = seconds * rate, buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+    const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+    w(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt ');
+    v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+    w(36, 'data'); v.setUint32(40, n * 2, true);
+    for (let i = 0; i < n; i++) {
+      const t = i / rate, f = (Math.floor(t) % 2 === 0) ? 440 : 1000;
+      const env = Math.min(1, (t % 1) * 20, (1 - t % 1) * 20); // krátké fade proti lupání
+      v.setInt16(44 + i * 2, Math.sin(2 * Math.PI * f * t) * env * 0.5 * 32767, true);
+    }
+    return URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+  }
+  async function playSrc(src, loop, title) {
+    try {
+      player.loop = !!loop;
+      player.src = src;
+      player.volume = parseFloat($('vol').value);
+      await player.play();
+      log('play() OK: ' + title, 'g');
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({ title, artist: 'BMW Bluetooth test' });
+        navigator.mediaSession.setActionHandler('play', () => player.play());
+        navigator.mediaSession.setActionHandler('pause', () => player.pause());
+      }
+    } catch (e) { err(e); }
+  }
+  $('btnTone').onclick = () => { if (!toneUrl) toneUrl = makeToneWav(); playSrc(toneUrl, true, 'Testovací tón'); };
+  $('btnStop').onclick = () => { player.pause(); player.removeAttribute('src'); player.load(); $('playState').textContent = 'zastaveno'; log('stop'); };
+  $('fileIn').onchange = e => { const f = e.target.files[0]; if (f) playSrc(URL.createObjectURL(f), false, f.name); };
+  $('btnUrl').onclick = () => { const u = $('urlIn').value.trim(); if (u) playSrc(u, false, u); };
+  $('vol').oninput = e => player.volume = parseFloat(e.target.value);
+  ['play', 'playing', 'pause', 'ended', 'stalled', 'waiting', 'error', 'suspend'].forEach(ev =>
+    player.addEventListener(ev, () => {
+      $('playState').textContent = ev + (player.error ? ' (' + player.error.code + ')' : '');
+      if (ev === 'error') log('audio error code ' + (player.error && player.error.code), 'e');
+      else if (ev !== 'suspend') log('audio: ' + ev);
+    }));
+
+  // ---------- wake lock ----------
+  let wakePending = false;
+  async function requestWakeLock() {
+    if (!hasWake || wakeLock || wakePending || !$('chkWake').checked || document.visibilityState !== 'visible') return;
+    wakePending = true;
+    try {
+      const lock = await navigator.wakeLock.request('screen');
+      if (!$('chkWake').checked || document.visibilityState !== 'visible') { await lock.release(); return; }
+      wakeLock = lock;
+      log('wakeLock aktivní');
+      lock.addEventListener('release', () => { if (wakeLock === lock) wakeLock = null; log('wakeLock uvolněn'); });
+    } catch (x) { err(x); $('chkWake').checked = false; }
+    finally { wakePending = false; }
+  }
+  $('chkWake').onchange = async e => {
+    if (e.target.checked) await requestWakeLock();
+    else if (wakeLock) {
+      const lock = wakeLock;
+      wakeLock = null;
+      try { await lock.release(); } catch (x) { err(x); }
+    }
+  };
+
+  // ---------- životní cyklus ----------
+  document.addEventListener('visibilitychange', () => {
+    log('visibility: ' + document.visibilityState + ` | mic=${!!micStream} playing=${!player.paused}`);
+    refreshAS();
+    if (document.visibilityState === 'visible') requestWakeLock();
+  });
+  window.addEventListener('pagehide', () => log('pagehide'));
+
+  $('btnCopy').onclick = async () => {
+    try { await navigator.clipboard.writeText(logEl.innerText); log('log zkopírován'); } catch (e) { err(e); }
+  };
+  $('btnClear').onclick = () => logEl.textContent = '';
+})();
+</script>
+</body>
+</html>
