@@ -1,0 +1,36 @@
+{
+  "name": "BMW · Spotify v2",
+  "short_name": "BMW v2",
+  "description": "Zvuk z webu do staré BMW handsfree jednotky přes HFP",
+  "lang": "cs",
+  "start_url": "./bmw-bluetooth-v2.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0C1017",
+  "theme_color": "#0C1017",
+  "icons": [
+    {
+      "src": "./bmw-icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "./bmw-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./bmw-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "id": "./bmw-bluetooth-v2.html",
+  "display_override": [
+    "fullscreen",
+    "standalone"
+  ]
+}
