@@ -94,6 +94,19 @@
   .track-row button{flex:none;padding:10px 12px}
   #spBrowseStatus{margin:8px 0}
   #spReconnect{margin:6px 0}
+  .shuffle-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:12px 0}
+  .ios-switch{display:flex;align-items:center;gap:10px;cursor:pointer;color:var(--ink);font-size:15px;margin:0}
+  .ios-switch input{position:absolute;opacity:0;width:1px;height:1px}
+  .switch-track{width:51px;height:31px;border-radius:18px;background:#8D96A8;position:relative;transition:background .18s;flex:none}
+  .switch-track:after{content:"";position:absolute;width:27px;height:27px;left:2px;top:2px;border-radius:50%;background:white;box-shadow:0 2px 4px #0003;transition:transform .18s}
+  .ios-switch input:checked+.switch-track{background:#34C759}
+  .ios-switch input:checked+.switch-track:after{transform:translateX(20px)}
+  .ios-switch input:focus-visible+.switch-track{outline:3px solid var(--cobalt);outline-offset:3px}
+  .ios-switch input:disabled+.switch-track{opacity:.5}
+  .list-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+  .list-heading h3{margin:0}
+  .list-heading button{font-size:13px;padding:8px 10px}
+  @media(prefers-reduced-motion:reduce){.switch-track,.switch-track:after{transition:none}}
 </style>
 </head>
 <body>
@@ -126,6 +139,13 @@
       <button id="spToggle" aria-label="Přehrát nebo pozastavit" class="big" disabled>▶</button>
       <button id="spNext" aria-label="Další skladba" class="secondary" disabled>▶▶</button>
     </div>
+    <div class="shuffle-row">
+      <span id="spOrderHint" class="note">Popořadě</span>
+      <label class="ios-switch" for="spShuffle">
+        <span>Náhodně</span><input type="checkbox" role="switch" id="spShuffle" aria-label="Náhodné přehrávání">
+        <span class="switch-track" aria-hidden="true"></span>
+      </label>
+    </div>
     <p class="note" id="spNote" role="status" aria-live="polite">V autě nejdřív zapni handsfree níže. Pak vyber skladbu.</p>
     <div class="music-browser">
       <form id="spSearchForm" role="search">
@@ -136,12 +156,24 @@
           <button type="button" id="spLiked" class="secondary" aria-pressed="false">♥ Oblíbené</button>
         </div>
       </form>
-      <h3 id="spBrowseTitle">Vyber si hudbu</h3>
+      <div class="list-heading">
+        <h3 id="spBrowseTitle">Vyber si hudbu</h3>
+        <button id="spHideTracks" class="secondary" aria-controls="spTrackList" aria-expanded="true" hidden>Skrýt skladby</button>
+      </div>
       <p class="note" id="spBrowseStatus" role="status" aria-live="polite">Přihlas se ke Spotify a vyhledej skladbu nebo otevři své oblíbené.</p>
       <button id="spReconnect" hidden>Povolit oblíbené ve Spotify</button>
+      <div id="spOrderRow" hidden>
+        <label for="spOrder">Pořadí oblíbených podle uložení</label>
+        <select id="spOrder">
+          <option value="newest">Od nejnovějších</option>
+          <option value="oldest">Od nejstarších</option>
+        </select>
+      </div>
       <div class="row"><button id="spPlayList" class="secondary" hidden>▶ Přehrát zobrazené skladby</button></div>
+      <div id="spTrackList">
       <ul id="spResults" class="track-list" aria-label="Skladby" aria-busy="false"></ul>
       <button id="spMore" class="secondary" hidden>Načíst další</button>
+      </div>
     </div>
     <details>
       <summary>Přehrát vlastní odkaz na Spotify</summary>
@@ -506,7 +538,7 @@
   const DEFAULT_CLIENT = 'a7000b47f7de4d85aa1452503d008a10';
   const SCOPES = 'streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state user-library-read';
   const REDIR = location.origin + location.pathname;
-  const K = { client: 'sp-client', ver: 'sp-verifier', tok: 'sp-token', pending: 'sp-pending-view' };
+  const K = { client: 'sp-client', ver: 'sp-verifier', tok: 'sp-token', pending: 'sp-pending-view', order: 'sp-order', shuffle: 'sp-shuffle' };
   const ls = {
     get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } },
     set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} },
@@ -515,6 +547,9 @@
 
   $('spRedir').value = REDIR;
   $('spClient').value = ls.get(K.client) || DEFAULT_CLIENT;
+  $('spOrder').value = ls.get(K.order) === 'oldest' ? 'oldest' : 'newest';
+  $('spShuffle').checked = ls.get(K.shuffle) === 'true';
+  $('spOrderHint').textContent = $('spShuffle').checked ? 'Náhodné pořadí' : 'Popořadě';
   // kdyby Client ID chybělo, nech Nastavení rozbalené – jinak se nedá nikde začít
   if (!$('spClient').value.trim()) { const d = document.querySelector('#spotify details'); if (d) d.open = true; }
 
@@ -746,6 +781,7 @@
   // ---------- vyhledávání a oblíbené ----------
   let browse = { mode: 'search', query: '', offset: 0, more: false, tracks: [] };
   let browseVersion = 0, browseBusy = false;
+  let tracksHidden = false;
   const playable = tr => tr && /^spotify:track:[A-Za-z0-9]+$/.test(tr.uri || '') && !tr.is_local && tr.is_playable !== false && !tr.restrictions;
   const browseStatus = text => { $('spBrowseStatus').textContent = text; };
 
@@ -790,6 +826,11 @@
     $('spPlayList').disabled = playBusy;
     $('spMore').hidden = !browse.more;
     $('spMore').disabled = browseBusy;
+    $('spHideTracks').hidden = !browse.tracks.length;
+    $('spHideTracks').textContent = tracksHidden ? 'Zobrazit skladby' : 'Skrýt skladby';
+    $('spHideTracks').setAttribute('aria-expanded', String(!tracksHidden));
+    $('spTrackList').hidden = tracksHidden;
+    $('spOrderRow').hidden = browse.mode !== 'liked';
   }
 
   async function browseTracks(mode, append = false) {
@@ -797,7 +838,10 @@
     const query = append ? browse.query : $('spSearch').value.trim();
     if (mode === 'search' && !query) { browseStatus('Napiš název skladby nebo interpreta.'); $('spSearch').focus(); return; }
     const version = ++browseVersion;
-    if (!append) browse = { mode, query: mode === 'search' ? query : '', offset: 0, more: false, tracks: [] };
+    if (!append) {
+      browse = { mode, query: mode === 'search' ? query : '', offset: 0, more: false, tracks: [], order: $('spOrder').value };
+      tracksHidden = false;
+    }
     $('spBrowseTitle').textContent = mode === 'liked' ? '♥ Oblíbené skladby' : 'Výsledky hledání';
     $('spLiked').setAttribute('aria-pressed', String(mode === 'liked'));
     $('spReconnect').hidden = true;
@@ -806,18 +850,33 @@
     browseBusy = true;
     $('spResults').setAttribute('aria-busy', 'true'); $('spMore').disabled = true;
     browseStatus(mode === 'liked' ? 'Načítám oblíbené…' : 'Hledám…');
-    const offset = browse.offset;
-    const params = new URLSearchParams({ limit: mode === 'liked' ? '25' : '10', offset: String(offset) });
-    if (mode === 'search') { params.set('q', browse.query); params.set('type', 'track'); }
     try {
-      const data = await api((mode === 'liked' ? '/me/tracks?' : '/search?') + params);
+      const oldest = mode === 'liked' && browse.order === 'oldest';
+      let offset = browse.offset, limit = mode === 'liked' ? 25 : 10;
+      if (oldest) {
+        if (!append) {
+          const meta = await api('/me/tracks?limit=1&offset=0');
+          if (version !== browseVersion) return;
+          if (!meta || !Number.isFinite(meta.total)) throw new Error('Spotify nevrátilo počet oblíbených. Zkus to znovu.');
+          browse.end = meta.total;
+        }
+        limit = Math.min(25, browse.end);
+        offset = Math.max(0, browse.end - limit);
+      }
+      const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+      if (mode === 'search') { params.set('q', browse.query); params.set('type', 'track'); }
+      const data = oldest && !limit ? { items: [], total: 0, next: null }
+        : await api((mode === 'liked' ? '/me/tracks?' : '/search?') + params);
       if (version !== browseVersion) return;
       const page = mode === 'liked' ? data : data && data.tracks;
       if (!page || !Array.isArray(page.items)) throw new Error('Spotify nevrátilo seznam skladeb. Zkus to znovu.');
       const tracks = mode === 'liked' ? page.items.map(item => item && item.track) : page.items;
+      if (oldest) tracks.reverse();
       browse.tracks.push(...tracks.filter(Boolean));
       browse.offset = offset + page.items.length;
-      browse.more = !!page.next && page.items.length > 0 && (mode === 'liked' || browse.offset <= 1000);
+      browse.end = offset;
+      browse.more = oldest ? offset > 0 && page.items.length > 0
+        : !!page.next && page.items.length > 0 && (mode === 'liked' || browse.offset <= 1000);
       browseStatus(browse.tracks.length
         ? 'Zobrazeno ' + browse.tracks.length + (Number.isFinite(page.total) ? ' z ' + page.total : '') + ' skladeb. Klepnutím na ▶ spustíš přehrávání.'
         : mode === 'liked' ? 'Zatím nemáš uložené žádné oblíbené skladby.' : 'Nic nenalezeno. Zkus jiný název nebo interpreta.');
@@ -836,11 +895,18 @@
     }
   }
 
-  function playTracks(index) {
-    const uris = browse.tracks.slice(index).filter(playable).slice(0, 100).map(tr => tr.uri);
+  function playTracks(index = null) {
+    let uris = browse.tracks.filter(playable).map(tr => tr.uri);
     if (!uris.length) return;
+    const start = index === null ? ($('spShuffle').checked ? Math.floor(Math.random() * uris.length) : 0)
+      : Math.max(0, uris.indexOf((browse.tracks[index] || {}).uri));
+    uris = $('spShuffle').checked ? uris.slice(start).concat(uris.slice(0, start)) : uris.slice(start);
     return play({ uris });
   }
+
+  const applyShuffle = () => api('/me/player/shuffle?' + new URLSearchParams({
+    state: String($('spShuffle').checked), device_id: deviceId
+  }), 'PUT');
 
   async function play(selection) {
     if (playBusy) return;
@@ -863,6 +929,8 @@
       if (what) await api('/me/player/play?device_id=' + deviceId, 'PUT', what);
       else await player.resume();
       $('spNote').textContent = 'Hraje. Jestli je zvuk v telefonu a ne v autě, vypni a znovu zapni krok 1 a ťukni na Hrát.';
+      try { await applyShuffle(); }
+      catch (e) { $('spNote').textContent = 'Přehrávání spuštěno, ale Spotify nepotvrdilo změnu pořadí. Zkus přepínač Náhodně znovu.'; log('pořadí: ' + e.message, 'w'); }
     } catch (e) { if (version === authVersion) { $('spNote').textContent = e.message; log('hraní: ' + e.message, 'e'); } }
     finally { playBusy = false; renderTracks(); }
   }
@@ -871,7 +939,18 @@
   $('spSearchForm').onsubmit = event => { event.preventDefault(); return browseTracks('search'); };
   $('spLiked').onclick = () => browseTracks('liked');
   $('spMore').onclick = () => browseTracks(browse.mode, true);
-  $('spPlayList').onclick = () => playTracks(0);
+  $('spPlayList').onclick = () => playTracks();
+  $('spHideTracks').onclick = () => { tracksHidden = !tracksHidden; renderTracks(); };
+  $('spOrder').onchange = () => { ls.set(K.order, $('spOrder').value); return browseTracks('liked'); };
+  $('spShuffle').onchange = async () => {
+    ls.set(K.shuffle, String($('spShuffle').checked));
+    $('spOrderHint').textContent = $('spShuffle').checked ? 'Náhodné pořadí' : 'Popořadě';
+    if (!connected || !deviceId || !dur || playBusy) return;
+    $('spShuffle').disabled = true;
+    try { await applyShuffle(); }
+    catch (e) { $('spNote').textContent = 'Pořadí se použije při příštím spuštění seznamu. ' + e.message; }
+    finally { $('spShuffle').disabled = false; }
+  };
   $('spReconnect').onclick = () => {
     if (browse.mode === 'liked') ls.set(K.pending, 'liked');
     return login().catch(e => browseStatus(e.message));
