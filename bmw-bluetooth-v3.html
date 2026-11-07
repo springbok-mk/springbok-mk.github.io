@@ -1,0 +1,1363 @@
+<!doctype html>
+<html lang="cs" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="BMW v3">
+<meta name="theme-color" content="#10110E">
+<link rel="manifest" href="bmw-v3.webmanifest">
+<link rel="apple-touch-icon" href="bmw-icon-180.png">
+<title>BMW · Spotify v3</title>
+<style>
+  :root{color-scheme:dark;--bg:#10110E;--surface:#151B24;--surface2:#222B38;--ink:#F3F6FC;--muted:#A7B4C8;--line:#334052;--cobalt:#8EBAFF;--cobalt-deep:#BCD5FF;--on-cobalt:#081426;--ok:#84DEB2;--ok-bg:#153A2B;--bad:#FFADA5;--bad-bg:#402626;--warn:#E8C679;--warn-bg:#3D3420}
+  *{box-sizing:border-box} [hidden]{display:none!important}
+  html{scroll-behavior:smooth;scroll-padding-top:85px;background:var(--bg)}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+  main{width:100%;max-width:1056px;margin:0 auto;padding:20px 20px 40px}
+  .app-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}
+  h1{font-size:22px;letter-spacing:-.03em;line-height:1.2;margin:3px 0 0}h1 span{font-size:16px;color:var(--muted);font-weight:500;letter-spacing:0;margin-left:8px}
+  .back{font-size:12px;text-decoration:none;color:var(--muted)}
+  a{color:var(--cobalt);text-underline-offset:3px}a:hover{color:var(--cobalt-deep)}
+  button,input,select,summary{touch-action:manipulation}
+  button{appearance:none;border:1px solid transparent;border-radius:13px;min-height:48px;padding:12px 16px;font:650 15px/1.25 system-ui,sans-serif;background:var(--cobalt);color:var(--on-cobalt);cursor:pointer}
+  button:hover:not(:disabled){filter:brightness(1.1)}button:active:not(:disabled){transform:translateY(1px)}
+  button.secondary{background:var(--surface2);color:var(--ink);border-color:var(--line)}button.danger{background:var(--bad-bg);border-color:#8D514C;color:var(--bad)}button:disabled{opacity:.4;cursor:default}
+  button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--cobalt);outline-offset:3px}
+  p{margin:0 0 12px}.note{font-size:13px;line-height:1.5;color:var(--muted)}
+  #spotify{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 30px;align-items:start}
+  #spotify>details{grid-column:1/-1;border-top:1px solid var(--line);padding-top:12px;margin-top:14px}
+  .player-core{min-width:0}.connection-strip{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .connection-badge{font-size:11px;font-weight:600;letter-spacing:.02em;color:var(--muted);padding:4px 8px;background:var(--surface2);border-radius:7px}
+  .connection-badge[data-active=true]{background:var(--ok-bg);color:var(--ok)}
+  .quick-actions{display:flex;gap:8px}.quick-actions button{flex:1;font-size:13px;min-height:44px}#btnShowMusic{display:block}
+  .row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.row:has(#spLogin[style*="none"]){display:none}
+  .np{display:flex;gap:16px;align-items:center;margin:24px 0 18px;min-height:90px}.np img{width:88px;height:88px;border-radius:12px;object-fit:cover;background:var(--surface2);flex:none}
+  .meta{min-width:0}.np .t{font-size:22px;font-weight:700;line-height:1.2;overflow-wrap:anywhere;letter-spacing:-.025em}.np .a{font-size:14px;color:var(--muted);margin-top:7px;overflow-wrap:anywhere}
+  label{display:block;font-size:13px;color:var(--muted);margin-top:8px}
+  select,input[type=text],input[type=url],input[type=search]{width:100%;min-width:0;min-height:48px;font:16px/1.3 system-ui,sans-serif;padding:12px;border:1px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);margin:6px 0}
+  input::placeholder{color:#8694AA}input[type=range]{width:100%;min-height:30px;accent-color:var(--cobalt);margin:4px 0}input[type=file]{max-width:100%;margin:8px 0}input[type=checkbox]{accent-color:var(--cobalt)}
+  .times{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums;font-size:12px;color:var(--muted);margin:0 0 12px}
+  .transport{display:flex;gap:10px;margin:8px 0 16px}.transport button{flex:1;min-width:0;min-height:66px;font-size:22px;border-radius:18px}.transport .big{flex:1.65;font-size:27px}
+  .shuffle-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:14px 0}.ios-switch{display:flex;align-items:center;justify-content:space-between;gap:14px;cursor:pointer;font-size:14px;color:var(--ink);margin:0;min-height:44px;position:relative}
+  .ios-switch small{font-size:11px;color:var(--muted);font-weight:400;margin-left:5px}.ios-switch input{position:absolute;right:0;opacity:0;width:51px;height:31px;margin:0;cursor:pointer}
+  .switch-track{width:51px;height:31px;border-radius:20px;background:#566175;position:relative;pointer-events:none;transition:background .15s;flex:none}.switch-track:after{content:"";position:absolute;width:27px;height:27px;left:2px;top:2px;border-radius:50%;background:#fff;box-shadow:0 1px 4px #0005;transition:transform .15s}
+  .ios-switch input:checked+.switch-track{background:#34C759}.ios-switch input:checked+.switch-track:after{transform:translateX(20px)}.ios-switch input:focus-visible+.switch-track{outline:3px solid var(--cobalt);outline-offset:4px}.ios-switch input:disabled+.switch-track{opacity:.35}
+  .player-message{min-height:20px;margin:10px 0 16px}.mic-control{background:var(--bg);border-radius:13px;padding:12px}.mic-control .note{font-size:12px;margin:4px 0 10px}.mic-control button{min-height:38px;font-size:12px;padding:8px 12px}.wake-control{display:flex;gap:8px;align-items:center;font-size:12px;min-height:44px;margin:3px 0 0}.wake-control input{width:18px;height:18px}
+  .music-browser{min-width:0;border-left:1px solid var(--line);padding-left:28px}.music-browser label{margin-top:0}.music-browser form .row{margin:8px 0 18px}.music-browser form button{flex:1}.music-browser button[aria-pressed=true]{background:var(--cobalt);color:var(--on-cobalt);border-color:var(--cobalt)}
+  .list-heading{display:flex;align-items:center;justify-content:space-between;gap:8px}.list-heading h3{font-size:15px;line-height:1.3;margin:0}.list-heading button{font-size:11px;min-height:40px;padding:8px 10px;white-space:nowrap}
+  #spBrowseStatus{font-size:12px;line-height:1.4;margin:10px 0}#spReconnect{width:100%;margin:6px 0 10px}#spOrderRow label{font-size:12px;margin-top:6px}#spOrderRow select{font-size:14px;min-height:44px}#spPlayList{width:100%}
+  .track-list{list-style:none;margin:0;padding:0;max-height:min(54vh,510px);overflow:auto;overscroll-behavior:contain;scrollbar-width:thin}.track-row{display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);padding:12px 0}.track-row img{width:44px;height:44px;object-fit:cover;border-radius:8px;flex:none;background:var(--surface2)}.track-meta{min-width:0;flex:1;overflow-wrap:anywhere}.track-title{font-size:14px;font-weight:600;line-height:1.25}.track-detail{font-size:11px;color:var(--muted);margin-top:4px}.track-meta a{font-size:11px}.track-row button{width:44px;min-height:44px;padding:8px;flex:none}#spMore{width:100%;margin-top:12px}
+  .version-link{font-size:12px;text-align:right;margin:12px 2px 18px}.version-link a{color:var(--muted)}
+  details{margin-top:12px}summary{cursor:pointer;min-height:36px;align-content:center;color:var(--muted);font-size:13px}summary:hover{color:var(--ink)}details[open]>summary{margin-bottom:12px}.panel{background:var(--surface);border:1px solid var(--line);border-radius:15px;padding:10px 16px;margin:10px 0}.panel>summary{font-size:14px;font-weight:600;color:var(--ink);min-height:36px}.panel[open]{padding-bottom:18px}
+  .filter-control{margin:16px 0 8px}.status{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:7px 14px;font-size:13px;margin:0}.status dt{color:var(--muted)}.status dd{margin:0;font:12px/1.5 ui-monospace,monospace;overflow-wrap:anywhere}.pill{display:inline-block;padding:3px 7px;border-radius:6px;font-size:11px;font-weight:600}.pill.ok{color:var(--ok);background:var(--ok-bg)}.pill.off{color:var(--muted);background:var(--surface2)}.pill.warn{color:var(--warn);background:var(--warn-bg)}.pill.bad{color:var(--bad);background:var(--bad-bg)}
+  h2{font-size:16px}ol{padding-left:20px;margin:0;font-size:14px}ol li{margin-bottom:8px}audio{width:100%;margin:12px 0}#log{font:11px/1.5 ui-monospace,monospace;background:var(--bg);padding:12px;border-radius:10px;max-height:260px;overflow:auto;white-space:pre-wrap;word-break:break-word}#log .e{color:var(--bad)}#log .w{color:var(--warn)}#log .g{color:var(--ok)}
+/* V3: one clipped corner, mustard controls, and a viewport-sized player. */
+:root{--bg:#10110E;--surface:#191A15;--surface2:#27281F;--ink:#E4B83F;--muted:#C2A957;--line:#514A2D;--cobalt:#D6A82D;--cobalt-deep:#F0C85C;--on-cobalt:#17170E;--ok:#E4B83F;--ok-bg:#34301B;--bad:#E4B83F;--bad-bg:#403019;--warn:#E4B83F;--warn-bg:#403019;--cut-x:12px;--cut-y:10px;--row-height:68px}
+*,*::before,*::after{border-radius:0!important}
+button,select,input[type=text],input[type=url],input[type=search],#spotify,.panel,.connection-badge,.pill,.np img,.track-row img,.mic-control,.switch-track{clip-path:polygon(0 0,calc(100% - var(--cut-x)) 0,100% var(--cut-y),100% 100%,0 100%)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline-offset:-4px}
+button.secondary,button.danger{color:var(--ink);border-color:var(--line)}
+input::placeholder{color:#AB9652}button{font-weight:700}
+input[type=checkbox]:not([role=switch]){appearance:none;width:18px;height:18px;flex:none;border:1px solid var(--muted);background:var(--bg);display:inline-grid;place-content:center}
+input[type=checkbox]:not([role=switch]):checked{background:var(--cobalt);border-color:var(--cobalt)}
+input[type=checkbox]:not([role=switch]):checked:after{content:'✓';color:var(--bg);font:bold 15px/1 system-ui}
+.switch-track{background:#5E5637;--cut-x:6px;--cut-y:5px}
+.switch-track:after{background:var(--ink);box-shadow:none;clip-path:polygon(0 0,calc(100% - 5px) 0,100% 4px,100% 100%,0 100%)}
+.ios-switch input:checked+.switch-track{background:var(--cobalt)}
+.ios-switch input:checked+.switch-track:after{background:var(--bg)}
+input[type=range]{appearance:none;background:transparent;height:28px;min-height:28px;padding:0}
+input[type=range]::-webkit-slider-runnable-track{height:4px;background:var(--line)}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:20px;height:24px;margin-top:-10px;background:var(--ink);clip-path:polygon(0 0,14px 0,20px 5px,20px 24px,0 24px)}
+input[type=range]::-moz-range-track{height:4px;background:var(--line)}
+input[type=range]::-moz-range-thumb{width:20px;height:24px;border:0;background:var(--ink);clip-path:polygon(0 0,14px 0,20px 5px,20px 24px,0 24px)}
+.top-actions{display:flex;gap:6px}#btnBackPlayer,.library-player{display:none}
+#spTrackList{display:flex;flex-direction:column;min-height:0;gap:8px}
+.track-list{height:340px;max-height:none;overflow:hidden;flex:none}
+.track-row{height:var(--row-height);padding:6px 0;gap:10px;overflow:hidden}
+.track-title,.track-detail{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal}
+.track-title{font-size:14px}.track-detail{font-size:12px;margin-top:3px}.track-meta a{display:inline-block;font-size:10px;line-height:12px}
+.track-row img{width:44px;height:44px}.track-row button{width:44px;height:44px;min-height:44px}
+.track-pager{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;min-height:44px}
+.track-pager button{font-size:13px;min-height:44px;padding:8px}.track-pager span{font:12px/1.3 system-ui;font-variant-numeric:tabular-nums;text-align:center}
+#spMore{display:none}.music-browser{min-height:0}.list-heading h3{font-size:14px}
+@media(max-width:760px){main{padding:12px}#spotify{display:block;padding:14px}.music-browser{border-left:0;border-top:1px solid var(--line);margin-top:18px;padding:18px 0 0}.np img{width:72px;height:72px}.app-top h1{font-size:19px}.app-top h1 span{font-size:13px;margin-left:4px}.app-top button{font-size:12px;padding:8px 10px;min-height:44px}}
+/* A fixed shell, not a tall document: only one primary screen is visible. */
+html.focus-mode,html.focus-mode body{height:100%;overflow:hidden;overscroll-behavior:none;scroll-behavior:auto}
+.focus-mode body{position:fixed;inset:0;padding:0}
+.focus-mode main{position:absolute;top:var(--visual-top,0px);left:0;right:0;height:var(--app-height,100dvh);max-width:1200px;padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));display:grid;grid-template-rows:44px minmax(0,1fr);gap:8px;overflow:hidden}
+.focus-mode .app-top{position:static;height:44px;margin:0;padding:0;min-width:0;gap:6px}
+.focus-mode .app-top .back,.focus-mode .version-link,.focus-mode main>.panel,.focus-mode #spotify>details{display:none}
+.focus-mode #fullscreenNote{position:absolute;width:1px;height:1px;clip-path:inset(100%);overflow:hidden;margin:0}
+.focus-mode #spotify{display:flex;flex-direction:column;align-items:stretch;min-height:0;max-width:none;width:100%;height:100%;padding:12px;gap:8px;overflow:hidden}
+.focus-mode .player-core{display:flex;flex-direction:column;gap:4px;min-height:0;height:100%}
+.focus-mode .player-core>*{flex-shrink:0;margin-top:0;margin-bottom:0}
+.focus-mode .connection-strip{height:24px;overflow:hidden;flex-wrap:nowrap}
+.focus-mode .connection-badge{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.focus-mode .quick-actions button{min-height:44px;padding:8px;font-size:12px}
+.focus-mode .np{flex:1 1 0;min-height:60px;gap:14px;overflow:hidden}
+.focus-mode .np img{width:clamp(60px,14vh,128px);height:clamp(60px,14vh,128px);max-height:100%;object-fit:contain}
+.focus-mode .np .t{font-size:clamp(21px,4vw,34px);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.focus-mode .np .a{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
+.focus-mode .times{font-size:11px;height:16px}
+.focus-mode .transport{gap:8px}.focus-mode .transport button{height:62px;min-height:62px;font-size:23px;padding:8px}.focus-mode .transport .big{font-size:29px}
+.focus-mode .shuffle-row{height:44px}.focus-mode .ios-switch{min-height:40px;font-size:13px}.focus-mode .shuffle-row .note{margin:0;font-size:12px}
+.focus-mode .player-message{font-size:12px;line-height:16px;min-height:16px;max-height:32px;overflow:hidden}
+.focus-mode .mic-control{padding:8px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;min-height:0}
+.focus-mode .mic-control .ios-switch{gap:6px}.focus-mode .mic-control small{display:none}
+.focus-mode .mic-control button{grid-column:2;grid-row:1;min-height:40px;padding:6px;font-size:11px}
+.focus-mode .mic-control .note{grid-column:1/-1;font-size:11px;line-height:14px;margin:0;max-height:28px;overflow:hidden}
+.focus-mode .wake-control{min-height:28px;font-size:11px}
+.focus-mode .music-browser{display:none}
+.focus-mode.show-library .player-core{display:none}
+.focus-mode.show-library #btnBackPlayer{display:block}
+.focus-mode.show-library .music-browser{display:flex;flex-direction:column;flex:1;min-height:0;width:100%;border:0;padding:0;margin:0;gap:6px}
+.focus-mode.show-library .music-browser>*{flex-shrink:0;margin:0}
+.focus-mode .music-browser form label,.focus-mode #spOrderRow label{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(100%)}
+.focus-mode .music-browser form{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.focus-mode .music-browser form input{grid-column:1/-1;height:44px;min-height:44px;margin:0;padding:8px 12px}
+.focus-mode .music-browser form .row{display:contents}.focus-mode .music-browser form button{min-height:44px;padding:8px}
+.focus-mode #spBrowseStatus{font-size:11px;line-height:14px;max-height:28px;overflow:hidden}
+.focus-mode #spOrderRow select{margin:0;min-height:44px;height:44px;padding:8px;font-size:13px}
+.focus-mode .music-browser>.row{margin:0}.focus-mode #spPlayList{min-height:44px;padding:8px;font-size:13px}
+.focus-mode #spTrackList{flex:1;min-height:0;gap:4px}
+.focus-mode .track-list{flex:1;min-height:0;height:auto;max-height:none;overflow:hidden}
+.focus-mode .track-pager{flex:none}
+.focus-mode.show-library .library-player{display:flex;gap:6px;align-items:center;flex:none;padding-top:6px;border-top:1px solid var(--line)}
+.library-player .mini-meta{flex:1;min-width:0}.library-player .mini-meta span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}.library-player .mini-meta small{font-size:10px;color:var(--muted)}
+.library-player button{width:48px;height:44px;min-height:44px;padding:8px}
+.focus-mode.compact-height{--row-height:60px}
+.focus-mode.compact-height .music-browser form{grid-template-columns:minmax(0,1fr) auto auto}
+.focus-mode.compact-height .music-browser form input{grid-column:auto}
+.focus-mode.compact-height .music-browser form button{font-size:11px;padding:6px}
+.focus-mode.compact-height .list-heading{display:none}
+.focus-mode.compact-height .music-browser{gap:4px}
+.focus-mode.compact-height .music-browser>.row{display:none}
+.focus-mode.compact-height .library-player{padding-top:4px}
+.focus-mode.compact-height #spBrowseStatus{max-height:14px;white-space:nowrap;text-overflow:ellipsis}
+.focus-mode.compact-height .player-core{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:24px 44px minmax(56px,1fr) auto;gap:6px 16px}
+.focus-mode.compact-height .connection-strip{grid-column:1;grid-row:1}.focus-mode.compact-height .quick-actions{grid-column:1;grid-row:2}
+.focus-mode.compact-height .np{grid-column:1;grid-row:3;min-height:0}.focus-mode.compact-height .np img{width:64px;height:64px}.focus-mode.compact-height .np .t{font-size:20px}
+.focus-mode.compact-height .mic-control{grid-column:1;grid-row:4}.focus-mode.compact-height .mic-control .note{display:none}
+.focus-mode.compact-height .player-core>input{grid-column:2;grid-row:1}
+.focus-mode.compact-height .times{grid-column:2;grid-row:2;align-self:start}
+.focus-mode.compact-height .transport{grid-column:2;grid-row:3;align-self:center}
+.focus-mode.compact-height .shuffle-row{grid-column:2;grid-row:4;align-self:end}
+.focus-mode.compact-height .player-message,.focus-mode.compact-height .wake-control{display:none}
+.focus-mode.compact-height .player-core>.row{grid-column:1;grid-row:3;z-index:1;align-self:center;background:var(--surface)}
+.focus-mode.show-library .player-core{display:none}
+/* While the keyboard is open, keep search, one or more results and paging reachable. */
+.focus-mode.keyboard-open .library-player,.focus-mode.keyboard-open #spOrderRow{display:none}
+.focus-mode.keyboard-open main{grid-template-rows:36px minmax(0,1fr);gap:4px;padding-top:4px;padding-bottom:4px}
+.focus-mode.keyboard-open .app-top{height:36px}.focus-mode.keyboard-open .app-top button{min-height:36px}
+.focus-mode.keyboard-open #spotify{padding:6px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.switch-track,.switch-track:after{transition:none}}
+
+</style>
+</head>
+<body>
+<main>
+  <header class="app-top">
+    <div><a class="back" href="index.html">springbok-mk</a><h1>BMW <span>Spotify v3</span></h1></div>
+    <div class="top-actions"><button id="btnBackPlayer" class="secondary">← Přehrávač</button><button id="btnFullscreen" class="secondary" aria-pressed="false">⛶ Zvětšit</button></div>
+  </header>
+  <p id="fullscreenNote" class="note" role="status" hidden></p>
+  <section id="spotify">
+    <div class="player-core">
+    <div class="connection-strip" aria-live="polite">
+      <span id="carBadge" class="connection-badge">Auto · vypnuto</span>
+      <span id="spotifyBadge" class="connection-badge">Spotify · nepřihlášeno</span>
+    </div>
+    <div class="quick-actions">
+      <button id="btnQuickConnect" class="secondary">Připojit handsfree</button>
+      <button id="btnShowMusic" class="secondary" aria-pressed="false">♫ Vybrat hudbu</button>
+    </div>
+
+
+    <div class="row">
+      <button id="spLogin">Přihlásit se ke Spotify</button>
+
+    </div>
+    <div class="np" aria-label="Právě hraje">
+      <img id="spArt" alt="" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiBmaWxsPSIjQ0JENUVBIi8+PC9zdmc+">
+      <div class="meta">
+        <div class="t" id="spTitle">Vyber si skladbu</div>
+        <div class="a" id="spArtist">—</div>
+      </div>
+    </div>
+    <input type="range" aria-label="Pozice ve skladbě" id="spSeek" min="0" max="1000" value="0" step="1" disabled>
+    <div class="times"><span id="spPos">0:00</span><span id="spDur">0:00</span></div>
+    <div class="transport">
+      <button id="spPrev" aria-label="Předchozí skladba" class="secondary" disabled>◀◀</button>
+      <button id="spToggle" aria-label="Přehrát nebo pozastavit" class="big" disabled>▶</button>
+      <button id="spNext" aria-label="Další skladba" class="secondary" disabled>▶▶</button>
+    </div>
+    <div class="shuffle-row">
+      <span id="spOrderHint" class="note">Popořadě</span>
+      <label class="ios-switch" for="spShuffle">
+        <span>Náhodně</span><input type="checkbox" role="switch" id="spShuffle" aria-label="Náhodné přehrávání">
+        <span class="switch-track" aria-hidden="true"></span>
+      </label>
+    </div>
+    <p class="note player-message" id="spNote" role="status" aria-live="polite">Připoj handsfree a vyber skladbu.</p>
+    <div class="mic-control">
+      <label class="ios-switch" for="micMute"><span>Ztlumit mikrofon <small>zkouška</small></span><input type="checkbox" role="switch" id="micMute" aria-label="Ztlumit mikrofon" disabled><span class="switch-track" aria-hidden="true"></span></label>
+      <p id="micHint" class="note" role="status">Nejdřív připoj handsfree. Mikrofon se nenahrává ani neodesílá.</p>
+      <button id="btnRestoreAudio" class="secondary" disabled>↻ Obnovit zvuk</button>
+    </div>
+    <label class="wake-control"><input type="checkbox" id="chkWake"> Nezhasínat displej</label>
+    </div>
+    <div class="music-browser" id="musicLibrary">
+      <form id="spSearchForm" role="search">
+        <label for="spSearch">Vyhledat skladbu nebo interpreta</label>
+        <input type="search" id="spSearch" placeholder="Název písničky nebo interpret…" maxlength="250" autocomplete="off" enterkeyhint="search">
+        <div class="row">
+          <button type="submit" id="spSearchBtn">Vyhledat</button>
+          <button type="button" id="spLiked" class="secondary" aria-pressed="false">♥ Oblíbené</button>
+        </div>
+      </form>
+      <div class="list-heading">
+        <h3 id="spBrowseTitle">Vyber si hudbu</h3>
+        <button id="spHideTracks" class="secondary" aria-controls="spTrackList" aria-expanded="true" hidden>Skrýt skladby</button>
+      </div>
+      <p class="note" id="spBrowseStatus" role="status" aria-live="polite">Přihlas se ke Spotify a vyhledej skladbu nebo otevři své oblíbené.</p>
+      <button id="spReconnect" hidden>Povolit oblíbené ve Spotify</button>
+      <div id="spOrderRow" hidden>
+        <label for="spOrder">Pořadí oblíbených podle uložení</label>
+        <select id="spOrder">
+          <option value="newest">Od nejnovějších</option>
+          <option value="oldest">Od nejstarších</option>
+        </select>
+      </div>
+      <div class="row"><button id="spPlayList" class="secondary" hidden>▶ Přehrát výběr</button></div>
+      <div id="spTrackList">
+      <ul id="spResults" class="track-list" aria-label="Skladby" aria-busy="false"></ul>
+      <nav class="track-pager" id="spPager" aria-label="Stránky skladeb" hidden>
+        <button id="spPagePrev" class="secondary" aria-label="Předchozí stránka skladeb" disabled>← Zpět</button>
+        <span id="spPageInfo" aria-live="polite">0 skladeb</span>
+        <button id="spPageNext" class="secondary" aria-label="Další stránka skladeb" disabled>Další →</button>
+      </nav>
+      <button id="spMore" class="secondary" hidden>Načíst další</button>
+      </div>
+    </div>
+    <div class="library-player" aria-label="Ovládání při výběru hudby">
+      <div class="mini-meta"><small>PRÁVĚ HRAJE</small><span id="miniTitle">Vyber si skladbu</span></div>
+      <button id="miniToggle" aria-label="Přehrát nebo pozastavit při výběru" disabled>▶</button>
+      <button id="miniNext" class="secondary" aria-label="Další skladba při výběru" disabled>▶▶</button>
+    </div>
+    <details>
+      <summary>Přehrát vlastní odkaz na Spotify</summary>
+    <label for="spUri">Playlist, album nebo skladba (odkaz nebo URI) – nepovinné</label>
+    <input type="text" id="spUri" placeholder="https://open.spotify.com/playlist/… nebo spotify:playlist:…" autocomplete="off" spellcheck="false">
+    <div class="row">
+      <button id="spPlay" disabled>Hrát v autě</button>
+    </div>
+    </details>
+
+
+
+
+    <details>
+      <summary>Nastavení Spotify</summary>
+      <ol>
+        <li>Client ID už je ve stránce předvyplněné – tohle řeš jen, kdyby přestalo platit.</li>
+        <li>Na <code>developer.spotify.com/dashboard</code> otevři svou aplikaci.</li>
+        <li>Do <b>Redirect URI</b> vlož přesně tuhle adresu:</li>
+      </ol>
+      <input type="text" id="spRedir" readonly>
+      <div class="row"><button id="spCopyRedir" class="secondary">Kopírovat adresu</button></div>
+      <label for="spClient">Client ID z té aplikace</label>
+      <input type="text" id="spClient" placeholder="např. 3a9f…" autocomplete="off" spellcheck="false">
+      <div class="row"><button id="spSaveClient" class="secondary">Uložit Client ID</button></div>
+      <p class="note">Client ID je veřejný identifikátor aplikace. Přihlašuješ se přímo u Spotify (PKCE),
+      heslo se do stránky nezadává a já ho nevidím.</p>
+    <label for="spVol">Hlasitost Spotify</label>
+    <input type="range" id="spVol" min="0" max="1" step="0.05" value="1" disabled>
+    <p class="note"><b>Spotify na iPhonu otevři v Safari a nech připojení k internetu zapnuté.</b> Ikonu si můžeš přidat přes Sdílet → Přidat na plochu. Pokud se přihlášení z ikony nevrátí do aplikace, dokonči ho přímo v Safari.</p>
+    <div class="row"><button id="spLogout" class="secondary">Odhlásit</button></div>
+    </details>
+  </section>
+  <p class="version-link"><a href="bmw-bluetooth-v2.html">Otevřít v2</a></p>
+
+  <details class="panel" id="connectionStatus">
+    <summary>Stav připojení</summary>
+    <dl class="status">
+      <dt>Podpora</dt><dd id="support">…</dd>
+      <dt>Režim HFP</dt><dd id="hfpState"><span class="pill off">vypnuto</span></dd>
+      <dt>audioSession.type</dt><dd id="asType">–</dd>
+      <dt>audioSession.state</dt><dd id="asState">–</dd>
+      <dt>Vstup (mikrofon)</dt><dd id="inputLabel">–</dd>
+      <dt>Výstup (sinkId)</dt><dd id="sinkLabel">výchozí (systém)</dd>
+      <dt>Přehrávač</dt><dd id="playState">zastaveno</dd>
+      <dt>Spotify</dt><dd id="spState"><span class="pill off">nepřipojeno</span></dd>
+
+      <dt>SDK</dt><dd id="spSdk"><span class="pill off">nenačteno</span></dd>
+      <dt>Přihlášení</dt><dd id="spAuth"><span class="pill off">nepřihlášeno</span></dd>
+      <dt>Účet</dt><dd id="spAcct">–</dd>
+      <dt>Zařízení</dt><dd id="spDev">–</dd>
+      <dt>Hraje</dt><dd id="spTrack">–</dd>
+        </dl>
+  </details>
+
+  <details class="panel" id="carSettings">
+    <summary>Handsfree a mikrofon</summary>
+    <p class="note">Zapne mikrofon pro zvuk přes handsfree. Nic se nenahrává ani neodesílá.</p>
+    <div class="row">
+      <button id="btnHfpOn">Připojit handsfree</button>
+      <button id="btnHfpOff" class="danger" disabled>Odpojit handsfree</button>
+    </div>
+    <label class="ios-switch filter-control" for="chkEcho"><span>Hlasové filtry</span><input type="checkbox" role="switch" id="chkEcho" aria-label="Hlasové filtry"><span class="switch-track" aria-hidden="true"></span></label>
+    <p class="note">Pro hudbu nech vypnuté. Přepínač žádá vypnutí potlačení ozvěny, šumu a automatické citlivosti mikrofonu.</p>
+    <p id="processingStatus" class="note" role="status">Skutečné nastavení se ukáže po připojení.</p>
+    <details><summary>Když hluk ztišuje hudbu</summary>
+      <p class="note">Příčinu může mít iOS nebo samotná handsfree jednotka. Hlasové filtry jsou standardně vypnuté, ale ne každý systém dovolí změnu.</p>
+      <p class="note">„Ztlumit mikrofon“ umlčí vstupní stopu bez jejího ukončení. Safari přesto může změnit zvukovou cestu. Když hudba zmizí, vypni ztlumení nebo použij „Obnovit zvuk“. Mikrofon nevypínej tlačítkem Safari, pokud tím zvuk v autě mizí.</p>
+    </details>
+
+  </details>
+
+  <details class="panel" id="outputSettings">
+    <summary>Zvukový výstup</summary>
+    <p class="note">Pokud zvuk nejde do auta, zkus výstup přepnout tady nebo v telefonu.</p>
+    <select id="selOutput"><option value="">Výchozí výstup (systém)</option></select>
+    <div class="row">
+      <button id="btnEnumerate" class="secondary">Načíst zařízení</button>
+      <button id="btnPickOutput" class="secondary" disabled>Vybrat výstup (dialog)</button>
+      <button id="btnApplySink" class="secondary" disabled>Použít vybraný výstup</button>
+    </div>
+    <div id="devices" class="note"></div>
+  </details>
+
+  <details class="panel">
+    <summary>Testovací zvuk a další zdroje</summary>
+    <div class="row">
+      <button id="btnTone">Testovací tón (smyčka)</button>
+      <button id="btnStop" class="secondary">Stop</button>
+    </div>
+    <label for="fileIn">Vlastní MP3 / M4A ze Souborů</label>
+    <input type="file" id="fileIn" accept="audio/*">
+    <label for="urlIn">Nebo URL audio streamu (HTTPS)</label>
+    <input type="url" id="urlIn" placeholder="https://…/stream.mp3" inputmode="url">
+    <div class="row"><button id="btnUrl" class="secondary">Přehrát URL</button></div>
+    <audio id="player" controls playsinline preload="auto"></audio>
+    <label for="vol">Hlasitost stránky</label>
+    <input type="range" id="vol" min="0" max="1" step="0.05" value="1">
+  </details>
+
+  <details class="panel">
+    <summary>Postup v autě a nápověda</summary>
+    <ol>
+      <li>iPhone spárovaný s BMW jako telefon, zapalování zapnuté, rádio na zdroji „Telefon“ nebo kdekoli, kde se obvykle ozývá hovor.</li>
+      <li>Připoj handsfree, povolit mikrofon. Sleduj, zda BMW ukáže „aktivní hovor“ a zda se změnil vstup na BMW.</li>
+      <li>V části „Testovací zvuk a další zdroje“ pusť tón a ověř, že se ozývá z reproduktorů auta.</li>
+      <li>Pokud zvuk jde z iPhonu: otevři Zvukový výstup, pak zkus přepnout Hlasové filtry, vypnout a znovu zapnout HFP, případně v Ovládacím centru ručně přepnout výstup na BMW.</li>
+      <li>Když tón hraje v autě, zastav ho. Nahoře se přihlas ke Spotify, vyhledej skladbu nebo otevři Oblíbené a klepni na ▶.</li>
+    </ol>
+    <details>
+      <summary>Co od toho čekat</summary>
+      <p class="note">HFP je hlasový profil: mono, 8 nebo 16 kHz. I při úspěchu bude kvalita na úrovni telefonního hovoru.
+      Spotify zde hraje přes Web Playback SDK a vyžaduje internet i podporovaný účet Premium. Přesměrování do konkrétní BMW jednotky musíš ověřit přímo v autě; stránka ho nemůže zaručit.</p>
+    </details>
+  </details>
+
+  <details class="panel">
+    <summary>Diagnostický log</summary>
+    <div class="row">
+      <button id="btnCopy" class="secondary">Kopírovat log</button>
+      <button id="btnClear" class="secondary">Vymazat</button>
+    </div>
+    <pre id="log"></pre>
+  </details>
+</main>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const logEl = $('log');
+  const player = $('player');
+  let micStream = null;
+  let micRequest = 0;
+  let toneUrl = null;
+  let wakeLock = null;
+  let currentSink = '';
+
+  function log(msg, cls) {
+    const t = new Date().toTimeString().slice(0, 8);
+    const line = document.createElement('div');
+    if (cls) line.className = cls;
+    line.textContent = `[${t}] ${msg}`;
+    logEl.appendChild(line);
+    logEl.scrollTop = logEl.scrollHeight;
+  }
+  const err = e => log((e && (e.name ? e.name + ': ' : '') + (e.message || e)) || 'neznámá chyba', 'e');
+
+  // ---------- podpora ----------
+  const hasAS = 'audioSession' in navigator;
+  const hasGUM = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  const hasSink = typeof player.setSinkId === 'function';
+  const hasSelect = !!(navigator.mediaDevices && navigator.mediaDevices.selectAudioOutput);
+  const hasWake = 'wakeLock' in navigator;
+  $('support').textContent =
+    `audioSession ${hasAS ? '✓' : '✗'} · getUserMedia ${hasGUM ? '✓' : '✗'} · setSinkId ${hasSink ? '✓' : '✗'} · selectAudioOutput ${hasSelect ? '✓' : '✗'} · wakeLock ${hasWake ? '✓' : '✗'}`;
+  $('btnHfpOn').disabled = !hasGUM;
+  $('btnQuickConnect').disabled = !hasGUM;
+  $('btnPickOutput').disabled = !(hasSelect && hasSink);
+  $('btnApplySink').disabled = !hasSink;
+  if (!hasWake) $('chkWake').disabled = true;
+  if (!window.isSecureContext) log('Stránka neběží v zabezpečeném kontextu; otevři ji přes HTTPS.', 'e');
+  log('UA: ' + navigator.userAgent);
+  log(`Podpora: audioSession=${hasAS} getUserMedia=${hasGUM} setSinkId=${hasSink} selectAudioOutput=${hasSelect} wakeLock=${hasWake}`);
+  if (!hasAS) log('navigator.audioSession chybí: stránka nemůže vyžádat play-and-record. Mikrofon samotný přesto může režim přepnout.', 'w');
+
+  function refreshAS() {
+    if (!hasAS) { $('asType').textContent = 'nepodporováno'; $('asState').textContent = 'nepodporováno'; return; }
+    $('asType').textContent = navigator.audioSession.type;
+    $('asState').textContent = navigator.audioSession.state || '–';
+  }
+  if (hasAS) {
+    navigator.audioSession.addEventListener && navigator.audioSession.addEventListener('statechange', () => { refreshAS(); log('audioSession.state → ' + navigator.audioSession.state); });
+  }
+  refreshAS();
+
+  function setAS(type) {
+    if (!hasAS) return;
+    try { navigator.audioSession.type = type; log('audioSession.type = ' + navigator.audioSession.type); }
+    catch (e) { err(e); }
+    refreshAS();
+  }
+
+  // ---------- 1. HFP režim ----------
+  const micTrack = () => micStream && micStream.getAudioTracks().find(track => track.readyState !== 'ended');
+  const voiceConstraints = () => ({ echoCancellation: $('chkEcho').checked, noiseSuppression: $('chkEcho').checked, autoGainControl: $('chkEcho').checked });
+  function updateMicUi() {
+    const track = micTrack();
+    $('micMute').disabled = !track;
+    $('micMute').checked = !!track && track.enabled === false;
+    $('btnRestoreAudio').disabled = !track;
+    $('btnQuickConnect').disabled = !!track || $('btnHfpOn').disabled;
+    $('btnQuickConnect').textContent = track ? 'Handsfree zapnuté' : 'Připojit handsfree';
+    if (!track) {
+      $('micHint').textContent = 'Nejdřív připoj handsfree. Mikrofon se nenahrává ani neodesílá.';
+      $('processingStatus').textContent = 'Skutečné nastavení se ukáže po připojení.';
+      return;
+    }
+    $('micHint').textContent = track.enabled === false
+      ? 'Vstup je ztlumený. Pokud hudba zmizí, vypni ztlumení nebo obnov zvuk.'
+      : track.muted ? 'Safari přerušilo mikrofon. Pokud zvuk zmizel, použij Obnovit zvuk.'
+      : 'Vstup běží pro handsfree. Nic se nenahrává ani neodesílá.';
+    const settings = track.getSettings ? track.getSettings() : {};
+    const names = { echoCancellation: 'Ozvěna', noiseSuppression: 'Šum', autoGainControl: 'Automatická citlivost' };
+    $('processingStatus').textContent = Object.entries(names).map(([key, label]) => label + ': ' +
+      (settings[key] === true ? 'zapnuto' : settings[key] === false ? 'vypnuto' : 'prohlížeč nehlásí')).join(' · ');
+  }
+  async function updateVoiceFilters() {
+    const track = micTrack();
+    if (!track) return;
+    const request = micRequest;
+    $('chkEcho').disabled = true;
+    try {
+      if (!track.applyConstraints) throw new Error('Prohlížeč neumí filtry změnit za běhu. Odpoj a znovu připoj handsfree.');
+      await track.applyConstraints(voiceConstraints());
+      if (request !== micRequest) return;
+      updateMicUi();
+      log('Hlasové filtry: požadavek ' + ($('chkEcho').checked ? 'zapnout' : 'vypnout') + '; ' + $('processingStatus').textContent);
+    } catch (e) { if (request === micRequest) { $('processingStatus').textContent = e.message; err(e); } }
+    finally { if (request === micRequest) $('chkEcho').disabled = false; }
+  }
+  async function hfpOn() {
+    if (micStream || $('btnHfpOn').disabled) return;
+    if (!hasGUM) { log('Přístup k mikrofonu není v tomto prohlížeči dostupný.', 'w'); return; }
+    const request = ++micRequest;
+    $('btnHfpOn').disabled = true;
+    $('btnQuickConnect').disabled = true;
+    $('btnQuickConnect').textContent = 'Připojuji…';
+    $('btnHfpOff').disabled = false;
+    $('hfpState').innerHTML = '<span class="pill warn">čeká na mikrofon</span>';
+    try {
+      setAS('play-and-record');
+      const constraints = { audio: voiceConstraints(), video: false };
+      log('getUserMedia ' + JSON.stringify(constraints.audio));
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      if (request !== micRequest) { stream.getTracks().forEach(t => t.stop()); return; }
+      micStream = stream;
+      // zvuk z mikrofonu nikam nevedeme: žádný AudioContext, žádný recorder, žádné síťové spojení
+      const track = micStream.getAudioTracks()[0];
+      if (!track) throw new Error('Prohlížeč nevrátil mikrofonní stopu.');
+      track.enabled = true;
+      const s = track.getSettings ? track.getSettings() : {};
+      $('inputLabel').textContent = track.label || s.deviceId || 'mic';
+      log(`Mikrofon aktivní: "${track.label}" ` + JSON.stringify(s), 'g');
+      track.onended = () => { if (micTrack() === track || (micStream && micStream.getAudioTracks().includes(track))) { log('Mikrofonní stopa ukončena systémem', 'w'); hfpOff(); } };
+      track.onmute = () => { if (micTrack() === track) { log('Safari přerušilo vstup', 'w'); updateMicUi(); } };
+      track.onunmute = () => { if (micTrack() === track) { log('Mikrofonní vstup obnoven'); updateMicUi(); } };
+      setAS('play-and-record');
+      $('hfpState').innerHTML = '<span class="pill ok">mikrofon aktivní; ověř zvuk v autě</span>';
+      $('btnHfpOn').disabled = true; $('btnHfpOff').disabled = false;
+      updateMicUi();
+      await enumerate();
+    } catch (e) { if (request === micRequest) { err(e); hfpOff(); } }
+  }
+  function hfpOff() {
+    micRequest++;
+    if (micStream) { const stream = micStream; micStream = null; stream.getTracks().forEach(t => { t.onended = t.onmute = t.onunmute = null; t.stop(); }); log('Mikrofon uvolněn'); }
+    setAS('auto');
+    $('inputLabel').textContent = '–';
+    $('hfpState').innerHTML = '<span class="pill off">vypnuto</span>';
+    $('btnHfpOn').disabled = !hasGUM; $('btnHfpOff').disabled = true;
+    $('chkEcho').disabled = false;
+    updateMicUi();
+  }
+  $('btnHfpOn').onclick = hfpOn;
+  $('btnHfpOff').onclick = hfpOff;
+  $('btnQuickConnect').onclick = hfpOn;
+  $('chkEcho').onchange = updateVoiceFilters;
+  $('micMute').onchange = () => {
+    const track = micTrack();
+    if (!track) { updateMicUi(); return; }
+    // Nevoláme stop() ani neměníme audioSession. Safari přesto smí zařízení uvolnit.
+    track.enabled = !$('micMute').checked;
+    log(track.enabled ? 'Mikrofonní stopa odtlumena' : 'Mikrofonní stopa ztlumena bez ukončení; ověř zvuk v autě', track.enabled ? 'g' : 'w');
+    updateMicUi();
+  };
+  $('btnRestoreAudio').onclick = async () => {
+    const track = micTrack();
+    if (!track) { await hfpOn(); return; }
+    track.enabled = true;
+    setAS('play-and-record');
+    updateMicUi();
+    await updateVoiceFilters();
+    if (micTrack() === track) $('micHint').textContent = 'Vstup obnoven. Ověř zvuk v autě; případně znovu vyber výstup.';
+  };
+
+  // ---------- 2. výstup ----------
+  async function enumerate() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) { log('enumerateDevices nepodporováno', 'w'); return; }
+    try {
+      const devs = await navigator.mediaDevices.enumerateDevices();
+      const sel = $('selOutput');
+      sel.innerHTML = '<option value="">Výchozí výstup (systém)</option>';
+      const lines = [];
+      devs.forEach(d => {
+        lines.push(`${d.kind}: "${d.label || '(bez názvu)'}" id=${(d.deviceId || '').slice(0, 12)}`);
+        if (d.kind === 'audiooutput') {
+          const o = document.createElement('option');
+          o.value = d.deviceId; o.textContent = d.label || ('výstup ' + d.deviceId.slice(0, 8));
+          if (d.deviceId === currentSink) o.selected = true;
+          sel.appendChild(o);
+        }
+      });
+      const outs = devs.filter(d => d.kind === 'audiooutput').length;
+      $('devices').textContent = devs.length ? `${devs.length} zařízení, z toho ${outs} výstupů (iOS výstupy obvykle vůbec nevypisuje).` : 'Žádná zařízení.';
+      log('Zařízení:\n' + (lines.join('\n') || '(nic)'));
+    } catch (e) { err(e); }
+  }
+  $('btnEnumerate').onclick = enumerate;
+  navigator.mediaDevices && navigator.mediaDevices.addEventListener && navigator.mediaDevices.addEventListener('devicechange', () => { log('devicechange'); enumerate(); });
+
+  async function applySink(id) {
+    if (!hasSink) { log('setSinkId nepodporováno', 'w'); return; }
+    try {
+      await player.setSinkId(id);
+      currentSink = id;
+      const opt = [...$('selOutput').options].find(o => o.value === id);
+      $('sinkLabel').textContent = id ? (opt ? opt.textContent : id) : 'výchozí (systém)';
+      log('setSinkId OK → ' + (id || 'default'), 'g');
+    } catch (e) { err(e); }
+  }
+  $('btnApplySink').onclick = () => applySink($('selOutput').value);
+  $('btnPickOutput').onclick = async () => {
+    try {
+      const d = await navigator.mediaDevices.selectAudioOutput();
+      log(`selectAudioOutput → "${d.label}" ${d.deviceId.slice(0, 12)}`, 'g');
+      await enumerate();
+      $('selOutput').value = d.deviceId;
+      await applySink(d.deviceId);
+    } catch (e) { err(e); }
+  };
+
+  // ---------- 3. přehrávání ----------
+  function makeToneWav(seconds = 4, rate = 16000) {
+    // 1 s A4 440 Hz + 1 s 1 kHz, 2× (hlasové pásmo, aby to HFP přeneslo)
+    const n = seconds * rate, buf = new ArrayBuffer(44 + n * 2), v = new DataView(buf);
+    const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+    w(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt ');
+    v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+    v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+    w(36, 'data'); v.setUint32(40, n * 2, true);
+    for (let i = 0; i < n; i++) {
+      const t = i / rate, f = (Math.floor(t) % 2 === 0) ? 440 : 1000;
+      const env = Math.min(1, (t % 1) * 20, (1 - t % 1) * 20); // krátké fade proti lupání
+      v.setInt16(44 + i * 2, Math.sin(2 * Math.PI * f * t) * env * 0.5 * 32767, true);
+    }
+    return URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+  }
+  async function playSrc(src, loop, title) {
+    try {
+      player.loop = !!loop;
+      player.src = src;
+      player.volume = parseFloat($('vol').value);
+      await player.play();
+      log('play() OK: ' + title, 'g');
+      if ('mediaSession' in navigator) {
+        navigator.mediaSession.metadata = new MediaMetadata({ title, artist: 'BMW Bluetooth test' });
+        navigator.mediaSession.setActionHandler('play', () => player.play());
+        navigator.mediaSession.setActionHandler('pause', () => player.pause());
+      }
+    } catch (e) { err(e); }
+  }
+  $('btnTone').onclick = () => { if (!toneUrl) toneUrl = makeToneWav(); playSrc(toneUrl, true, 'Testovací tón'); };
+  $('btnStop').onclick = () => { player.pause(); player.removeAttribute('src'); player.load(); $('playState').textContent = 'zastaveno'; log('stop'); };
+  $('fileIn').onchange = e => { const f = e.target.files[0]; if (f) playSrc(URL.createObjectURL(f), false, f.name); };
+  $('btnUrl').onclick = () => { const u = $('urlIn').value.trim(); if (u) playSrc(u, false, u); };
+  $('vol').oninput = e => player.volume = parseFloat(e.target.value);
+  ['play', 'playing', 'pause', 'ended', 'stalled', 'waiting', 'error', 'suspend'].forEach(ev =>
+    player.addEventListener(ev, () => {
+      $('playState').textContent = ev + (player.error ? ' (' + player.error.code + ')' : '');
+      if (ev === 'error') log('audio error code ' + (player.error && player.error.code), 'e');
+      else if (ev !== 'suspend') log('audio: ' + ev);
+    }));
+
+  // ---------- wake lock ----------
+  let wakePending = false;
+  async function requestWakeLock() {
+    if (!hasWake || wakeLock || wakePending || !$('chkWake').checked || document.visibilityState !== 'visible') return;
+    wakePending = true;
+    try {
+      const lock = await navigator.wakeLock.request('screen');
+      if (!$('chkWake').checked || document.visibilityState !== 'visible') { await lock.release(); return; }
+      wakeLock = lock;
+      log('wakeLock aktivní');
+      lock.addEventListener('release', () => { if (wakeLock === lock) wakeLock = null; log('wakeLock uvolněn'); });
+    } catch (x) { err(x); $('chkWake').checked = false; }
+    finally { wakePending = false; }
+  }
+  $('chkWake').onchange = async e => {
+    if (e.target.checked) await requestWakeLock();
+    else if (wakeLock) {
+      const lock = wakeLock;
+      wakeLock = null;
+      try { await lock.release(); } catch (x) { err(x); }
+    }
+  };
+
+  // ---------- životní cyklus ----------
+  document.addEventListener('visibilitychange', () => {
+    log('visibility: ' + document.visibilityState + ` | mic=${!!micStream} playing=${!player.paused}`);
+    refreshAS();
+    if (document.visibilityState === 'visible') requestWakeLock();
+  });
+  window.addEventListener('pagehide', () => log('pagehide'));
+
+  $('btnCopy').onclick = async () => {
+    try { await navigator.clipboard.writeText(logEl.innerText); log('log zkopírován'); } catch (e) { err(e); }
+  };
+  $('btnClear').onclick = () => logEl.textContent = '';
+})();
+</script>
+
+
+<script>
+// ---------- Spotify Web Playback SDK (pokus) ----------
+(() => {
+  const $ = id => document.getElementById(id);
+  const logEl = $('log');
+  const log = (msg, cls) => {
+    const line = document.createElement('div');
+    if (cls) line.className = cls;
+    line.textContent = '[' + new Date().toTimeString().slice(0, 8) + '] SP: ' + msg;
+    logEl.appendChild(line);
+    logEl.scrollTop = logEl.scrollHeight;
+  };
+  const pill = (el, cls, txt) => { $(el).innerHTML = '<span class="pill ' + cls + '">' + txt + '</span>'; };
+
+  // Client ID tvojí aplikace ze developer.spotify.com. Není to tajný údaj (PKCE žádné
+  // tajemství v prohlížeči nepoužívá); co ho chrání, je povolená Redirect URI.
+  const DEFAULT_CLIENT = 'a7000b47f7de4d85aa1452503d008a10';
+  const SCOPES = 'streaming user-read-email user-read-private user-read-playback-state user-modify-playback-state user-library-read';
+  const REDIR = location.origin + location.pathname;
+  const K = { client: 'sp-client', ver: 'sp-v3-verifier', tok: 'sp-token', pending: 'sp-v3-pending-view', order: 'sp-order', shuffle: 'sp-shuffle' };
+  const ls = {
+    get: k => { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} },
+    del: k => { try { localStorage.removeItem(k); } catch (e) {} }
+  };
+
+  $('spRedir').value = REDIR;
+  $('spClient').value = ls.get(K.client) || DEFAULT_CLIENT;
+  $('spOrder').value = ls.get(K.order) === 'oldest' ? 'oldest' : 'newest';
+  $('spShuffle').checked = ls.get(K.shuffle) === 'true';
+  $('spOrderHint').textContent = $('spShuffle').checked ? 'Náhodné pořadí' : 'Popořadě';
+  // kdyby Client ID chybělo, nech Nastavení rozbalené – jinak se nedá nikde začít
+  if (!$('spClient').value.trim()) { const d = document.querySelector('#spotify details'); if (d) d.open = true; }
+
+  let player = null, deviceId = null, connected = false, connecting = null, cancelConnect = null;
+  let authVersion = 0, refreshing = null, playBusy = false;
+
+  const clientId = () => (ls.get(K.client) || DEFAULT_CLIENT || '').trim();
+  const tokens = () => { try { return JSON.parse(ls.get(K.tok) || 'null'); } catch (e) { return null; } };
+  const setTokens = t => ls.set(K.tok, JSON.stringify(t));
+  const hasLibraryAccess = () => ((tokens() || {}).scope || '').split(' ').includes('user-library-read');
+
+  // ---------- PKCE ----------
+  const b64url = buf => btoa(String.fromCharCode.apply(null, new Uint8Array(buf)))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  const randomVerifier = () => {
+    const a = new Uint8Array(48); crypto.getRandomValues(a);
+    return b64url(a);
+  };
+
+  async function login() {
+    const cid = clientId();
+    if (!cid) { log('chybí Client ID – rozbal Nastavení a vlož ho', 'e'); $('spNote').textContent = 'Nejdřív vlož Client ID v Nastavení.'; return; }
+    if (!navigator.onLine) { log('telefon je offline, přihlášení potřebuje signál', 'w'); return; }
+    const ver = randomVerifier();
+    ls.set(K.ver, ver);
+    const chal = b64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(ver)));
+    const u = new URL('https://accounts.spotify.com/authorize');
+    u.search = new URLSearchParams({
+      client_id: cid, response_type: 'code', redirect_uri: REDIR,
+      code_challenge_method: 'S256', code_challenge: chal, scope: SCOPES
+    }).toString();
+    log('přesměrovávám na přihlášení Spotify');
+    location.assign(u.toString());
+  }
+
+  async function tokenRequest(body) {
+    const version = authVersion;
+    const r = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(body).toString()
+    });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error((d.error || r.status) + ': ' + (d.error_description || ''));
+    if (version !== authVersion) throw new Error('Přihlášení bylo zrušeno.');
+    setTokens({ access: d.access_token, refresh: d.refresh_token || (tokens() || {}).refresh,
+      scope: d.scope || (body.grant_type === 'refresh_token' ? (tokens() || {}).scope : '') || '',
+      exp: Date.now() + (d.expires_in - 60) * 1000 });
+    return d.access_token;
+  }
+
+  async function exchangeCode(code) {
+    const ver = ls.get(K.ver);
+    if (!ver) throw new Error('chybí code_verifier (přihlášení začni znovu v téže záložce)');
+    await tokenRequest({ client_id: clientId(), grant_type: 'authorization_code', code, redirect_uri: REDIR, code_verifier: ver });
+    ls.del(K.ver);
+    log('přihlášeno', 'g');
+  }
+
+  async function token(forceRefresh = false) {
+    const t = tokens();
+    if (!t || !t.access) throw new Error('nepřihlášeno');
+    if (!forceRefresh && Date.now() < t.exp) return t.access;
+    if (!t.refresh) throw new Error('vypršelo přihlášení, přihlas se znovu');
+    log('obnovuji přístupový token');
+    if (!refreshing) refreshing = tokenRequest({ client_id: clientId(), grant_type: 'refresh_token', refresh_token: t.refresh }).finally(() => { refreshing = null; });
+    return refreshing;
+  }
+
+  async function api(path, method, body, retry = true) {
+    if (!navigator.onLine) throw new Error('Jsi offline. Obnov připojení k internetu.');
+    const t = await token();
+    const r = await fetch('https://api.spotify.com/v1' + path, {
+      method: method || 'GET',
+      headers: { Authorization: 'Bearer ' + t, 'Content-Type': 'application/json' },
+      body: body ? JSON.stringify(body) : undefined
+    });
+    if (r.status === 401 && retry && (tokens() || {}).refresh) {
+      await token(true);
+      return api(path, method, body, false);
+    }
+    if (r.status === 204 || r.status === 202) return null;
+    if (!r.ok) {
+      const d = await r.json().catch(() => ({}));
+      const message = r.status === 401 ? 'Přihlášení vypršelo. Přihlas se znovu ke Spotify.'
+        : r.status === 429 ? 'Spotify omezuje požadavky. Zkus to za ' + (r.headers.get('Retry-After') || 'několik') + ' sekund.'
+        : r.status === 403 ? 'Spotify přístup nepovolilo. Zkontroluj oprávnění a účet aplikace.'
+        : 'Spotify: ' + ((d.error || {}).message || r.status);
+      const error = new Error(message); error.status = r.status; throw error;
+    }
+    return (r.headers.get('content-type') || '').indexOf('json') >= 0 ? r.json() : null;
+  }
+
+  // ---------- SDK ----------
+  let sdkLoading = null;
+  function loadSdk() {
+    if (window.Spotify) { pill('spSdk', 'ok', 'načteno'); return Promise.resolve(); }
+    if (sdkLoading) return sdkLoading;
+    sdkLoading = new Promise((resolve, reject) => {
+      const script = document.createElement('script');
+      const timeout = setTimeout(() => fail(), 20000);
+      const fail = () => { clearTimeout(timeout); script.remove(); sdkLoading = null; reject(new Error('SDK se nepodařilo načíst. Zkontroluj internet a zkus to znovu.')); };
+      window.onSpotifyWebPlaybackSDKReady = () => { clearTimeout(timeout); pill('spSdk', 'ok', 'načteno'); resolve(); };
+      script.src = 'https://sdk.scdn.co/spotify-player.js';
+      script.onerror = fail;
+      document.head.appendChild(script);
+      pill('spSdk', 'warn', 'stahuje se…');
+    });
+    return sdkLoading;
+  }
+
+  function connect() {
+    if (connected && deviceId) return Promise.resolve();
+    if (connecting) return connecting;
+    const version = authVersion;
+    const task = (async () => {
+      await token();
+      await loadSdk();
+      if (version !== authVersion) throw new Error('Přihlášení bylo zrušeno.');
+      if (player) player.disconnect();
+      const sdk = new Spotify.Player({
+        name: 'BMW v3 (prohlížeč)',
+        enableMediaSession: true,
+        getOAuthToken: cb => token().then(cb).catch(e => log('token: ' + e.message, 'e')),
+        volume: parseFloat($('spVol').value) || 0
+      });
+      player = sdk;
+      await new Promise((resolve, reject) => {
+        let settled = false;
+        const finish = error => {
+          if (settled) return;
+          settled = true; clearTimeout(timeout); cancelConnect = null;
+          if (error) { sdk.disconnect(); if (player === sdk) { player = null; connected = false; deviceId = null; } reject(error); }
+          else resolve();
+        };
+        const timeout = setTimeout(() => finish(new Error('Spotify přehrávač se nepřipojil. Zkus přehrání znovu.')), 20000);
+        cancelConnect = () => finish(new Error('Přihlášení bylo zrušeno.'));
+        sdk.addListener('ready', ({ device_id }) => {
+          if (player !== sdk || version !== authVersion) return;
+          deviceId = device_id; connected = true;
+          $('spDev').textContent = device_id.slice(0, 12) + '…';
+          pill('spState', 'ok', 'připojeno');
+          CTRLS.forEach(b => $(b).disabled = false);
+          log('přehrávač je v seznamu zařízení Spotify', 'g'); finish();
+        });
+        sdk.addListener('not_ready', () => {
+          if (player !== sdk) return;
+          connected = false; deviceId = null;
+          CTRLS.forEach(b => $(b).disabled = true);
+          pill('spState', 'warn', 'odpojeno'); log('zařízení zmizelo ze sítě', 'w');
+        });
+        sdk.addListener('player_state_changed', st => { if (player === sdk) renderState(st); });
+        for (const name of ['initialization_error', 'authentication_error', 'account_error']) {
+          sdk.addListener(name, e => {
+            if (player !== sdk) return;
+            const message = name === 'account_error' ? 'Spotify přehrávání vyžaduje podporovaný účet Premium.' : e.message;
+            connected = false; deviceId = null; CTRLS.forEach(b => $(b).disabled = true);
+            pill('spState', 'bad', 'chyba'); $('spNote').textContent = message;
+            log(name + ': ' + message, 'e'); finish(new Error(message));
+          });
+        }
+        sdk.addListener('playback_error', e => { if (player === sdk) { $('spNote').textContent = e.message; log(e.message, 'e'); } });
+        sdk.addListener('autoplay_failed', () => { $('spNote').textContent = 'Prohlížeč čeká na klepnutí. Klepni znovu na přehrání skladby.'; });
+        sdk.connect().then(ok => { if (!ok) finish(new Error('Spotify SDK se nepřipojilo.')); }).catch(finish);
+      });
+    })();
+    connecting = task;
+    task.finally(() => { if (connecting === task) connecting = null; }).catch(() => {});
+    return task;
+  }
+
+  // ---------- vykreslení přehrávače ----------
+  const CTRLS = ['spPlay', 'spToggle', 'spPrev', 'spNext', 'spSeek', 'spVol'];
+  const BLANK = $('spArt').src;
+  let dur = 0, pos = 0, paused = true, seeking = false, ticker = null;
+
+  const mmss = ms => {
+    if (!ms || ms < 0) ms = 0;
+    const t = Math.floor(ms / 1000);
+    return Math.floor(t / 60) + ':' + String(t % 60).padStart(2, '0');
+  };
+  const drawPos = () => {
+    $('spPos').textContent = mmss(pos);
+    $('spDur').textContent = mmss(dur);
+    if (!seeking) $('spSeek').value = dur ? Math.round(pos / dur * 1000) : 0;
+  };
+  function startTicker() {
+    clearInterval(ticker);
+    ticker = setInterval(() => {
+      if (paused || seeking) return;
+      pos = Math.min(pos + 500, dur || pos + 500);
+      drawPos();
+    }, 500);
+  }
+  function renderState(st) {
+    if (!st) {
+      $('spTrack').textContent = '–'; $('spTitle').textContent = 'Nic nehraje';
+      $('spArtist').textContent = '—'; $('spArt').src = BLANK;
+      $('spToggle').textContent = '▶'; dur = pos = 0; paused = true; drawPos();
+      return;
+    }
+    const tr = st.track_window && st.track_window.current_track;
+    paused = !!st.paused;
+    dur = st.duration || (tr && tr.duration_ms) || 0;
+    pos = st.position || 0;
+    $('spToggle').textContent = paused ? '▶' : '❚❚';
+    if (tr) {
+      const who = (tr.artists || []).map(a => a.name).join(', ');
+      $('spTitle').textContent = tr.name;
+      $('spArtist').textContent = who || '—';
+      $('spTrack').textContent = tr.name + ' – ' + who + (paused ? ' (pauza)' : '');
+      const img = tr.album && tr.album.images && tr.album.images.length
+        ? tr.album.images[tr.album.images.length - 1].url : null;
+      $('spArt').src = img || BLANK;
+      $('spNote').textContent = paused ? 'Pozastaveno.' : 'Hraje. Zvukový výstup do auta můžeš změnit níže.';
+    }
+    drawPos();
+    startTicker();
+  }
+
+  function parseUri(v) {
+    v = (v || '').trim();
+    if (!v) return null;
+    let m = v.match(/^spotify:(track|album|playlist|artist):([A-Za-z0-9]+)/);
+    if (!m) m = v.match(/open\.spotify\.com\/(?:intl-[a-z-]+\/)?(track|album|playlist|artist)\/([A-Za-z0-9]+)/);
+    if (!m) { log('odkazu nerozumím, nechávám hrát to, co máš ve Spotify rozehrané', 'w'); return null; }
+    const uri = 'spotify:' + m[1] + ':' + m[2];
+    return m[1] === 'track' ? { uris: [uri] } : { context_uri: uri };
+  }
+
+  // ---------- vyhledávání a oblíbené ----------
+  let browse = { mode: 'search', query: '', offset: 0, more: false, tracks: [] };
+  let browseVersion = 0, browseBusy = false;
+  let tracksHidden = false, pageIndex = 0, pageSize = 5, pagingBusy = false;
+  function fitTrackPage() {
+    const list = $('spResults');
+    const height = list.getBoundingClientRect().height;
+    if (!height) return;
+    const rowHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row-height')) || 68;
+    const size = Math.max(1, Math.floor(height / rowHeight));
+    if (size !== pageSize) {
+      const first = pageIndex * pageSize;
+      pageSize = size; pageIndex = Math.floor(first / pageSize);
+      renderTracks();
+    }
+  }
+  if (typeof ResizeObserver !== 'undefined') new ResizeObserver(fitTrackPage).observe($('spResults'));
+  document.addEventListener('bmw:layout', () => requestAnimationFrame(fitTrackPage));
+  async function turnPage(direction) {
+    if (browseBusy || pagingBusy) return;
+    if (direction < 0) { pageIndex = Math.max(0, pageIndex - 1); renderTracks(); return; }
+    const target = (pageIndex + 1) * pageSize;
+    if (target >= browse.tracks.length && !browse.more) return;
+    const currentBrowse = browse;
+    pagingBusy = true; renderTracks();
+    try {
+      // Fill the requested screen before rendering it, even across API batches.
+      while (browse === currentBrowse && browse.more && browse.tracks.length < target + pageSize) {
+        const count = browse.tracks.length;
+        await browseTracks(browse.mode, true);
+        if (browse.tracks.length === count) break;
+      }
+      if (browse === currentBrowse && target < browse.tracks.length) pageIndex++;
+    } finally { pagingBusy = false; renderTracks(); }
+  }
+  $('spPagePrev').onclick = () => turnPage(-1);
+  $('spPageNext').onclick = () => turnPage(1);
+  const playable = tr => tr && /^spotify:track:[A-Za-z0-9]+$/.test(tr.uri || '') && !tr.is_local && tr.is_playable !== false && !tr.restrictions;
+  const browseStatus = text => { $('spBrowseStatus').textContent = text; };
+
+  function requireLogin(library = false) {
+    const loggedIn = !!(tokens() || {}).access;
+    if (loggedIn && (!library || hasLibraryAccess())) return false;
+    $('spReconnect').hidden = false;
+    $('spReconnect').textContent = loggedIn ? 'Povolit oblíbené ve Spotify' : 'Přihlásit se ke Spotify';
+    browseStatus(loggedIn
+      ? 'Pro oblíbené jednou potvrď oprávnění ke čtení uložených skladeb. Nic v knihovně neměníme.'
+      : 'Nejdřív se přihlas ke Spotify.');
+    return true;
+  }
+
+  function renderTracks() {
+    $('spResults').replaceChildren();
+    pageIndex = Math.min(pageIndex, Math.max(0, Math.ceil(browse.tracks.length / pageSize) - 1));
+    const first = pageIndex * pageSize;
+    browse.tracks.slice(first, first + pageSize).forEach((tr, localIndex) => {
+      const index = first + localIndex;
+      if (!tr) return;
+      const row = document.createElement('li'); row.className = 'track-row';
+      const image = document.createElement('img'); image.alt = ''; image.loading = 'lazy';
+      const images = (tr.album || {}).images || [];
+      const cover = images.length ? images[images.length - 1].url : '';
+      image.src = /^https:\/\//.test(cover) ? cover : BLANK;
+      const meta = document.createElement('div'); meta.className = 'track-meta';
+      const name = document.createElement('div'); name.className = 'track-title'; name.textContent = tr.name || 'Neznámá skladba';
+      const detail = document.createElement('div'); detail.className = 'track-detail';
+      detail.textContent = (tr.artists || []).map(a => a.name).join(', ') + ' · ' + mmss(tr.duration_ms);
+      meta.appendChild(name); meta.appendChild(detail);
+      const id = (tr.uri || '').match(/^spotify:track:([A-Za-z0-9]+)$/);
+      if (id) {
+        const link = document.createElement('a'); link.href = 'https://open.spotify.com/track/' + id[1];
+        link.target = '_blank'; link.rel = 'noopener noreferrer'; link.textContent = 'Spotify'; meta.appendChild(link);
+      }
+      const button = document.createElement('button'); button.type = 'button'; button.className = 'secondary';
+      button.textContent = playable(tr) ? '▶' : '—';
+      button.setAttribute('aria-label', playable(tr) ? 'Přehrát ' + tr.name : 'Skladba není dostupná');
+      button.disabled = !playable(tr) || playBusy;
+      button.onclick = () => playTracks(index);
+      row.appendChild(image); row.appendChild(meta); row.appendChild(button); $('spResults').appendChild(row);
+    });
+    $('spPlayList').hidden = !browse.tracks.some(playable);
+    $('spPlayList').disabled = playBusy;
+    $('spMore').hidden = !browse.more;
+    $('spMore').disabled = browseBusy;
+    $('spHideTracks').hidden = !browse.tracks.length;
+    $('spHideTracks').textContent = tracksHidden ? 'Zobrazit skladby' : 'Skrýt skladby';
+    $('spHideTracks').setAttribute('aria-expanded', String(!tracksHidden));
+    $('spTrackList').hidden = tracksHidden;
+    $('spOrderRow').hidden = browse.mode !== 'liked';
+    $('spPager').hidden = !browse.tracks.length || tracksHidden;
+    $('spPagePrev').disabled = pageIndex === 0 || browseBusy || pagingBusy;
+    $('spPageNext').disabled = (first + pageSize >= browse.tracks.length && !browse.more) || browseBusy || pagingBusy;
+    $('spPageInfo').textContent = browse.tracks.length ? (first + 1) + '–' + Math.min(first + pageSize, browse.tracks.length) + (Number.isFinite(browse.total) ? ' / ' + browse.total : '') : '0 skladeb';
+    document.dispatchEvent(new Event('bmw:tracks'));
+    requestAnimationFrame(fitTrackPage);
+  }
+
+  async function browseTracks(mode, append = false) {
+    if (append && (browseBusy || !browse.more)) return;
+    const query = append ? browse.query : $('spSearch').value.trim();
+    if (mode === 'search' && !query) { browseStatus('Napiš název skladby nebo interpreta.'); $('spSearch').focus(); return; }
+    const version = ++browseVersion;
+    if (!append) {
+      browse = { mode, query: mode === 'search' ? query : '', offset: 0, more: false, tracks: [], order: $('spOrder').value };
+      tracksHidden = false; pageIndex = 0;
+    }
+    $('spBrowseTitle').textContent = mode === 'liked' ? '♥ Oblíbené skladby' : 'Výsledky hledání';
+    $('spLiked').setAttribute('aria-pressed', String(mode === 'liked'));
+    $('spReconnect').hidden = true;
+    browseBusy = false; $('spResults').setAttribute('aria-busy', 'false'); renderTracks();
+    if (requireLogin(mode === 'liked')) return;
+    browseBusy = true;
+    $('spResults').setAttribute('aria-busy', 'true'); $('spMore').disabled = true;
+    browseStatus(mode === 'liked' ? 'Načítám oblíbené…' : 'Hledám…');
+    try {
+      const oldest = mode === 'liked' && browse.order === 'oldest';
+      let offset = browse.offset, limit = mode === 'liked' ? 25 : 10;
+      if (oldest) {
+        if (!append) {
+          const meta = await api('/me/tracks?limit=1&offset=0');
+          if (version !== browseVersion) return;
+          if (!meta || !Number.isFinite(meta.total)) throw new Error('Spotify nevrátilo počet oblíbených. Zkus to znovu.');
+          browse.end = meta.total;
+        }
+        limit = Math.min(25, browse.end);
+        offset = Math.max(0, browse.end - limit);
+      }
+      const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+      if (mode === 'search') { params.set('q', browse.query); params.set('type', 'track'); }
+      const data = oldest && !limit ? { items: [], total: 0, next: null }
+        : await api((mode === 'liked' ? '/me/tracks?' : '/search?') + params);
+      if (version !== browseVersion) return;
+      const page = mode === 'liked' ? data : data && data.tracks;
+      if (!page || !Array.isArray(page.items)) throw new Error('Spotify nevrátilo seznam skladeb. Zkus to znovu.');
+      const tracks = mode === 'liked' ? page.items.map(item => item && item.track) : page.items;
+      if (oldest) tracks.reverse();
+      browse.tracks.push(...tracks.filter(Boolean));
+      browse.total = page.total;
+      browse.offset = offset + page.items.length;
+      browse.end = offset;
+      browse.more = oldest ? offset > 0 && page.items.length > 0
+        : !!page.next && page.items.length > 0 && (mode === 'liked' || browse.offset <= 1000);
+      browseStatus(browse.tracks.length
+        ? 'Načteno ' + browse.tracks.length + (Number.isFinite(page.total) ? ' z ' + page.total : '') + ' skladeb.'
+        : mode === 'liked' ? 'Zatím nemáš uložené žádné oblíbené skladby.' : 'Nic nenalezeno. Zkus jiný název nebo interpreta.');
+    } catch (e) {
+      if (version !== browseVersion) return;
+      browseStatus(e.message); log('seznam skladeb: ' + e.message, 'w');
+      if (e.status === 401 || (e.status === 403 && mode === 'liked')) {
+        $('spReconnect').hidden = false;
+        $('spReconnect').textContent = mode === 'liked' ? 'Povolit oblíbené ve Spotify' : 'Znovu přihlásit ke Spotify';
+        if (e.status === 403) browseStatus('Spotify nepovolilo čtení oblíbených. Přihlas se znovu a potvrď přístup ke knihovně.');
+      }
+    } finally {
+      if (version === browseVersion) {
+        browseBusy = false; $('spResults').setAttribute('aria-busy', 'false'); renderTracks();
+      }
+    }
+  }
+
+  function playTracks(index = null) {
+    let uris = browse.tracks.filter(playable).map(tr => tr.uri);
+    if (!uris.length) return;
+    const start = index === null ? ($('spShuffle').checked ? Math.floor(Math.random() * uris.length) : 0)
+      : Math.max(0, uris.indexOf((browse.tracks[index] || {}).uri));
+    uris = $('spShuffle').checked ? uris.slice(start).concat(uris.slice(0, start)) : uris.slice(start);
+    return play({ uris });
+  }
+
+  const applyShuffle = () => api('/me/player/shuffle?' + new URLSearchParams({
+    state: String($('spShuffle').checked), device_id: deviceId
+  }), 'PUT');
+
+  async function play(selection) {
+    if (playBusy) return;
+    playBusy = true; renderTracks();
+    const version = authVersion;
+    try {
+      // Odemkni existující SDK hned v události klepnutí, ještě před síťovými požadavky.
+      const activation = player && player.activateElement ? player.activateElement() : null;
+      if ($('btnHfpOff').disabled || $('inputLabel').textContent === '–')
+        log('HFP režim není zapnutý – zvuk pravděpodobně půjde mimo auto (krok 1)', 'w');
+      $('spNote').textContent = 'Připravuji přehrávání…';
+      if (activation) await activation;
+      await connect();
+      if (version !== authVersion) return;
+      if (!activation && player.activateElement) await player.activateElement();
+      await api('/me/player', 'PUT', { device_ids: [deviceId], play: false });
+      if (version !== authVersion) return;
+      log('přehrávání převedeno na tuhle stránku');
+      const what = selection || parseUri($('spUri').value);
+      if (what) await api('/me/player/play?device_id=' + deviceId, 'PUT', what);
+      else await player.resume();
+      $('spNote').textContent = 'Hraje. Jestli je zvuk v telefonu a ne v autě, vypni a znovu zapni krok 1 a ťukni na Hrát.';
+      try { await applyShuffle(); }
+      catch (e) { $('spNote').textContent = 'Přehrávání spuštěno, ale Spotify nepotvrdilo změnu pořadí. Zkus přepínač Náhodně znovu.'; log('pořadí: ' + e.message, 'w'); }
+    } catch (e) { if (version === authVersion) { $('spNote').textContent = e.message; log('hraní: ' + e.message, 'e'); } }
+    finally { playBusy = false; renderTracks(); }
+  }
+
+  // ---------- obsluha ----------
+  $('spSearchForm').onsubmit = event => { event.preventDefault(); $('spSearch').blur(); return browseTracks('search'); };
+  $('spLiked').onclick = () => browseTracks('liked');
+  $('spMore').onclick = () => browseTracks(browse.mode, true);
+  $('spPlayList').onclick = () => playTracks();
+  $('spHideTracks').onclick = () => { tracksHidden = !tracksHidden; renderTracks(); };
+  $('spOrder').onchange = () => { ls.set(K.order, $('spOrder').value); return browseTracks('liked'); };
+  $('spShuffle').onchange = async () => {
+    ls.set(K.shuffle, String($('spShuffle').checked));
+    $('spOrderHint').textContent = $('spShuffle').checked ? 'Náhodné pořadí' : 'Popořadě';
+    if (!connected || !deviceId || !dur || playBusy) return;
+    $('spShuffle').disabled = true;
+    try { await applyShuffle(); }
+    catch (e) { $('spNote').textContent = 'Pořadí se použije při příštím spuštění seznamu. ' + e.message; }
+    finally { $('spShuffle').disabled = false; }
+  };
+  $('spReconnect').onclick = () => {
+    if (browse.mode === 'liked') ls.set(K.pending, 'liked');
+    return login().catch(e => browseStatus(e.message));
+  };
+  $('spSaveClient').onclick = () => {
+    const v = $('spClient').value.trim();
+    if (!v) { ls.del(K.client); log('Client ID smazáno'); return; }
+    ls.set(K.client, v); log('Client ID uloženo', 'g');
+    $('spNote').textContent = 'Client ID uloženo. Teď Přihlásit se ke Spotify.';
+  };
+  $('spCopyRedir').onclick = async () => {
+    try { await navigator.clipboard.writeText(REDIR); log('adresa zkopírována', 'g'); }
+    catch (e) { $('spRedir').select(); log('zkopíruj ručně z pole výše', 'w'); }
+  };
+  $('spLogin').onclick = () => login().catch(e => log('přihlášení: ' + e.message, 'e'));
+  $('spLogout').onclick = () => {
+    authVersion++; browseVersion++;
+    if (cancelConnect) cancelConnect();
+    connecting = null;
+    ls.del(K.tok); ls.del(K.ver); ls.del(K.pending);
+    if (player) { try { player.disconnect(); } catch (e) {} }
+    player = null; deviceId = null; connected = false;
+    pill('spAuth', 'off', 'nepřihlášeno'); pill('spState', 'off', 'nepřipojeno');
+    $('spLogin').style.display = '';
+    $('spAcct').textContent = '–'; $('spDev').textContent = '–';
+    clearInterval(ticker); renderState(null);
+    CTRLS.forEach(b => $(b).disabled = true);
+    browse = { mode: 'search', query: '', offset: 0, more: false, tracks: [] };
+    browseBusy = false; $('spResults').setAttribute('aria-busy', 'false'); renderTracks();
+    $('spLiked').setAttribute('aria-pressed', 'false'); $('spReconnect').hidden = true;
+    $('spBrowseTitle').textContent = 'Vyber si hudbu';
+    browseStatus('Přihlas se ke Spotify a vyhledej skladbu nebo otevři své oblíbené.');
+    log('odhlášeno');
+  };
+  $('spPlay').onclick = () => play();
+  $('spToggle').onclick = async () => {
+    if (!player) return;
+    try {
+      // první spuštění musí projít přes activateElement, jinak iOS zvuk nepustí
+      if (paused && player.activateElement) { try { await player.activateElement(); } catch (e) {} }
+      await player.togglePlay();
+    } catch (e) { log('togglePlay: ' + e.message, 'e'); }
+  };
+  $('spNext').onclick = () => player && player.nextTrack().catch(e => log(e.message, 'e'));
+  $('spPrev').onclick = () => player && player.previousTrack().catch(e => log(e.message, 'e'));
+  const seek = $('spSeek');
+  const seekStart = () => { seeking = true; };
+  const seekEnd = async () => {
+    seeking = false;                       // platí i pro posun klávesnicí, kde pointerdown nepřijde
+    if (!player || !dur) return;
+    pos = Math.round(seek.value / 1000 * dur);
+    drawPos();
+    try { await player.seek(pos); } catch (e) { log('seek: ' + e.message, 'e'); }
+  };
+  seek.addEventListener('pointerdown', seekStart);
+  seek.addEventListener('touchstart', seekStart, { passive: true });
+  seek.addEventListener('input', () => { if (dur) { $('spPos').textContent = mmss(Math.round(seek.value / 1000 * dur)); } });
+  seek.addEventListener('change', seekEnd);
+  $('spVol').addEventListener('input', () => {
+    if (player && player.setVolume) player.setVolume(parseFloat($('spVol').value)).catch(() => {});
+  });
+
+  // ---------- start ----------
+  (async () => {
+    const q = new URLSearchParams(location.search);
+    if (q.get('error')) {
+      log('Spotify přihlášení odmítlo: ' + q.get('error'), 'e');
+      history.replaceState(null, '', REDIR);
+    } else if (q.get('code')) {
+      try {
+        await exchangeCode(q.get('code'));
+        history.replaceState(null, '', REDIR);
+      } catch (e) {
+        log('výměna kódu: ' + e.message, 'e');
+        history.replaceState(null, '', REDIR);
+      }
+    }
+    const standalone = navigator.standalone === true ||
+      (window.matchMedia && matchMedia('(display-mode: standalone)').matches);
+    if (standalone) {
+      log('běžíš z ikony na ploše – přihlášení ke Spotify sem iOS nemusí vrátit, zkoušej ho v Safari', 'w');
+      $('spNote').textContent = 'Z ikony na ploše se Spotify přihlásit nemusí podařit (iOS odskok otevře v Safari). Pro Spotify otevři stránku v Safari a nech internet zapnutý.';
+    }
+    const t = tokens();
+    if (!t || !t.access) { pill('spAuth', 'off', 'nepřihlášeno'); return; }
+    pill('spAuth', 'ok', 'přihlášeno');
+    $('spLogin').style.display = 'none';
+    browseStatus('Vyhledej skladbu nebo otevři ♥ Oblíbené.');
+    if (ls.get(K.pending) === 'liked') {
+      ls.del(K.pending);
+      browseTracks('liked');
+    }
+    if (!navigator.onLine) {
+      $('spNote').textContent = 'Telefon je offline – pro přehrávání Spotify obnov připojení k internetu.';
+      pill('spSdk', 'off', 'bez signálu');
+      return;
+    }
+    const version = authVersion;
+    try {
+      const me = await api('/me');
+      if (version !== authVersion) return;
+      $('spAcct').textContent = (me.display_name || me.id || 'Spotify') + (me.product ? ' · ' + me.product : '');
+      if (me.product && me.product !== 'premium') log('účet není Premium (' + me.product + ') – SDK vyžaduje Premium', 'e');
+    } catch (e) { log('/me: ' + e.message, 'w'); }
+    if (version !== authVersion) return;
+    try { await connect(); } catch (e) { log('připojení: ' + e.message, 'e'); }
+  })();
+})();
+</script>
+<script>
+// Viewport-sized screens; no scrolling is needed to select or control music.
+(() => {
+  const $ = id => document.getElementById(id), root = document.documentElement;
+  let focusMode = false, usedFullscreen = false, fullscreenRequest = 0, savedScroll = 0;
+  const fullscreenElement = () => document.fullscreenElement || document.webkitFullscreenElement;
+  const layout = () => document.dispatchEvent(new Event('bmw:layout'));
+  function fitViewport() {
+    const view = window.visualViewport;
+    const height = view ? view.height : window.innerHeight;
+    // Don't counteract the user's pinch zoom.
+    if (view && view.scale > 1.05) return;
+    root.style.setProperty('--app-height', height + 'px');
+    root.style.setProperty('--visual-top', (view ? view.offsetTop : 0) + 'px');
+    root.classList.toggle('compact-height', height < 550);
+    root.classList.toggle('keyboard-open', document.activeElement === $('spSearch') && height < 600);
+    layout();
+  }
+  function library(open) {
+    root.classList.toggle('show-library', open);
+    $('btnShowMusic').setAttribute('aria-pressed', String(open));
+    if (!open) $('spSearch').blur();
+    fitViewport();
+    layout();
+  }
+  function setFocus(active) {
+    if (active && !focusMode) savedScroll = window.scrollY;
+    focusMode = active;
+    root.classList.toggle('focus-mode', active);
+    library(false);
+    $('btnFullscreen').textContent = active ? '↙ Zpět' : '⛶ Zvětšit';
+    $('btnFullscreen').setAttribute('aria-pressed', String(active));
+    $('btnFullscreen').setAttribute('aria-label', active ? 'Ukončit velký přehrávač' : 'Zvětšit přehrávač');
+    if (!active) { $('fullscreenNote').hidden = true; window.scrollTo(0, savedScroll); }
+    fitViewport();
+  }
+  const exitNative = () => {
+    const exit = document.exitFullscreen || document.webkitExitFullscreen;
+    return exit ? Promise.resolve(exit.call(document)) : Promise.resolve();
+  };
+  $('btnFullscreen').onclick = async () => {
+    const request = ++fullscreenRequest;
+    if (focusMode) {
+      setFocus(false);
+      if (fullscreenElement()) { try { await exitNative(); } catch (e) {} }
+      return;
+    }
+    setFocus(true);
+    const enter = root.requestFullscreen || root.webkitRequestFullscreen;
+    try {
+      if (enter) await enter.call(root);
+      if (request !== fullscreenRequest) { if (fullscreenElement()) await exitNative(); return; }
+      usedFullscreen = !!fullscreenElement();
+    } catch (e) { /* The fixed viewport layout is the Safari fallback. */ }
+    if (request === fullscreenRequest && !fullscreenElement()) {
+      $('fullscreenNote').hidden = false;
+      $('fullscreenNote').textContent = 'Velký režim je zapnutý. Bez lišt Safari: Sdílet → Přidat na plochu → BMW v3.';
+    }
+    fitViewport();
+  };
+  function syncFullscreen() {
+    if (fullscreenElement()) usedFullscreen = true;
+    else if (usedFullscreen) { usedFullscreen = false; fullscreenRequest++; setFocus(false); }
+    fitViewport();
+  }
+  document.addEventListener('fullscreenchange', syncFullscreen);
+  document.addEventListener('webkitfullscreenchange', syncFullscreen);
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && focusMode && !fullscreenElement()) {
+      if (root.classList.contains('show-library')) library(false);
+      else { fullscreenRequest++; setFocus(false); }
+    }
+  });
+  $('btnShowMusic').onclick = () => {
+    if (!focusMode) { setFocus(true); }
+    library(true);
+  };
+  $('btnBackPlayer').onclick = () => library(false);
+  $('miniToggle').onclick = () => $('spToggle').click();
+  $('miniNext').onclick = () => $('spNext').click();
+  function syncOverview() {
+    const active = !$('btnHfpOff').disabled && $('inputLabel').textContent !== '–';
+    $('carBadge').textContent = active ? ($('micMute').checked ? 'Vstup · ztlumený' : 'Handsfree · zapnuté') : 'Handsfree · vypnuté';
+    $('carBadge').dataset.active = String(active && !$('micMute').checked);
+    const state = $('spState').textContent, auth = $('spAuth').textContent;
+    $('spotifyBadge').textContent = state === 'připojeno' ? 'Spotify · připravené' : auth === 'přihlášeno' ? 'Spotify · přihlášeno' : 'Spotify · přihlásit';
+    $('spotifyBadge').dataset.active = String(state === 'připojeno');
+    $('miniTitle').textContent = $('spTitle').textContent;
+    $('miniToggle').textContent = $('spToggle').textContent;
+    $('miniToggle').disabled = $('spToggle').disabled;
+    $('miniNext').disabled = $('spNext').disabled;
+  }
+  function cutCorners() {
+    for (const el of document.querySelectorAll('button,select,input,#spotify,.panel,.connection-badge,.pill,.np img,.track-row img,.mic-control,.switch-track')) {
+      if (el.dataset.cutAngle) continue;
+      const angle = 38 + Math.random() * 7, x = el.classList.contains('switch-track') ? 6 : 12;
+      el.dataset.cutAngle = angle.toFixed(3);
+      el.style.setProperty('--cut-x', x + 'px');
+      el.style.setProperty('--cut-y', (Math.tan(angle * Math.PI / 180) * x).toFixed(3) + 'px');
+    }
+  }
+  const observer = new MutationObserver(syncOverview);
+  for (const id of ['hfpState','spState','spAuth','micHint','spTitle','spToggle','spNext']) observer.observe($(id), {childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:['disabled']});
+  document.addEventListener('bmw:tracks', cutCorners);
+  window.addEventListener('resize', fitViewport);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', fitViewport);
+    window.visualViewport.addEventListener('scroll', fitViewport);
+  }
+  $('spSearch').addEventListener('focus', fitViewport);
+  // Don't move a pressed search button between pointerdown (blur) and click.
+  $('spSearchForm').addEventListener('submit', fitViewport);
+  syncOverview(); cutCorners(); setFocus(false);
+})();
+
+</script>
+</body>
+</html>
