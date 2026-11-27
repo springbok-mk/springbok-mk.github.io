@@ -15,7 +15,6 @@
   --set:#9A3A06;--warn:#C27C00;--warn-soft:#FBF0D9;--bad:#C62F2F;--bad-soft:#FBE3E3;--ok:#119A63;
   --eco:#5B6BBF;--eco-soft:#E7E9F8;--off:#8C877F;--off-soft:#EDEAE5;
   --r:16px;--shadow:0 1px 2px rgba(29,27,24,.06),0 4px 16px rgba(29,27,24,.05);
-  font-synthesis:none;
 }
 @media (prefers-color-scheme:dark){:root{
   --bg:#15130F;--card:#1F1C18;--card2:#26221D;--ink:#F2EEE8;--muted:#ADA598;--faint:#7A7368;--line:#332E27;
@@ -31,11 +30,15 @@ body{font:15px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Ro
 header.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid transparent}
 header.top.scrolled{border-bottom-color:var(--line)}
-.top-in{max-width:880px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:12px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:650;font-size:17px;letter-spacing:-.01em}
-.brand i{width:30px;height:30px;border-radius:9px;background:var(--heat);display:grid;place-items:center;color:#fff}
-.brand small{display:block;font-weight:500;font-size:12px;color:var(--muted);letter-spacing:0}
-.pill{margin-left:auto;font-size:12px;font-weight:600;padding:5px 10px;border-radius:999px;background:var(--warn-soft);color:var(--warn);white-space:nowrap}
+.top-in{max-width:880px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;display:flex;align-items:center;gap:10px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:650;font-size:17px;letter-spacing:-.01em;min-width:0}
+.brand i{width:30px;height:30px;border-radius:9px;background:var(--heat);display:grid;place-items:center;color:#fff;flex:none}
+.brand small{display:block;font-weight:500;font-size:12px;color:var(--muted);letter-spacing:0;white-space:nowrap}
+.pill{margin-left:auto;font-size:11.5px;font-weight:650;padding:5px 9px;border-radius:999px;background:var(--warn-soft);color:var(--warn);white-space:nowrap}
+@media (max-width:380px){.pill{display:none}.lang{margin-left:auto}}
+.lang{display:flex;background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:2px;flex:none}
+.lang button{appearance:none;border:0;background:transparent;color:var(--muted);font:inherit;font-size:12px;font-weight:700;padding:5px 9px;border-radius:999px;cursor:pointer;letter-spacing:.03em}
+.lang button.on{background:var(--ink);color:var(--bg)}
 main{max-width:880px;margin:0 auto;padding:8px 16px 24px}
 section.view{display:none;animation:fade .18s ease}
 section.view.on{display:block}
@@ -43,10 +46,15 @@ section.view.on{display:block}
 h2{font-size:24px;letter-spacing:-.02em;margin:14px 2px 12px;font-weight:700}
 h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:22px 4px 8px;font-weight:650}
 .card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);border:1px solid var(--line);padding:16px}
+a.card,button.card{display:block;color:inherit;text-decoration:none;font:inherit;text-align:left;width:100%;cursor:pointer;position:relative;transition:transform .08s,border-color .15s}
+a.card:hover,button.card:hover{border-color:var(--faint)}
+a.card:active,button.card:active{transform:scale(.985)}
+.go::after{content:"";position:absolute;right:12px;top:14px;width:7px;height:7px;border-right:2px solid var(--faint);border-top:2px solid var(--faint);transform:rotate(45deg)}
 .grid{display:grid;gap:12px}
 .g2{grid-template-columns:repeat(2,minmax(0,1fr))}
-@media (min-width:700px){.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .g4{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (min-width:700px){.g4{grid-template-columns:repeat(4,minmax(0,1fr))}}
 .stat{padding:14px 14px 12px}
 .stat .lbl{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px}
 .stat .val{font-size:30px;font-weight:700;letter-spacing:-.03em;margin-top:2px;line-height:1.1}
@@ -55,41 +63,44 @@ h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute
 .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex:none}
 .hero{display:grid;grid-template-columns:1.25fr 1fr;gap:12px}
 @media (max-width:560px){.hero{grid-template-columns:1fr}}
-.hero .main{padding:18px;position:relative;overflow:hidden}
+.hero .main{padding:18px}
 .hero .big{font-size:58px;font-weight:750;letter-spacing:-.045em;line-height:1}
 .hero .big span{font-size:24px;color:var(--muted);font-weight:600;letter-spacing:0;margin-left:2px}
 .row{display:flex;align-items:center;gap:10px}
 .between{justify-content:space-between}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
-.chip{font-size:12.5px;font-weight:600;padding:5px 10px;border-radius:999px;background:var(--card2);border:1px solid var(--line);color:var(--muted);display:inline-flex;gap:6px;align-items:center}
+.chip{font:inherit;font-size:12.5px;font-weight:600;padding:5px 10px;border-radius:999px;background:var(--card2);border:1px solid var(--line);color:var(--muted);display:inline-flex;gap:6px;align-items:center;cursor:pointer}
 .chip.heat{background:var(--heat-soft);color:var(--heat);border-color:transparent}
 .chip.ok{background:var(--room-soft);color:var(--room);border-color:transparent}
 .chip.eco{background:var(--eco-soft);color:var(--eco);border-color:transparent}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .flame{animation:pulse 1.6s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.45}}
 .btn{appearance:none;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:600;
   padding:11px 14px;border-radius:12px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px}
 .btn:active{transform:scale(.98)}
 .btn.primary{background:var(--heat);border-color:var(--heat);color:#fff}
-.btn.ghost{background:transparent}
 .btn.sm{min-height:36px;padding:7px 11px;font-size:13.5px;border-radius:10px}
+.btn.round{width:44px;height:44px;padding:0;border-radius:50%;font-size:24px;font-weight:500;line-height:1}
 .actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .actions .btn{flex-direction:column;gap:4px;padding:12px 6px;font-size:13px}
 .actions .btn svg{color:var(--heat)}
 .seg{display:flex;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
 .seg button{flex:1;appearance:none;border:0;background:transparent;color:var(--muted);font:inherit;font-weight:600;font-size:13.5px;
-  padding:8px 6px;border-radius:9px;cursor:pointer;min-height:36px}
+  padding:8px 4px;border-radius:9px;cursor:pointer;min-height:36px}
 .seg button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
-.seg.mode button.on[data-v="ZAP"]{background:var(--heat);color:#fff}
-.seg.mode button.on[data-v="ZKUŠEBNÍ"]{background:var(--warn);color:#fff}
-.seg.mode button.on[data-v="VYP"]{background:var(--off);color:#fff}
+.seg.mode button.on[data-v="ZAP"],.seg.kinds button.on[data-v="k"]{background:var(--heat);color:#fff}
+.seg.mode button.on[data-v="TEST"]{background:var(--warn);color:#fff}
+.seg.mode button.on[data-v="VYP"],.seg.kinds button.on[data-v="o"]{background:var(--off);color:#fff}
+.seg.kinds button.on[data-v="e"]{background:var(--eco);color:#fff}
 .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;color:var(--muted);margin:2px 0 8px}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .legend i{width:14px;height:3px;border-radius:2px;display:inline-block}
-svg.chart{width:100%;height:auto;display:block;touch-action:pan-y}
+.legend i.sq{width:10px;height:10px;border-radius:3px}
+svg.chart{width:100%;height:auto;display:block;touch-action:pan-y;user-select:none;-webkit-user-select:none}
 svg.chart text{fill:var(--faint);font-size:11px;font-family:inherit}
 .tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font-size:12px;padding:6px 8px;border-radius:8px;white-space:nowrap;
-  transform:translate(-50%,-110%);opacity:0;transition:opacity .1s;line-height:1.35}
+  transform:translate(-50%,-110%);opacity:0;transition:opacity .1s;line-height:1.35;z-index:2}
 .chartbox{position:relative}
 label.switch{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;padding:4px 0}
 label.switch input{appearance:none;width:46px;height:28px;border-radius:999px;background:var(--line);position:relative;cursor:pointer;flex:none;transition:background .15s;margin:0}
@@ -97,7 +108,7 @@ label.switch input::after{content:"";position:absolute;top:3px;left:3px;width:22
 label.switch input:checked{background:var(--room)}
 label.switch input:checked::after{transform:translateX(18px)}
 input[type=range]{width:100%;accent-color:var(--heat)}
-input[type=time],input[type=date],input[type=number],select{font:inherit;color:var(--ink);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-height:40px}
+input[type=date],input[type=number],select{font:inherit;color:var(--ink);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;min-height:40px}
 .list{display:flex;flex-direction:column}
 .li{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
 .li:first-child{border-top:0}
@@ -110,21 +121,25 @@ input[type=time],input[type=date],input[type=number],select{font:inherit;color:v
 .badge.bad{background:var(--bad-soft);color:var(--bad)}
 .muted{color:var(--muted)}
 .small{font-size:12.5px}
-.days{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
-.days::-webkit-scrollbar{display:none}
-.days button{flex:1;min-width:44px;appearance:none;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:650;border-radius:12px;padding:9px 0;cursor:pointer}
+.days{display:flex;gap:6px}
+.days button{flex:1;min-width:0;appearance:none;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:650;border-radius:12px;padding:9px 0;cursor:pointer}
 .days button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.timeline{position:relative;height:44px;border-radius:12px;overflow:hidden;background:var(--eco-soft);margin:6px 0 4px;display:flex}
-.timeline div{position:absolute;top:0;bottom:0;display:grid;place-items:center;font-size:11px;font-weight:700;color:#fff;overflow:hidden;white-space:nowrap}
-.hours{display:flex;justify-content:space-between;font-size:11px;color:var(--faint);padding:0 2px}
-.nowline{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);border-radius:2px}
-.block{display:grid;grid-template-columns:auto auto 1fr auto;gap:8px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
-.block:first-child{border-top:0}
-.block select{width:100%}
-.block .x{appearance:none;border:0;background:transparent;color:var(--faint);font-size:22px;cursor:pointer;width:36px;height:36px;border-radius:10px}
-@media (max-width:420px){.block{grid-template-columns:1fr 1fr auto}.block select{grid-column:1/3}}
-.kind{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600}
-.kind i{width:10px;height:10px;border-radius:3px;display:inline-block}
+.range{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
+.range input{width:100%;min-width:0}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.tablewrap{overflow:auto;max-height:440px;margin:0 -16px -16px;border-top:1px solid var(--line)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{padding:9px 10px;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left;padding-left:16px}
+th:last-child,td:last-child{padding-right:16px}
+thead th{position:sticky;top:0;background:var(--card);color:var(--muted);font-size:12px;font-weight:650;border-bottom:1px solid var(--line);z-index:1}
+tbody tr:nth-child(even){background:var(--card2)}
+tfoot td{font-weight:700;border-top:1px solid var(--line);background:var(--card);position:sticky;bottom:0}
+.selinfo{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center;margin-top:12px}
+@media (max-width:600px){svg.chart text{font-size:19px}svg.chart text.seglbl{font-size:18px}}
+.stepper{display:flex;align-items:center;gap:6px}
+.stepper b{min-width:64px;text-align:center;font-size:20px}
+.pm{display:flex;gap:8px;align-items:center}
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
 nav.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
@@ -133,17 +148,17 @@ nav.tabs button.on{color:var(--heat)}
 nav.tabs svg{width:24px;height:24px}
 @media (min-width:900px){
   body{padding-bottom:24px}
-  nav.tabs{position:sticky;top:57px;bottom:auto;background:transparent;border:0;backdrop-filter:none;padding:0 16px;z-index:4}
+  nav.tabs{position:sticky;top:57px;bottom:auto;background:transparent;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;padding:0 16px;z-index:4}
   nav.tabs .in{max-width:880px;display:flex;gap:6px;padding:4px 0 6px}
   nav.tabs button{flex-direction:row;font-size:14px;padding:9px 14px;gap:8px;color:var(--muted)}
-  nav.tabs button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow);border:1px solid var(--line)}
+  nav.tabs button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow);outline:1px solid var(--line)}
   nav.tabs svg{width:18px;height:18px}
 }
 .toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);opacity:0;background:var(--ink);color:var(--bg);
   padding:10px 16px;border-radius:12px;font-size:14px;font-weight:600;transition:.2s;z-index:9;pointer-events:none;max-width:calc(100% - 32px);text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .note{font-size:12.5px;color:var(--muted);margin:8px 4px 0}
-.lock{display:inline-flex;align-items:center;gap:4px;color:var(--bad);font-weight:650;font-size:12px}
+.lock{white-space:nowrap;display:inline-flex;align-items:center;gap:4px;color:var(--bad);font-weight:650;font-size:12px}
 .foot{text-align:center;color:var(--faint);font-size:12px;margin:28px 0 8px}
 .foot a{color:inherit}
 </style>
@@ -154,195 +169,209 @@ nav.tabs svg{width:24px;height:24px}
   <div class="top-in">
     <div class="brand">
       <i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-1.6.7-2.7 1.5-3.5.2 1.5 1 2.3 2 2.5C11 8 11 5.5 12 3z"/><path d="M8 18h8M9 21h6"/></svg></i>
-      <div>Topení<small>Zlín · Vitodens 100-W</small></div>
+      <div><span data-t="app">Topení</span><small>Zlín · Vitodens 100-W</small></div>
     </div>
-    <span class="pill" title="Žádná data nejsou připojená">Ukázka · bez dat</span>
+    <span class="pill" data-t="demo">Ukázka · bez dat</span>
+    <div class="lang" role="group" aria-label="Jazyk / Idioma"><button data-lang="cs">CZ</button><button data-lang="es">ES</button></div>
   </div>
 </header>
 
 <nav class="tabs" aria-label="Sekce">
   <div class="in">
-    <button data-tab="prehled" class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>Přehled</button>
-    <button data-tab="statistiky"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Statistiky</button>
-    <button data-tab="ekviterm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M4 17C8 16 12 12 20 4"/><circle cx="8" cy="15" r="1.6"/><circle cx="14" cy="10" r="1.6"/></svg>Ekviterm</button>
-    <button data-tab="programy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>Programy</button>
-    <button data-tab="system"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/><circle cx="12" cy="12" r="3.5"/></svg>Systém</button>
+    <button data-tab="prehled"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span data-t="tab.prehled">Přehled</span></button>
+    <button data-tab="statistiky"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span data-t="tab.statistiky">Statistiky</span></button>
+    <button data-tab="programy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span data-t="tab.programy">Programy</span></button>
+    <button data-tab="ekviterm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 20h18M4 17C8 16 12 12 20 4"/><circle cx="8" cy="15" r="1.6"/><circle cx="14" cy="10" r="1.6"/></svg><span data-t="tab.ekviterm">Ekviterm</span></button>
+    <button data-tab="system"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/><circle cx="12" cy="12" r="3.5"/></svg><span data-t="tab.system">Systém</span></button>
   </div>
 </nav>
 
 <main>
 
 <!-- ============ PŘEHLED ============ -->
-<section class="view on" id="v-prehled">
-  <h2>Dobré ráno</h2>
+<section class="view" id="v-prehled">
+  <h2 id="hello">Dobrý den</h2>
   <div class="hero">
-    <div class="card main">
-      <div class="row between">
-        <div class="muted small row"><span class="dot" style="background:var(--room)"></span>Obývák · Shelly H&amp;T</div>
-        <div class="muted small num">před 4 min</div>
+    <button class="card main go" data-go="programy">
+      <div class="row between" style="padding-right:16px">
+        <div class="muted small row"><span class="dot" style="background:var(--room)"></span><span data-t="room.where">Obývák · Shelly H&amp;T</span></div>
+        <div class="muted small num" data-t="ago4">před 4 min</div>
       </div>
       <div class="big num" style="margin-top:10px">21,4<span>°C</span></div>
-      <div class="muted num" style="margin-top:6px">Vlhkost 47 % · cíl 21,0 °C</div>
+      <div class="muted num" style="margin-top:6px" data-t="room.sub">Vlhkost 47 % · cíl 21,0 °C</div>
       <div class="chips">
-        <span class="chip heat"><svg class="flame" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1.2 3.6 5 5.3 5 10a5 5 0 0 1-10 0c0-2 .9-3.4 1.9-4.4.2 1.9 1.2 2.9 2.4 3.2C10.8 7.6 10.8 4.6 12 2z"/></svg>Hořák hoří · 34 %</span>
-        <span class="chip ok">Ekviterm ZAP</span>
-        <span class="chip eco" id="nowBlock">Komfort do 22:00</span>
+        <span class="chip heat" data-go="statistiky"><svg class="flame" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1.2 3.6 5 5.3 5 10a5 5 0 0 1-10 0c0-2 .9-3.4 1.9-4.4.2 1.9 1.2 2.9 2.4 3.2C10.8 7.6 10.8 4.6 12 2z"/></svg><span data-t="chip.burner">Hořák hoří · 34 %</span></span>
+        <span class="chip ok" data-go="ekviterm" data-t="chip.ekv">Ekviterm ZAP</span>
+        <span class="chip eco" data-go="programy" id="nowBlock">Komfort</span>
       </div>
-    </div>
+    </button>
     <div class="grid g2">
-      <div class="card stat"><div class="lbl"><span class="dot" style="background:var(--cold)"></span>Venku</div><div class="val num">−1,2<span>°C</span></div><div class="sub">MET Norway · záloha</div></div>
-      <div class="card stat"><div class="lbl"><span class="dot" style="background:var(--heat)"></span>Přívod</div><div class="val num">44,7<span>°C</span></div><div class="sub num">nastaveno 42 °C</div></div>
-      <div class="card stat"><div class="lbl">Plyn dnes</div><div class="val num">1,9<span>m³</span></div><div class="sub num">včera 2,6 m³</div></div>
-      <div class="card stat"><div class="lbl">Hořák dnes</div><div class="val num">3:12<span>h</span></div><div class="sub num">14 startů</div></div>
+      <button class="card stat go" data-go="ekviterm"><div class="lbl"><span class="dot" style="background:var(--cold)"></span><span data-t="out">Venku</span></div><div class="val num">−1,2<span>°C</span></div><div class="sub" data-t="out.sub">MET Norway · záloha</div></button>
+      <button class="card stat go" data-go="ekviterm"><div class="lbl"><span class="dot" style="background:var(--heat)"></span><span data-t="supply">Přívod</span></div><div class="val num">44,7<span>°C</span></div><div class="sub num" data-t="supply.sub">nastaveno 42 °C</div></button>
+      <button class="card stat go" data-go="statistiky" data-range="today"><div class="lbl" data-t="gasToday">Plyn dnes</div><div class="val num">1,9<span>m³</span></div><div class="sub num" data-t="gasToday.sub">včera 2,6 m³</div></button>
+      <button class="card stat go" data-go="statistiky" data-range="today"><div class="lbl" data-t="burnToday">Hořák dnes</div><div class="val num">3:12<span>h</span></div><div class="sub num" data-t="burnToday.sub">14 startů</div></button>
     </div>
   </div>
 
-  <h3>Posledních 24 hodin</h3>
+  <h3 data-t="quick">Rychlé akce</h3>
+  <div class="actions">
+    <button class="btn" data-demo="act.on.toast"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v10M6.3 6.3a8 8 0 1 0 11.4 0"/></svg><span data-t="act.on">Zapni</span></button>
+    <button class="btn" data-demo="act.eco.toast"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg><span data-t="act.eco">Útlum</span></button>
+    <button class="btn" data-go="programy"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span data-t="act.tune">Laď program</span></button>
+  </div>
+
+  <h3 data-t="last24">Posledních 24 hodin</h3>
   <div class="card">
     <div class="legend">
-      <span><i style="background:var(--cold)"></i>Venku</span>
-      <span><i style="background:var(--room)"></i>Místnost</span>
-      <span><i style="background:var(--heat)"></i>Přívod</span>
-      <span><i style="background:repeating-linear-gradient(90deg,var(--set) 0 4px,transparent 4px 7px)"></i>Nastaveno</span>
+      <span><i style="background:var(--cold)"></i><span data-t="out">Venku</span></span>
+      <span><i style="background:var(--room)"></i><span data-t="room">Místnost</span></span>
+      <span><i style="background:var(--heat)"></i><span data-t="supply">Přívod</span></span>
+      <span><i style="background:repeating-linear-gradient(90deg,var(--set) 0 4px,transparent 4px 7px)"></i><span data-t="setp">Nastaveno</span></span>
     </div>
-    <div class="chartbox"><svg class="chart" id="ch24" viewBox="0 0 640 240" role="img" aria-label="Průběh teplot za posledních 24 hodin"></svg><div class="tip" id="tip24"></div></div>
+    <div class="chartbox"><svg class="chart" id="ch24" viewBox="0 0 640 240" role="img"></svg><div class="tip" id="tip24"></div></div>
   </div>
 
-  <h3>Rychlé akce</h3>
-  <div class="actions">
-    <button class="btn" data-demo="Přitápím 2 hodiny (+3 °C)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>Přitop 2 h</button>
-    <button class="btn" data-demo="Útlum až do dalšího bloku programu"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>Útlum teď</button>
-    <button class="btn" data-go="programy"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 16l20-5-7 9zM9 14l-2-6 3-1 4 5"/></svg>Dovolená</button>
-  </div>
-  <p class="note">Ukázka: všechna čísla jsou vymyšlená a tlačítka nic nemění.</p>
+  <button class="card go" data-go="system" style="margin-top:12px;padding:14px 16px">
+    <div class="row"><span class="dot" style="background:var(--warn)"></span><b data-t="sys.short">1 upozornění · venkovní teplota ze zálohy</b></div>
+  </button>
+  <p class="note" data-t="demo.note">Ukázka: všechna čísla jsou vymyšlená a tlačítka nic nemění.</p>
 </section>
 
 <!-- ============ STATISTIKY ============ -->
 <section class="view" id="v-statistiky">
-  <h2>Statistiky</h2>
-  <div class="seg" id="period">
-    <button data-v="d" class="on">14 dní</button><button data-v="w">Týdny</button><button data-v="m">Měsíce</button><button data-v="s">Sezóny</button>
+  <h2 data-t="tab.statistiky">Statistiky</h2>
+  <div class="card">
+    <div class="range"><input type="date" id="dFrom" aria-label="Od"><span class="muted">–</span><input type="date" id="dTo" aria-label="Do"></div>
+    <div class="presets" id="presets">
+      <button class="chip" data-p="14"><span data-t="p.14">14 dní + dnes</span></button>
+      <button class="chip" data-p="month"><span data-t="p.month">Tento měsíc</span></button>
+      <button class="chip" data-p="season"><span data-t="p.season">Celá sezóna</span></button>
+    </div>
+    <div class="seg" id="gran" style="margin-top:12px">
+      <button data-v="h" data-t="g.h">Hodiny</button><button data-v="d" data-t="g.d">Dny</button><button data-v="w" data-t="g.w">Týdny</button><button data-v="m" data-t="g.m">Měsíce</button>
+    </div>
   </div>
+
   <div class="grid g4" style="margin-top:12px">
-    <div class="card stat"><div class="lbl">Plyn celkem</div><div class="val num" id="kGas">—</div><div class="sub" id="kGasSub">&nbsp;</div></div>
-    <div class="card stat"><div class="lbl">Náklady</div><div class="val num" id="kCost">—</div><div class="sub">při <input id="price" type="number" step="0.5" value="28" style="width:62px;min-height:28px;padding:2px 6px;font-size:12.5px"> Kč/m³</div></div>
-    <div class="card stat"><div class="lbl">Na denostupeň</div><div class="val num" id="kDd">—</div><div class="sub">spotřeba bez vlivu počasí</div></div>
-    <div class="card stat"><div class="lbl">Hořák hořel</div><div class="val num" id="kBurn">—</div><div class="sub" id="kBurnSub">&nbsp;</div></div>
+    <div class="card stat"><div class="lbl" data-t="k.gas">Plyn celkem</div><div class="val num" id="kGas">—</div><div class="sub" id="kDays">&nbsp;</div></div>
+    <div class="card stat"><div class="lbl" data-t="k.cost">Náklady</div><div class="val num" id="kCost">—</div><div class="sub"><input id="price" type="number" step="0.5" value="28" style="width:58px;min-height:26px;padding:1px 6px;font-size:12.5px"> <span data-t="k.price">Kč/m³</span></div></div>
+    <div class="card stat"><div class="lbl" data-t="k.dd">Na denostupeň</div><div class="val num" id="kDd">—</div><div class="sub" data-t="k.dd.sub">spotřeba bez vlivu počasí</div></div>
+    <div class="card stat"><div class="lbl" data-t="k.burn">Hořák hořel</div><div class="val num" id="kBurn">—</div><div class="sub" id="kRate">&nbsp;</div></div>
   </div>
 
-  <h3>Spotřeba plynu</h3>
+  <h3 data-t="gasUse">Spotřeba plynu</h3>
   <div class="card">
-    <div class="legend"><span><i style="background:var(--heat);height:10px;width:10px;border-radius:3px"></i>Plyn (m³)</span><span><i style="background:var(--cold)"></i>Průměr venku</span></div>
-    <div class="chartbox"><svg class="chart" id="chGas" viewBox="0 0 640 240" role="img" aria-label="Spotřeba plynu po obdobích"></svg><div class="tip" id="tipGas"></div></div>
+    <div class="legend"><span><i class="sq" style="background:var(--heat)"></i><span data-t="gasM3">Plyn (m³)</span></span><span><i style="background:var(--cold)"></i><span data-t="outAvg">Průměr venku</span></span></div>
+    <div class="chartbox"><svg class="chart" id="chGas" viewBox="0 0 640 240" role="img"></svg><div class="tip" id="tipGas"></div></div>
   </div>
 
-  <h3>Doba chodu</h3>
+  <h3 data-t="summary">Souhrn</h3>
+  <div class="card" style="padding-bottom:16px">
+    <div class="tablewrap" style="margin-top:-16px;border-top:0"><table id="tbl"></table></div>
+  </div>
+
+  <h3 data-t="runtime">Doba chodu</h3>
   <div class="card">
-    <label class="switch"><span>Zobrazit dobu zapnutí topení<br><small class="muted">od 6. 11. je topení zapnuté 24 h denně</small></span><input type="checkbox" id="showOn"></label>
-    <div class="legend" style="margin-top:8px"><span><i style="background:var(--heat);height:10px;width:10px;border-radius:3px"></i>Hořák hořel</span><span id="lgOn" style="display:none"><i style="background:var(--line);height:10px;width:10px;border-radius:3px"></i>Topení zapnuto</span></div>
-    <div class="chartbox"><svg class="chart" id="chRun" viewBox="0 0 640 200" role="img" aria-label="Doba hoření hořáku po dnech"></svg></div>
+    <label class="switch"><span><span data-t="showOn">Zobrazit dobu zapnutí topení</span><br><small class="muted" data-t="showOn.sub">od 6. 11. je topení zapnuté 24 h denně</small></span><input type="checkbox" id="showOn"></label>
+    <div class="legend" style="margin-top:8px"><span><i class="sq" style="background:var(--heat)"></i><span data-t="burned">Hořák hořel</span></span><span id="lgOn" style="display:none"><i class="sq" style="background:var(--line)"></i><span data-t="heatOn">Topení zapnuto</span></span></div>
+    <div class="chartbox"><svg class="chart" id="chRun" viewBox="0 0 640 200" role="img"></svg></div>
   </div>
-</section>
-
-<!-- ============ EKVITERM ============ -->
-<section class="view" id="v-ekviterm">
-  <h2>Ekviterm</h2>
-  <div class="card">
-    <div class="seg mode" id="mode"><button data-v="ZAP" class="on">ZAP</button><button data-v="ZKUŠEBNÍ">Zkušební</button><button data-v="VYP">VYP</button></div>
-    <div class="row between" style="margin-top:14px;align-items:flex-end">
-      <div><div class="muted small">Teď venku (průměr −3 h…+2 h)</div><div class="num" style="font-size:22px;font-weight:700" id="eOut">−1,2 °C</div></div>
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-      <div style="text-align:right"><div class="muted small">Kotel dostane</div><div class="num" style="font-size:30px;font-weight:750;color:var(--heat)" id="eSet">42 °C</div></div>
-    </div>
-  </div>
-
-  <h3>Topná křivka</h3>
-  <div class="card">
-    <div class="row between small muted" style="margin-bottom:6px"><span>Tažením bodů nahoru a dolů křivku upravíte</span><span class="lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>max 55 °C</span></div>
-    <div class="chartbox"><svg class="chart" id="chCurve" viewBox="0 0 640 300" role="img" aria-label="Topná křivka – přívod podle venkovní teploty" style="touch-action:none"></svg><div class="tip" id="tipCurve"></div></div>
-    <div style="margin-top:14px">
-      <div class="row between"><b>Posun křivky</b><span class="num" id="shiftV">0 °C</span></div>
-      <input type="range" id="shift" min="-5" max="5" step="1" value="0">
-      <div class="row between small muted"><span>chladněji</span><span>tepleji</span></div>
-    </div>
-    <div class="row" style="margin-top:12px;gap:8px;flex-wrap:wrap">
-      <button class="btn sm" id="resetCurve">Výchozí křivka</button>
-      <button class="btn sm primary" data-demo="Křivka uložena (ukázka)">Uložit</button>
-    </div>
-  </div>
-
-  <h3>Korekce podle místnosti</h3>
-  <div class="card">
-    <label class="switch"><span><b>Zapnout korekci</b><br><small class="muted">Za každý stupeň pod cílem přidá přívod. Jen když Shelly měří.</small></span><input type="checkbox" id="roomOn"></label>
-    <div id="roomBox" style="opacity:.45;pointer-events:none;margin-top:10px">
-      <div class="row between"><span>Cílová teplota v místnosti</span><span class="num" id="rtV">21,0 °C</span></div>
-      <input type="range" id="rt" min="18" max="24" step="0.5" value="21">
-      <div class="row between" style="margin-top:8px"><span>Síla korekce</span><span class="num" id="rgV">1,0 °C / °C</span></div>
-      <input type="range" id="rg" min="0.5" max="3" step="0.5" value="1">
-    </div>
-  </div>
-
-  <h3>Poslední kroky</h3>
-  <div class="card"><div class="list" id="elog"></div></div>
 </section>
 
 <!-- ============ PROGRAMY ============ -->
 <section class="view" id="v-programy">
-  <h2>Programy</h2>
+  <h2 data-t="tab.programy">Programy</h2>
   <div class="card">
     <div class="days" id="days"></div>
-    <div style="position:relative;margin-top:12px"><div class="timeline" id="tl"></div></div>
-    <div class="hours"><span>0</span><span>6</span><span>12</span><span>18</span><span>24</span></div>
-    <div class="legend" style="margin-top:10px">
-      <span class="kind"><i style="background:var(--heat)"></i>Komfort</span>
-      <span class="kind"><i style="background:var(--eco)"></i>Útlum</span>
-      <span class="kind"><i style="background:var(--off)"></i>Vypnuto</span>
+    <div class="row between" style="margin-top:12px">
+      <div class="legend" style="margin:0">
+        <span><i class="sq" style="background:var(--heat)"></i><span data-t="kind.k">Komfort</span></span>
+        <span><i class="sq" style="background:var(--eco)"></i><span data-t="kind.e">Útlum</span></span>
+        <span><i class="sq" style="background:var(--off)"></i><span data-t="kind.o">Vypnuto</span></span>
+      </div>
+      <div class="pm">
+        <button class="btn round" id="segDel" aria-label="−">−</button>
+        <button class="btn round" id="segAdd" aria-label="+">+</button>
+      </div>
     </div>
-  </div>
-
-  <h3 id="dayTitle">Pondělí</h3>
-  <div class="card">
-    <div id="blocks"></div>
-    <div class="row" style="gap:8px;margin-top:10px;flex-wrap:wrap">
-      <button class="btn sm" id="addBlock">+ Přidat blok</button>
-      <button class="btn sm" id="copyAll">Kopírovat na Po–Pá</button>
+    <div class="chartbox" style="margin-top:6px"><svg class="chart" id="chProg" viewBox="0 0 640 260" role="img" style="touch-action:none"></svg><div class="tip" id="tipProg"></div></div>
+    <p class="note" style="margin:6px 0 0" data-t="prog.help">Tažením svislých úchytů měníte čas, tažením vodorovné čáry nahoru a dolů teplotu. Klepnutím vyberete úsek, + ho rozdělí, − smaže.</p>
+    <div class="selinfo">
+      <div><div class="muted small" data-t="prog.sel">Vybraný úsek</div><div class="num" style="font-size:18px;font-weight:700" id="selTime">—</div></div>
+      <div class="stepper"><button class="btn round" id="tDown" aria-label="−0,5 °C">−</button><b class="num" id="selTemp">—</b><button class="btn round" id="tUp" aria-label="+0,5 °C">+</button></div>
     </div>
-    <p class="note" style="margin-left:0">Mimo bloky platí útlum. Útlum = křivka o <b id="ecoV">5 °C</b> níž.</p>
-    <input type="range" id="eco" min="2" max="12" step="1" value="5">
+    <div class="seg kinds" id="kinds" style="margin-top:10px"><button data-v="k" data-t="kind.k">Komfort</button><button data-v="e" data-t="kind.e">Útlum</button><button data-v="o" data-t="kind.o">Vypnuto</button></div>
   </div>
 
-  <h3>Šablony</h3>
-  <div class="grid g3">
-    <button class="btn" data-tpl="work">Pracovní den</button>
-    <button class="btn" data-tpl="home">Home office</button>
-    <button class="btn" data-tpl="wknd">Víkend</button>
+  <div class="grid g3" style="margin-top:12px">
+    <button class="btn sm" data-tpl="work" data-t="tpl.work">Pracovní den</button>
+    <button class="btn sm" data-tpl="home" data-t="tpl.home">Home office</button>
+    <button class="btn sm" data-tpl="wknd" data-t="tpl.wknd">Víkend</button>
   </div>
+  <button class="btn sm" id="copyAll" style="margin-top:8px;width:100%" data-t="copyAll">Kopírovat tento den na Po–Pá</button>
 
-  <h3>Dovolená</h3>
+  <h3 data-t="vac">Dovolená</h3>
   <div class="card">
-    <label class="switch"><span><b>Režim dovolené</b><br><small class="muted">Po celou dobu útlum, den před návratem zase komfort.</small></span><input type="checkbox" id="vac"></label>
+    <label class="switch"><span><b data-t="vac.title">Režim dovolené</b><br><small class="muted" data-t="vac.sub">Celou dobu útlum 16 °C, den před návratem zase podle programu.</small></span><input type="checkbox" id="vac"></label>
     <div class="grid g2" style="margin-top:10px">
-      <label class="small muted">Od<br><input type="date" id="vFrom" style="width:100%"></label>
-      <label class="small muted">Do<br><input type="date" id="vTo" style="width:100%"></label>
+      <label class="small muted"><span data-t="from">Od</span><br><input type="date" id="vFrom" style="width:100%"></label>
+      <label class="small muted"><span data-t="to">Do</span><br><input type="date" id="vTo" style="width:100%"></label>
     </div>
   </div>
-  <p class="note">Programy řídí naše regulace. Časový program ve ViCare se nastaví na celý den normální, aby se plány nepraly.</p>
+  <p class="note" data-t="prog.note">Programy řídí naše regulace. Časový program ve ViCare se nastaví na celý den normální, aby se plány nepraly.</p>
+</section>
+
+<!-- ============ EKVITERM ============ -->
+<section class="view" id="v-ekviterm">
+  <h2 data-t="tab.ekviterm">Ekviterm</h2>
+  <div class="card">
+    <div class="seg mode" id="mode"><button data-v="ZAP" data-t="m.on">ZAP</button><button data-v="TEST" data-t="m.test">Zkušební</button><button data-v="VYP" data-t="m.off">VYP</button></div>
+    <div class="row between" style="margin-top:14px;align-items:flex-end">
+      <div><div class="muted small" data-t="e.now">Teď venku (průměr −3 h…+2 h)</div><div class="num" style="font-size:22px;font-weight:700">−1,2 °C</div></div>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2" stroke-linecap="round" style="flex:none"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      <div style="text-align:right"><div class="muted small" data-t="e.gets">Kotel dostane</div><div class="num" style="font-size:30px;font-weight:750;color:var(--heat)" id="eSet">42 °C</div></div>
+    </div>
+  </div>
+
+  <h3 data-t="e.curve">Topná křivka</h3>
+  <div class="card">
+    <div class="row between small muted" style="margin-bottom:6px"><span data-t="e.drag">Tažením bodů nahoru a dolů křivku upravíte</span><span class="lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>max 55 °C</span></div>
+    <div class="chartbox"><svg class="chart" id="chCurve" viewBox="0 0 640 300" role="img" style="touch-action:none"></svg><div class="tip" id="tipCurve"></div></div>
+    <div style="margin-top:14px">
+      <div class="row between"><b data-t="e.shift">Posun křivky</b><span class="num" id="shiftV">0 °C</span></div>
+      <input type="range" id="shift" min="-5" max="5" step="1" value="0">
+      <div class="row between small muted"><span data-t="e.colder">chladněji</span><span data-t="e.warmer">tepleji</span></div>
+    </div>
+    <div class="row" style="margin-top:12px;gap:8px;flex-wrap:wrap">
+      <button class="btn sm" id="resetCurve" data-t="e.reset">Výchozí křivka</button>
+      <button class="btn sm primary" data-demo="e.saved" data-t="save">Uložit</button>
+    </div>
+  </div>
+
+  <h3 data-t="e.room">Korekce podle místnosti</h3>
+  <div class="card">
+    <label class="switch"><span><b data-t="e.room.on">Zapnout korekci</b><br><small class="muted" data-t="e.room.sub">Za každý stupeň pod cílem přidá přívod. Jen když Shelly měří.</small></span><input type="checkbox" id="roomOn"></label>
+    <div id="roomBox" style="opacity:.45;pointer-events:none;margin-top:10px">
+      <div class="row between"><span data-t="e.gain">Síla korekce</span><span class="num" id="rgV">1,0 °C / °C</span></div>
+      <input type="range" id="rg" min="0.5" max="3" step="0.5" value="1">
+      <p class="note" style="margin:4px 0 0" data-t="e.target">Cílová teplota se bere z aktuálního úseku programu.</p>
+    </div>
+  </div>
+
+  <h3 data-t="e.log">Poslední kroky</h3>
+  <div class="card"><div class="list" id="elog"></div></div>
 </section>
 
 <!-- ============ SYSTÉM ============ -->
 <section class="view" id="v-system">
-  <h2>Systém</h2>
-  <h3 style="margin-top:4px">Zdroje dat</h3>
+  <h2 data-t="tab.system">Systém</h2>
+  <h3 style="margin-top:4px" data-t="s.src">Zdroje dat</h3>
   <div class="card"><div class="list" id="src"></div></div>
-  <h3>Upozornění</h3>
+  <h3 data-t="s.alerts">Upozornění</h3>
   <div class="card"><div class="list" id="alerts"></div></div>
-  <h3>Pojistky</h3>
-  <div class="card"><div class="list">
-    <div class="li"><div class="t"><b>Absolutní maximum přívodu</b><small>Vynucuje regulace ve skriptu, web ho nemůže změnit</small></div><span class="badge bad">55 °C</span></div>
-    <div class="li"><div class="t"><b>Pauza po ruční změně ve ViCare</b><small>Regulace nic nemění</small></div><span class="badge ok">4 h</span></div>
-    <div class="li"><div class="t"><b>Bez venkovní teploty</b><small>Kotel drží poslední hodnotu, e-mail po 3 h</small></div><span class="badge ok">aktivní</span></div>
-  </div></div>
-  <p class="foot">Ukázková verze bez připojení dat · <a href="./">springbok</a></p>
+  <h3 data-t="s.safe">Pojistky</h3>
+  <div class="card"><div class="list" id="safe"></div></div>
+  <p class="foot"><span data-t="s.foot">Ukázková verze bez připojení dat</span> · <a href="./">springbok</a></p>
 </section>
 
 </main>
@@ -351,219 +380,324 @@ nav.tabs svg{width:24px;height:24px}
 <script>
 (function(){
 'use strict';
+/* ================= překlady ================= */
+var I18N={
+cs:{app:'Topení',title:'Topení · Zlín',demo:'Ukázka · bez dat','tab.prehled':'Přehled','tab.statistiky':'Statistiky','tab.programy':'Programy','tab.ekviterm':'Ekviterm','tab.system':'Systém',
+ 'hello.m':'Dobré ráno','hello.d':'Dobrý den','hello.e':'Dobrý večer','room.where':'Obývák · Shelly H&T',ago4:'před 4 min','room.sub':'Vlhkost 47 % · cíl 21,0 °C',
+ 'chip.burner':'Hořák hoří · 34 %','chip.ekv':'Ekviterm ZAP',out:'Venku','out.sub':'MET Norway · záloha',supply:'Přívod','supply.sub':'nastaveno 42 °C',gasToday:'Plyn dnes','gasToday.sub':'včera 2,6 m³',
+ burnToday:'Hořák dnes','burnToday.sub':'14 startů',quick:'Rychlé akce','act.on':'Zapni','act.eco':'Útlum','act.tune':'Laď program','act.on.toast':'Komfort až do dalšího úseku programu','act.eco.toast':'Útlum až do dalšího úseku programu',
+ last24:'Posledních 24 hodin',room:'Místnost',setp:'Nastaveno','sys.short':'1 upozornění · venkovní teplota ze zálohy','demo.note':'Ukázka: všechna čísla jsou vymyšlená a tlačítka nic nemění.',
+ 'p.14':'14 dní + dnes','p.month':'Tento měsíc','p.season':'Celá sezóna','g.h':'Hodiny','g.d':'Dny','g.w':'Týdny','g.m':'Měsíce',
+ 'k.gas':'Plyn celkem','k.cost':'Náklady','k.price':'Kč/m³','k.dd':'Na denostupeň','k.dd.sub':'spotřeba bez vlivu počasí','k.burn':'Hořák hořel',days:'{n} dní',rate:'{r} m³ za hodinu hoření',
+ gasUse:'Spotřeba plynu','gasM3':'Plyn (m³)',outAvg:'Průměr venku',summary:'Souhrn','col.p.h':'Hodina','col.p.d':'Den','col.p.w':'Týden','col.p.m':'Měsíc','col.gas':'Plyn m³','col.burn':'Hoření h','col.out':'Venku Ø °C','col.rate':'m³/h hoření',total:'Celkem',
+ runtime:'Doba chodu',showOn:'Zobrazit dobu zapnutí topení','showOn.sub':'od 6. 11. je topení zapnuté 24 h denně',burned:'Hořák hořel',heatOn:'Topení zapnuto',
+ 'kind.k':'Komfort','kind.e':'Útlum','kind.o':'Vypnuto','prog.help':'Tažením svislých úchytů měníte čas, tažením vodorovné čáry nahoru a dolů teplotu. Klepnutím vyberete úsek, + ho rozdělí, − smaže.',
+ 'prog.sel':'Vybraný úsek','tpl.work':'Pracovní den','tpl.home':'Home office','tpl.wknd':'Víkend',copyAll:'Kopírovat tento den na Po–Pá',copied:'Zkopírováno na pracovní dny',tplDone:'Šablona použita',
+ vac:'Dovolená','vac.title':'Režim dovolené','vac.sub':'Celou dobu útlum 16 °C, den před návratem zase podle programu.',from:'Od',to:'Do','vac.on':'Dovolená naplánována – jen ukázka','vac.off':'Dovolená zrušena',
+ 'prog.note':'Programy řídí naše regulace. Časový program ve ViCare se nastaví na celý den normální, aby se plány nepraly.',minSeg:'Úsek už nejde zmenšit',lastSeg:'Den musí mít aspoň jeden úsek',
+ 'm.on':'ZAP','m.test':'Zkušební','m.off':'VYP','e.now':'Teď venku (průměr −3 h…+2 h)','e.gets':'Kotel dostane','e.noreg':'bez regulace','e.curve':'Topná křivka','e.drag':'Tažením bodů nahoru a dolů křivku upravíte',
+ 'e.shift':'Posun křivky','e.colder':'chladněji','e.warmer':'tepleji','e.reset':'Výchozí křivka','e.resetDone':'Vráceno na výchozí křivku',save:'Uložit','e.saved':'Křivka uložena','e.room':'Korekce podle místnosti','e.room.on':'Zapnout korekci',
+ 'e.room.sub':'Za každý stupeň pod cílem přidá přívod. Jen když Shelly měří.','e.gain':'Síla korekce','e.target':'Cílová teplota se bere z aktuálního úseku programu.','e.log':'Poslední kroky','e.never':'nikdy nad 55 °C','e.nowLbl':'teď',
+ 'e.out':'Venku','mode':'Režim',onlyDemo:'jen ukázka',
+ 's.src':'Zdroje dat','s.alerts':'Upozornění','s.safe':'Pojistky','s.foot':'Ukázková verze bez připojení dat',
+ log:[['6:05','beze změny','venku −1,2 °C · cíl 42,4 °C',''],['5:50','beze změny','venku z MET Norway (záloha)',''],['4:35','41 → 42 °C','ochlazení na −1,6 °C','ok'],['2:20','chyba, zkusí znovu','Viessmann API 502 – výpadek u nich','warn'],['22:35','komfort → útlum','program: večerní útlum','ok']],
+ logBadge:{ok:'zápis',warn:'opakování'},
+ src:[['Kotel · Viessmann API','poslední data před 2 min','ok','v pořádku'],['Venku · Open-Meteo','vyčerpaný denní limit (sdílené adresy Googlu)','warn','429'],['Venku · MET Norway','záloha, používá se teď','ok','aktivní'],['Venku · ČHMÚ Zlín','naměřená data, zpoždění ~1 h','ok','v pořádku'],['Místnost · Shelly H&T Gen3','baterie 92 % · Wi-Fi −58 dBm','ok','v pořádku'],['Data · BigQuery','zápis po 15 min','ok','v pořádku']],
+ alerts:[['27. 11. 2:20','Viessmann API 502','vyřešeno opakováním za 10 s','ok'],['26. 11. 23:35','Viessmann API 500 · TIMEOUT','vynechán 1 krok, kotel držel 45 °C','warn'],['12. 11. 10:30','Open-Meteo nedostupné 9 h','přepnuto na MET Norway','warn']],
+ safe:[['Absolutní maximum přívodu','Vynucuje regulace ve skriptu, web ho nemůže změnit','bad','55 °C'],['Pauza po ruční změně ve ViCare','Regulace nic nemění','ok','4 h'],['Bez venkovní teploty','Kotel drží poslední hodnotu, e-mail po 3 h','ok','aktivní']],
+ dayShort:['Po','Út','St','Čt','Pá','So','Ne'],dayLong:['Pondělí','Úterý','Středa','Čtvrtek','Pátek','Sobota','Neděle'],months:['led','úno','bře','dub','kvě','čvn','čvc','srp','zář','říj','lis','pro'],wk:'t. {n}'},
+es:{app:'Calefacción',title:'Calefacción · Zlín',demo:'Demo · sin datos','tab.prehled':'Inicio','tab.statistiky':'Estadísticas','tab.programy':'Horarios','tab.ekviterm':'Curva','tab.system':'Sistema',
+ 'hello.m':'Buenos días','hello.d':'Buenas tardes','hello.e':'Buenas noches','room.where':'Salón · Shelly H&T',ago4:'hace 4 min','room.sub':'Humedad 47 % · objetivo 21,0 °C',
+ 'chip.burner':'Quemador encendido · 34 %','chip.ekv':'Curva ACTIVA',out:'Exterior','out.sub':'MET Norway · respaldo',supply:'Impulsión','supply.sub':'consigna 42 °C',gasToday:'Gas hoy','gasToday.sub':'ayer 2,6 m³',
+ burnToday:'Quemador hoy','burnToday.sub':'14 arranques',quick:'Acciones rápidas','act.on':'Encender','act.eco':'Reducido','act.tune':'Ajustar horario','act.on.toast':'Confort hasta el siguiente tramo','act.eco.toast':'Reducido hasta el siguiente tramo',
+ last24:'Últimas 24 horas',room:'Interior',setp:'Consigna','sys.short':'1 aviso · temperatura exterior de respaldo','demo.note':'Demo: todos los números son inventados y los botones no cambian nada.',
+ 'p.14':'14 días + hoy','p.month':'Este mes','p.season':'Toda la temporada','g.h':'Horas','g.d':'Días','g.w':'Semanas','g.m':'Meses',
+ 'k.gas':'Gas total','k.cost':'Coste','k.price':'CZK/m³','k.dd':'Por grado-día','k.dd.sub':'consumo sin efecto del tiempo','k.burn':'Quemador',days:'{n} días',rate:'{r} m³ por hora de quemador',
+ gasUse:'Consumo de gas','gasM3':'Gas (m³)',outAvg:'Media exterior',summary:'Resumen','col.p.h':'Hora','col.p.d':'Día','col.p.w':'Semana','col.p.m':'Mes','col.gas':'Gas m³','col.burn':'Quemador h','col.out':'Ext. Ø °C','col.rate':'m³/h quem.',total:'Total',
+ runtime:'Tiempo de funcionamiento',showOn:'Mostrar tiempo de calefacción encendida','showOn.sub':'desde el 6/11 la calefacción está encendida 24 h',burned:'Quemador',heatOn:'Calefacción encendida',
+ 'kind.k':'Confort','kind.e':'Reducido','kind.o':'Apagado','prog.help':'Arrastra las marcas verticales para cambiar la hora y la línea horizontal para la temperatura. Toca un tramo para elegirlo; + lo divide, − lo borra.',
+ 'prog.sel':'Tramo seleccionado','tpl.work':'Día laboral','tpl.home':'Teletrabajo','tpl.wknd':'Fin de semana',copyAll:'Copiar este día a lun–vie',copied:'Copiado a los días laborables',tplDone:'Plantilla aplicada',
+ vac:'Vacaciones','vac.title':'Modo vacaciones','vac.sub':'Todo el tiempo reducido a 16 °C; el día antes de volver, según el horario.',from:'Desde',to:'Hasta','vac.on':'Vacaciones programadas – solo demo','vac.off':'Vacaciones canceladas',
+ 'prog.note':'Los horarios los aplica nuestra regulación. El horario de ViCare se deja en normal todo el día para que no choquen.',minSeg:'El tramo no puede ser más corto',lastSeg:'El día necesita al menos un tramo',
+ 'm.on':'ACTIVA','m.test':'Prueba','m.off':'APAGADA','e.now':'Exterior ahora (media −3 h…+2 h)','e.gets':'La caldera recibe','e.noreg':'sin regulación','e.curve':'Curva de calefacción','e.drag':'Arrastra los puntos arriba y abajo para ajustar la curva',
+ 'e.shift':'Desplazar curva','e.colder':'más frío','e.warmer':'más calor','e.reset':'Curva por defecto','e.resetDone':'Curva restablecida',save:'Guardar','e.saved':'Curva guardada','e.room':'Corrección por temperatura interior','e.room.on':'Activar corrección',
+ 'e.room.sub':'Por cada grado bajo el objetivo sube la impulsión. Solo si el Shelly mide.','e.gain':'Intensidad','e.target':'El objetivo se toma del tramo actual del horario.','e.log':'Últimos pasos','e.never':'nunca más de 55 °C','e.nowLbl':'ahora',
+ 'e.out':'Exterior','mode':'Modo',onlyDemo:'solo demo',
+ 's.src':'Fuentes de datos','s.alerts':'Avisos','s.safe':'Seguridad','s.foot':'Versión demo sin datos conectados',
+ log:[['6:05','sin cambios','exterior −1,2 °C · objetivo 42,4 °C',''],['5:50','sin cambios','exterior de MET Norway (respaldo)',''],['4:35','41 → 42 °C','bajó a −1,6 °C','ok'],['2:20','error, reintenta','Viessmann API 502 – caída de su servidor','warn'],['22:35','confort → reducido','horario: reducido nocturno','ok']],
+ logBadge:{ok:'escrito',warn:'reintento'},
+ src:[['Caldera · Viessmann API','últimos datos hace 2 min','ok','correcto'],['Exterior · Open-Meteo','límite diario agotado (IPs compartidas de Google)','warn','429'],['Exterior · MET Norway','respaldo, en uso ahora','ok','activo'],['Exterior · ČHMÚ Zlín','datos medidos, retraso ~1 h','ok','correcto'],['Interior · Shelly H&T Gen3','batería 92 % · Wi-Fi −58 dBm','ok','correcto'],['Datos · BigQuery','escritura cada 15 min','ok','correcto']],
+ alerts:[['27/11 2:20','Viessmann API 502','resuelto al reintentar a los 10 s','ok'],['26/11 23:35','Viessmann API 500 · TIMEOUT','se saltó 1 paso, la caldera mantuvo 45 °C','warn'],['12/11 10:30','Open-Meteo caído 9 h','cambiado a MET Norway','warn']],
+ safe:[['Máximo absoluto de impulsión','Lo impone el script, la web no puede cambiarlo','bad','55 °C'],['Pausa tras cambio manual en ViCare','La regulación no cambia nada','ok','4 h'],['Sin temperatura exterior','La caldera mantiene el último valor, e-mail a las 3 h','ok','activo']],
+ dayShort:['Lu','Ma','Mi','Ju','Vi','Sá','Do'],dayLong:['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'],months:['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'],wk:'sem. {n}'}
+};
+var params=new URLSearchParams(location.search);
+var lang=params.get('lang')==='es'?'es':'cs';
+function t(k,v){var s=(I18N[lang][k]!==undefined?I18N[lang][k]:I18N.cs[k]);if(typeof s==='string'&&v)for(var x in v)s=s.replace('{'+x+'}',v[x]);return s}
+
+/* ================= pomocné ================= */
 var $=function(s,el){return (el||document).querySelector(s)}, $$=function(s,el){return Array.prototype.slice.call((el||document).querySelectorAll(s))};
 var css=function(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()};
-var fmt=function(x,d){return (d===undefined?x.toFixed(1):x.toFixed(d)).replace('.',',').replace('-','−')};
-var store={get:function(k,d){try{var v=localStorage.getItem('topeni-'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},
-           set:function(k,v){try{localStorage.setItem('topeni-'+k,JSON.stringify(v))}catch(e){}}};
+var fmt=function(x,d){return (d===undefined?x.toFixed(1):x.toFixed(d)).replace('.',',').replace(/^-/,'−')};
+var store={get:function(k,d){try{var v=localStorage.getItem('topeni-'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set:function(k,v){try{localStorage.setItem('topeni-'+k,JSON.stringify(v))}catch(e){}}};
 var NS='http://www.w3.org/2000/svg';
 function el(tag,attrs,parent){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
+function txt(parent,x,y,s,anchor,style){var e=el('text',{x:x,y:y,'text-anchor':anchor||'start'},parent);if(style)e.setAttribute('style',style);e.textContent=s;return e}
 function clear(s){while(s.firstChild)s.removeChild(s.firstChild)}
-function toast(msg){var t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove('on')},2200)}
+function toast(msg){var tt=$('#toast');tt.textContent=msg;tt.classList.add('on');clearTimeout(toast._t);toast._t=setTimeout(function(){tt.classList.remove('on')},2300)}
+function drag(ev,mv,done){ev.preventDefault();var on=true;function m(e){if(on)mv(e)}function u(e){if(!on)return;on=false;window.removeEventListener('pointermove',m);window.removeEventListener('pointerup',u);window.removeEventListener('pointercancel',u);done(e)}
+  window.addEventListener('pointermove',m);window.addEventListener('pointerup',u);window.addEventListener('pointercancel',u)}
+function compact(){return window.innerWidth<600}
+function pad(n){return String(n).padStart(2,'0')}
+function ymd(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function hhmm(m){return pad(Math.floor(m/60))+':'+pad(m%60)}
 
-/* ---------- navigace ---------- */
-function go(tab){
+/* ================= jazyk ================= */
+function applyLang(){
+  document.documentElement.lang=lang;document.title=t('title');
+  $$('[data-t]').forEach(function(e){var s=t(e.dataset.t);if(typeof s==='string')e.textContent=s});
+  $$('.lang button').forEach(function(b){b.classList.toggle('on',b.dataset.lang===lang)});
+  var h=new Date().getHours();$('#hello').textContent=t(h<10?'hello.m':h<18?'hello.d':'hello.e');
+  renderLists();renderProg();if(cur==='statistiky')drawStats();if(cur==='ekviterm')drawCurve();if(cur==='prehled')draw24();
+}
+$$('.lang button').forEach(function(b){b.addEventListener('click',function(){
+  lang=b.dataset.lang;var u=new URL(location.href);if(lang==='es')u.searchParams.set('lang','es');else u.searchParams.delete('lang');
+  history.replaceState(null,'',u.pathname+u.search+u.hash);applyLang()})});
+
+/* ================= navigace ================= */
+var TABS=['prehled','statistiky','programy','ekviterm','system'],cur='prehled';
+function go(tab,opts){
+  if(TABS.indexOf(tab)<0)tab='prehled';cur=tab;
   $$('nav.tabs button').forEach(function(b){b.classList.toggle('on',b.dataset.tab===tab)});
   $$('section.view').forEach(function(s){s.classList.toggle('on',s.id==='v-'+tab)});
-  store.set('tab',tab);window.scrollTo({top:0,behavior:'instant'in window?'instant':'auto'});
-  if(tab==='ekviterm')drawCurve(); if(tab==='statistiky')drawStats(); if(tab==='prehled')draw24();
+  if(location.hash!=='#'+tab)history.replaceState(null,'','#'+tab);
+  window.scrollTo(0,0);
+  if(tab==='ekviterm')drawCurve();if(tab==='statistiky')drawStats();if(tab==='prehled')draw24();if(tab==='programy')renderProg();
 }
 $$('nav.tabs button').forEach(function(b){b.addEventListener('click',function(){go(b.dataset.tab)})});
-$$('[data-go]').forEach(function(b){b.addEventListener('click',function(){go(b.dataset.go)})});
-$$('[data-demo]').forEach(function(b){b.addEventListener('click',function(){toast(b.dataset.demo+' – jen ukázka')})});
+document.addEventListener('click',function(ev){
+  var g=ev.target.closest('[data-go]');
+  if(g){ev.stopPropagation();if(g.dataset.range==='today'){setRange(0);gran='h';syncGran()}go(g.dataset.go);return}
+  var d=ev.target.closest('[data-demo]');if(d)toast(t(d.dataset.demo)+' – '+t('onlyDemo'));
+});
 window.addEventListener('scroll',function(){$('#top').classList.toggle('scrolled',scrollY>4)},{passive:true});
-var h=new Date().getHours();$('#v-prehled h2').textContent=h<10?'Dobré ráno':h<18?'Dobrý den':'Dobrý večer';
 
-/* ---------- ukázková data ---------- */
-var rnd=(function(s){return function(){s=(s*16807)%2147483647;return (s-1)/2147483646}})(42);
+/* ================= ukázková data ================= */
+var rnd=(function(s){return function(){s=(s*16807)%2147483647;return (s-1)/2147483646}})(7);
 var CURVE0=[[15,28],[9,33],[7,34],[0,41],[-6,48],[-12,55]];
-var curve=store.get('curve',CURVE0.map(function(p){return p.slice()}));
-var shift=store.get('shift',0);
-function curveAt(t,pts){pts=pts||curve;if(t>=pts[0][0])return pts[0][1];for(var i=1;i<pts.length;i++)if(t>=pts[i][0]){var a=pts[i-1],b=pts[i];return b[1]+(a[1]-b[1])*(t-b[0])/(a[0]-b[0])}return pts[pts.length-1][1]}
-var now=new Date();now.setMinutes(Math.floor(now.getMinutes()/15)*15,0,0);
-var S24=[];
-(function(){var t0=now.getTime()-24*3600e3,sup=35,burn=false;
-  for(var i=0;i<=96;i++){var t=t0+i*900e3,d=new Date(t),hh=d.getHours()+d.getMinutes()/60;
-    var out=1.5-3.2*Math.cos((hh-14.5)/24*2*Math.PI)+(rnd()-.5)*.4;
-    var comfort=(hh>=5&&hh<22);var set=comfort?Math.round(Math.min(55,curveAt(out)+shift)):Math.round(Math.min(55,curveAt(out)-5));
-    if(!comfort&&hh>=22.5||hh<4.5)set=0;
-    if(set>0){if(sup<set-4)burn=true;if(sup>set+3)burn=false}else burn=false;
-    sup+= burn? 3+rnd()*2 : -(sup-24)*.12;
-    var room=20.6+(comfort?.6:-.4)+.35*Math.sin(hh/24*6.28)+(rnd()-.5)*.15;
-    S24.push({t:t,out:out,room:room,sup:sup,set:set||null});}
+var curve=store.get('curve',CURVE0.map(function(p){return p.slice()})),shift=store.get('shift',0);
+function curveAt(x,pts){pts=pts||curve;if(x>=pts[0][0])return pts[0][1];for(var i=1;i<pts.length;i++)if(x>=pts[i][0]){var a=pts[i-1],b=pts[i];return b[1]+(a[1]-b[1])*(x-b[0])/(a[0]-b[0])}return pts[pts.length-1][1]}
+var SEASON0=new Date(2026,9,1);
+var HOURS=[];
+(function(){var end=new Date();end.setMinutes(0,0,0);var w1=0,w2=0;
+  for(var t0=SEASON0.getTime();t0<=end.getTime();t0+=3600e3){var d=new Date(t0),h=d.getHours(),day=(t0-SEASON0.getTime())/864e5;
+    w1+= (rnd()-.5)*.35; w1*=.97; w2=Math.sin(day/5.3)*2.2+Math.sin(day/11.7)*1.6;
+    var out=11.5-day*.17+w2+w1*3-2.8*Math.cos((h-14.5)/24*2*Math.PI);
+    var comfort=h>=5&&h<22,f=comfort?1.15:.45;
+    var burn=Math.max(0,Math.min(60,.9*(19.5-out)*f+(rnd()-.5)*4));if(out>15)burn=0;
+    var gas=burn/60*(.40+.012*Math.max(0,8-out));
+    HOURS.push({t:t0,out:out,burn:burn,gas:gas,on:day>36?60:(comfort?60:0)});}
 })();
-var DAYS=[];(function(){for(var i=13;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);var out=4.5-3*Math.sin(i/2.3)+(rnd()-.5)*2;
-  var gas=Math.max(.8,(20-out)*.13+(rnd()-.5)*.4);DAYS.push({d:d,out:out,gas:gas,burn:gas*95+rnd()*20,on:i<9?1440:600+rnd()*300})}})();
+var now=new Date();
+var S24=[];(function(){var from=now.getTime()-24*3600e3,sup=34,burn=false;
+  HOURS.filter(function(r){return r.t>=from-3600e3}).forEach(function(r){for(var q=0;q<4;q++){var t0=r.t+q*900e3;if(t0<from||t0>now.getTime())continue;var h=new Date(t0).getHours();
+    var comfort=h>=5&&h<22,set=comfort?Math.round(Math.min(55,curveAt(r.out)+shift)):null;
+    if(set){if(sup<set-4)burn=true;if(sup>set+3)burn=false}else burn=false;
+    sup+=burn?3+rnd()*2:-(sup-24)*.12;
+    S24.push({t:t0,out:r.out,room:20.5+(comfort?.7:-.5)+.3*Math.sin(h/24*6.28)+(rnd()-.5)*.15,sup:sup,set:set})}})})();
 
-/* ---------- univerzální čárový graf ---------- */
+/* ================= graf 24 h ================= */
 function lineChart(svg,tip,o){
-  clear(svg);var W=640,H=o.h||240,L=34,R=8,T=10,B=24;
-  var xs=o.x,n=xs.length,x0=xs[0],x1=xs[n-1];
+  clear(svg);var W=640,H=240,L=34,R=8,T=10,B=24,xs=o.data.map(function(r){return r.t}),n=xs.length,x0=xs[0],x1=xs[n-1];
   var lo=Infinity,hi=-Infinity;o.series.forEach(function(s){o.data.forEach(function(r){var v=r[s.k];if(v!=null){lo=Math.min(lo,v);hi=Math.max(hi,v)}})});
-  lo=Math.floor(lo/5)*5;hi=Math.ceil(hi/5)*5;if(hi-lo<10)hi=lo+10;
+  lo=Math.floor(lo/5)*5;hi=Math.ceil(hi/5)*5;
   var X=function(v){return L+(v-x0)/(x1-x0)*(W-L-R)},Y=function(v){return T+(hi-v)/(hi-lo)*(H-T-B)};
-  for(var g=lo;g<=hi;g+=(hi-lo>30?10:5)){el('line',{x1:L,x2:W-R,y1:Y(g),y2:Y(g),stroke:css('--line'),'stroke-width':1},svg);var tx=el('text',{x:L-6,y:Y(g)+4,'text-anchor':'end'},svg);tx.textContent=g+'°'}
-  o.ticks.forEach(function(tk){var tx=el('text',{x:X(tk.v),y:H-6,'text-anchor':'middle'},svg);tx.textContent=tk.l});
-  o.series.forEach(function(s){var d='',pen=false;o.data.forEach(function(r,i){var v=r[s.k];if(v==null){pen=false;return}d+=(pen?'L':'M')+X(xs[i]).toFixed(1)+' '+Y(v).toFixed(1);pen=true});
-    el('path',{d:d,fill:'none',stroke:css(s.c),'stroke-width':s.w||2.2,'stroke-linejoin':'round','stroke-linecap':'round','stroke-dasharray':s.dash||''},svg)});
-  var cross=el('line',{y1:T,y2:H-B,stroke:css('--faint'),'stroke-width':1,opacity:0},svg);
-  var hit=el('rect',{x:L,y:T,width:W-L-R,height:H-T-B,fill:'transparent'},svg);
-  function move(ev){var r=svg.getBoundingClientRect(),cx=(ev.touches?ev.touches[0].clientX:ev.clientX)-r.left,vx=cx/r.width*W;
-    var i=Math.round((vx-L)/(W-L-R)*(n-1));i=Math.max(0,Math.min(n-1,i));var px=X(xs[i]);cross.setAttribute('x1',px);cross.setAttribute('x2',px);cross.setAttribute('opacity',1);
-    tip.innerHTML=o.tip(o.data[i]);tip.style.left=(px/W*r.width)+'px';tip.style.top=(T/H*r.height+8)+'px';tip.style.opacity=1}
+  for(var g=lo;g<=hi;g+=10){el('line',{x1:L,x2:W-R,y1:Y(g),y2:Y(g),stroke:css('--line')},svg);txt(svg,L-6,Y(g)+4,g+'°','end')}
+  o.data.forEach(function(r){var d=new Date(r.t);if(d.getMinutes()===0&&d.getHours()%6===0)txt(svg,X(r.t),H-6,d.getHours()+':00','middle')});
+  o.series.forEach(function(s){var p='',pen=false;o.data.forEach(function(r,i){var v=r[s.k];if(v==null){pen=false;return}p+=(pen?'L':'M')+X(xs[i]).toFixed(1)+' '+Y(v).toFixed(1);pen=true});
+    el('path',{d:p,fill:'none',stroke:css(s.c),'stroke-width':s.w||2.2,'stroke-linejoin':'round','stroke-linecap':'round','stroke-dasharray':s.dash||''},svg)});
+  var cross=el('line',{y1:T,y2:H-B,stroke:css('--faint'),opacity:0},svg),hit=el('rect',{x:L,y:T,width:W-L-R,height:H-T-B,fill:'transparent'},svg);
+  function move(ev){var r=svg.getBoundingClientRect(),cx=(ev.touches?ev.touches[0].clientX:ev.clientX)-r.left,vx=cx/r.width*W,i=Math.round((vx-L)/(W-L-R)*(n-1));i=Math.max(0,Math.min(n-1,i));
+    var px=X(xs[i]);cross.setAttribute('x1',px);cross.setAttribute('x2',px);cross.setAttribute('opacity',1);tip.innerHTML=o.tip(o.data[i]);tip.style.left=Math.max(70,Math.min(r.width-70,px/W*r.width))+'px';tip.style.top='18px';tip.style.opacity=1}
   function leave(){cross.setAttribute('opacity',0);tip.style.opacity=0}
-  hit.addEventListener('mousemove',move);hit.addEventListener('touchmove',move,{passive:true});hit.addEventListener('touchstart',move,{passive:true});
-  hit.addEventListener('mouseleave',leave);hit.addEventListener('touchend',function(){setTimeout(leave,1200)});
+  hit.addEventListener('mousemove',move);hit.addEventListener('touchmove',move,{passive:true});hit.addEventListener('touchstart',move,{passive:true});hit.addEventListener('mouseleave',leave);hit.addEventListener('touchend',function(){setTimeout(leave,1500)});
 }
-function hm(t){var d=new Date(t);return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0')}
-function draw24(){
-  var ticks=[];S24.forEach(function(r){var d=new Date(r.t);if(d.getMinutes()===0&&d.getHours()%6===0)ticks.push({v:r.t,l:d.getHours()+':00'})});
-  lineChart($('#ch24'),$('#tip24'),{x:S24.map(function(r){return r.t}),data:S24,ticks:ticks,
-    series:[{k:'out',c:'--cold'},{k:'room',c:'--room'},{k:'sup',c:'--heat'},{k:'set',c:'--set',dash:'5 4',w:1.8}],
-    tip:function(r){return '<b>'+hm(r.t)+'</b><br>Venku '+fmt(r.out)+' °C · Místnost '+fmt(r.room)+' °C<br>Přívod '+fmt(r.sup)+' °C'+(r.set?' · nastaveno '+r.set+' °C':' · útlum')}});
-}
+function draw24(){lineChart($('#ch24'),$('#tip24'),{data:S24,series:[{k:'out',c:'--cold'},{k:'room',c:'--room'},{k:'sup',c:'--heat'},{k:'set',c:'--set',dash:'5 4',w:1.8}],
+  tip:function(r){var d=new Date(r.t);return '<b>'+d.getHours()+':'+pad(d.getMinutes())+'</b><br>'+t('out')+' '+fmt(r.out)+' °C · '+t('room')+' '+fmt(r.room)+' °C<br>'+t('supply')+' '+fmt(r.sup)+' °C'+(r.set?' · '+t('setp')+' '+r.set+' °C':' · '+t('kind.e'))}})}
 
-/* ---------- statistiky ---------- */
-var period=store.get('period','d');
-function aggregate(){
-  if(period==='d')return DAYS.map(function(d){return{l:d.d.getDate()+'.',gas:d.gas,out:d.out,burn:d.burn,on:d.on}});
-  if(period==='w')return [3.1,5.2,4.4,2.6,1.8,0.9,2.2,3.4].map(function(o,i){return{l:(i+40)+'.',gas:(20-o)*.13*7+(rnd()-.5)*1.5,out:o,burn:(20-o)*12*7,on:1440*7}});
-  if(period==='m')return [['X',8.9],['XI',3.6],['XII',0.6],['I',-1.8],['II',0.4],['III',4.8]].map(function(m,i){var f=i<2?1:0;return{l:m[0],gas:(20-m[1])*.13*30*(i===0?.35:1),out:m[1],burn:(20-m[1])*12*30,on:1440*30,proj:i>1}});
-  return [['23/24',4.1,690],['24/25',3.6,742],['25/26',3.9,715],['26/27',3.2,210]].map(function(s){return{l:s[0],gas:s[2],out:s[1],burn:s[2]*60,on:0,proj:s[0]==='26/27'}});
-}
+/* ================= statistiky ================= */
+var gran=store.get('gran','d');
+function setRange(daysBack,from){var to=new Date();var f=from||new Date(to.getFullYear(),to.getMonth(),to.getDate()-daysBack);$('#dFrom').value=ymd(f);$('#dTo').value=ymd(to)}
+$('#dFrom').min=ymd(SEASON0);$('#dTo').min=ymd(SEASON0);$('#dFrom').max=ymd(now);$('#dTo').max=ymd(now);
+setRange(14);
+$$('#presets [data-p]').forEach(function(b){b.addEventListener('click',function(){var p=b.dataset.p,n=new Date();
+  if(p==='14')setRange(14);else if(p==='month')setRange(0,new Date(n.getFullYear(),n.getMonth(),1));else setRange(0,SEASON0);
+  if(p==='season'&&gran==='h')gran='d';if(p!=='14'&&gran==='h'&&p==='month')gran='d';syncGran();drawStats()})});
+['#dFrom','#dTo'].forEach(function(s){$(s).addEventListener('change',drawStats)});
+function syncGran(){$$('#gran button').forEach(function(b){b.classList.toggle('on',b.dataset.v===gran)});store.set('gran',gran)}
+$$('#gran button').forEach(function(b){b.addEventListener('click',function(){gran=b.dataset.v;syncGran();drawStats()})});syncGran();
+$('#price').addEventListener('input',drawStats);$('#showOn').addEventListener('change',drawStats);
+function isoWeek(d){var x=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));var dn=(x.getUTCDay()+6)%7;x.setUTCDate(x.getUTCDate()-dn+3);var fy=new Date(Date.UTC(x.getUTCFullYear(),0,4));return 1+Math.round(((x-fy)/864e5-3+((fy.getUTCDay()+6)%7))/7)}
+function bucketKey(d){if(gran==='h')return ymd(d)+' '+pad(d.getHours());if(gran==='d')return ymd(d);if(gran==='w'){var m=new Date(d.getFullYear(),d.getMonth(),d.getDate()-((d.getDay()+6)%7));return ymd(m)}return d.getFullYear()+'-'+pad(d.getMonth()+1)}
+function bucketLabel(k,long){var M=t('months');
+  if(gran==='h'){var p=k.split(' ');var dd=p[0].split('-');return long?Number(dd[2])+'. '+Number(dd[1])+'. '+p[1]+':00':p[1]+'h'}
+  if(gran==='d'){var q=k.split('-');return Number(q[2])+'. '+Number(q[1])+'.'}
+  if(gran==='w'){var w=new Date(k+'T12:00:00');return long?t('wk',{n:isoWeek(w)})+' ('+w.getDate()+'. '+(w.getMonth()+1)+'.)':t('wk',{n:isoWeek(w)})}
+  var r=k.split('-');return M[Number(r[1])-1]+(long?' '+r[0]:'')}
+function aggregate(){var f=new Date($('#dFrom').value+'T00:00:00'),to=new Date($('#dTo').value+'T23:59:59');if(f>to){var x=f;f=new Date(to.getFullYear(),to.getMonth(),to.getDate());to=new Date(x.getTime()+864e5-1)}
+  var map={},order=[];HOURS.forEach(function(r){if(r.t<f.getTime()||r.t>to.getTime())return;var k=bucketKey(new Date(r.t));if(!map[k]){map[k]={k:k,gas:0,burn:0,outSum:0,n:0,on:0};order.push(k)}
+    var b=map[k];b.gas+=r.gas;b.burn+=r.burn;b.outSum+=r.out;b.n++;b.on+=r.on});
+  return {rows:order.map(function(k){var b=map[k];b.out=b.outSum/b.n;return b}),days:Math.round((to-f)/864e5)}}
 function drawStats(){
-  var rows=aggregate(),svg=$('#chGas'),tip=$('#tipGas');clear(svg);
-  var W=640,H=240,L=34,R=34,T=12,B=26,n=rows.length,max=Math.max.apply(null,rows.map(function(r){return r.gas}))*1.15;
+  var A=aggregate(),rows=A.rows;var svg=$('#chGas'),tip=$('#tipGas');clear(svg);
+  var tot=rows.reduce(function(a,r){return a+r.gas},0),burn=rows.reduce(function(a,r){return a+r.burn},0)/60,hrs=rows.reduce(function(a,r){return a+r.n},0);
+  var dd=rows.reduce(function(a,r){return a+Math.max(0,20-r.out)*r.n/24},0);
+  $('#kGas').innerHTML=fmt(tot,tot<100?1:0)+'<span>m³</span>';$('#kDays').textContent=t('days',{n:A.days});
+  $('#kCost').innerHTML=Math.round(tot*Number($('#price').value||0)).toLocaleString(lang==='es'?'es-ES':'cs-CZ')+'<span>'+(lang==='es'?'CZK':'Kč')+'</span>';
+  $('#kDd').innerHTML=(dd?fmt(tot/dd,3):'—')+'<span>m³</span>';$('#kBurn').innerHTML=fmt(burn,burn<100?1:0)+'<span>h</span>';$('#kRate').textContent=burn?t('rate',{r:fmt(tot/burn,2)}):'';
+  if(!rows.length){txt(svg,320,120,'—','middle');$('#tbl').innerHTML='';drawRun([]);return}
+  var W=640,H=240,L=38,R=10,T=12,B=26,n=rows.length,max=Math.max.apply(null,rows.map(function(r){return r.gas}))*1.15||1;
   var bw=(W-L-R)/n,Y=function(v){return T+(1-v/max)*(H-T-B)};
   var omin=Math.min.apply(null,rows.map(function(r){return r.out}))-2,omax=Math.max.apply(null,rows.map(function(r){return r.out}))+2,YO=function(v){return T+(omax-v)/(omax-omin)*(H-T-B)};
-  for(var i=0;i<=4;i++){var v=max/4*i;el('line',{x1:L,x2:W-R,y1:Y(v),y2:Y(v),stroke:css('--line')},svg);var t=el('text',{x:L-6,y:Y(v)+4,'text-anchor':'end'},svg);t.textContent=v<10?fmt(v,1):Math.round(v)}
-  var d='';rows.forEach(function(r,i){var x=L+i*bw+bw*.18,w=bw*.64,y=Y(r.gas);
-    var b=el('rect',{x:x,y:y,width:w,height:H-B-y,rx:Math.min(6,w/3),fill:css('--heat'),opacity:r.proj?.45:1},svg);
-    var t=el('text',{x:x+w/2,y:H-8,'text-anchor':'middle'},svg);t.textContent=r.l;
-    d+=(i?'L':'M')+(x+w/2).toFixed(1)+' '+YO(r.out).toFixed(1);
-    b.addEventListener('mouseenter',show);b.addEventListener('touchstart',show,{passive:true});b.addEventListener('mouseleave',function(){tip.style.opacity=0});
-    function show(){var rr=svg.getBoundingClientRect();tip.innerHTML='<b>'+r.l+'</b><br>'+fmt(r.gas,1)+' m³ · venku '+fmt(r.out)+' °C'+(r.proj?'<br><i>odhad</i>':'');tip.style.left=((x+w/2)/W*rr.width)+'px';tip.style.top=(y/H*rr.height)+'px';tip.style.opacity=1}
-  });
-  el('path',{d:d,fill:'none',stroke:css('--cold'),'stroke-width':2,'stroke-linejoin':'round'},svg);
-  var tot=rows.reduce(function(a,r){return a+r.gas},0),dd=rows.reduce(function(a,r){return a+Math.max(0,20-r.out)*(period==='d'?1:period==='w'?7:period==='m'?30:200)},0);
-  var burn=rows.reduce(function(a,r){return a+r.burn},0)/60;
-  $('#kGas').innerHTML=fmt(tot,tot<100?1:0)+'<span>m³</span>';$('#kGasSub').textContent=period==='s'?'za sezónu, poslední = zatím':'za zobrazené období';
-  $('#kCost').innerHTML=Math.round(tot*Number($('#price').value||0)).toLocaleString('cs-CZ')+'<span>Kč</span>';
-  $('#kDd').innerHTML=fmt(tot/dd,3)+'<span>m³</span>';
-  $('#kBurn').innerHTML=Math.round(burn).toLocaleString('cs-CZ')+'<span>h</span>';$('#kBurnSub').textContent='průměrně '+fmt(burn/rows.length,1)+' h na '+({d:'den',w:'týden',m:'měsíc',s:'sezónu'})[period];
+  for(var i=0;i<=4;i++){var v=max/4*i;el('line',{x1:L,x2:W-R,y1:Y(v),y2:Y(v),stroke:css('--line')},svg);txt(svg,L-6,Y(v)+4,v<1?fmt(v,2):v<10?fmt(v,1):Math.round(v),'end')}
+  var every=Math.ceil(n/(compact()?5:10)),line='';
+  rows.forEach(function(r,i){var x=L+i*bw+bw*.15,w=Math.max(1,bw*.7),y=Y(r.gas);
+    el('rect',{x:x,y:y,width:w,height:Math.max(0,H-B-y),rx:Math.min(5,w/3),fill:css('--heat')},svg);
+    if(i%every===0)txt(svg,x+w/2,H-8,bucketLabel(r.k),'middle');line+=(i?'L':'M')+(x+w/2).toFixed(1)+' '+YO(r.out).toFixed(1)});
+  el('path',{d:line,fill:'none',stroke:css('--cold'),'stroke-width':n>100?1.4:2,'stroke-linejoin':'round'},svg);
+  var hit=el('rect',{x:L,y:T,width:W-L-R,height:H-T-B,fill:'transparent'},svg);
+  function mv(ev){var rr=svg.getBoundingClientRect(),cx=(ev.touches?ev.touches[0].clientX:ev.clientX)-rr.left,i=Math.floor((cx/rr.width*W-L)/bw);if(i<0||i>=n)return;var r=rows[i];
+    tip.innerHTML='<b>'+bucketLabel(r.k,true)+'</b><br>'+fmt(r.gas,2)+' m³ · '+fmt(r.burn/60,1)+' h · '+t('out').toLowerCase()+' '+fmt(r.out)+' °C';tip.style.left=Math.max(80,Math.min(rr.width-80,(L+i*bw+bw/2)/W*rr.width))+'px';tip.style.top=(Y(r.gas)/H*rr.height)+'px';tip.style.opacity=1}
+  hit.addEventListener('mousemove',mv);hit.addEventListener('touchstart',mv,{passive:true});hit.addEventListener('touchmove',mv,{passive:true});hit.addEventListener('mouseleave',function(){tip.style.opacity=0});hit.addEventListener('touchend',function(){setTimeout(function(){tip.style.opacity=0},1500)});
+  // tabulka
+  var head='<thead><tr><th>'+t('col.p.'+gran)+'</th><th>'+t('col.gas')+'</th><th>'+t('col.burn')+'</th><th>'+t('col.out')+'</th><th>'+t('col.rate')+'</th></tr></thead>';
+  var body=rows.slice().reverse().map(function(r){return '<tr><td>'+bucketLabel(r.k,true)+'</td><td>'+fmt(r.gas,gran==='h'?2:1)+'</td><td>'+fmt(r.burn/60,1)+'</td><td>'+fmt(r.out)+'</td><td>'+(r.burn>0?fmt(r.gas/(r.burn/60),2):'—')+'</td></tr>'}).join('');
+  var outAvg=rows.reduce(function(a,r){return a+r.out*r.n},0)/hrs;
+  var foot='<tfoot><tr><td>'+t('total')+'</td><td>'+fmt(tot,1)+'</td><td>'+fmt(burn,1)+'</td><td>'+fmt(outAvg)+'</td><td>'+(burn?fmt(tot/burn,2):'—')+'</td></tr></tfoot>';
+  $('#tbl').innerHTML=head+'<tbody>'+body+'</tbody>'+foot;
   drawRun();
 }
 function drawRun(){
   var svg=$('#chRun');clear(svg);var showOn=$('#showOn').checked;$('#lgOn').style.display=showOn?'':'none';
-  var W=640,H=200,L=34,R=8,T=10,B=24,n=DAYS.length,max=showOn?24:Math.ceil(Math.max.apply(null,DAYS.map(function(d){return d.burn/60}))+1);
-  var bw=(W-L-R)/n,Y=function(v){return T+(1-v/max)*(H-T-B)};
-  for(var g=0;g<=max;g+=(max>12?6:2)){el('line',{x1:L,x2:W-R,y1:Y(g),y2:Y(g),stroke:css('--line')},svg);var t=el('text',{x:L-6,y:Y(g)+4,'text-anchor':'end'},svg);t.textContent=g+' h'}
-  DAYS.forEach(function(d,i){var x=L+i*bw+bw*.18,w=bw*.64;
-    if(showOn){var y0=Y(d.on/60);el('rect',{x:x,y:y0,width:w,height:H-B-y0,rx:4,fill:css('--line')},svg)}
-    var y=Y(d.burn/60);el('rect',{x:x+(showOn?w*.2:0),y:y,width:showOn?w*.6:w,height:H-B-y,rx:4,fill:css('--heat')},svg);
-    var t=el('text',{x:x+w/2,y:H-7,'text-anchor':'middle'},svg);t.textContent=d.d.getDate()+'.'});
+  var keep=gran;gran='d';var rows=aggregate().rows;gran=keep;if(!rows.length)return;
+  var W=640,H=200,L=38,R=10,T=10,B=24,n=rows.length,max=showOn?24:Math.ceil(Math.max.apply(null,rows.map(function(d){return d.burn/60}))+1);
+  var bw=(W-L-R)/n,Y=function(v){return T+(1-v/max)*(H-T-B)},every=Math.ceil(n/(compact()?5:10));
+  for(var g=0;g<=max;g+=(max>12?6:2)){el('line',{x1:L,x2:W-R,y1:Y(g),y2:Y(g),stroke:css('--line')},svg);txt(svg,L-6,Y(g)+4,g+' h','end')}
+  rows.forEach(function(d,i){var x=L+i*bw+bw*.15,w=Math.max(1,bw*.7);
+    if(showOn){var y0=Y(d.on/60);el('rect',{x:x,y:y0,width:w,height:H-B-y0,rx:Math.min(4,w/3),fill:css('--line')},svg)}
+    var y=Y(d.burn/60);el('rect',{x:x+(showOn?w*.2:0),y:y,width:showOn?w*.6:w,height:H-B-y,rx:Math.min(4,w/3),fill:css('--heat')},svg);
+    if(i%every===0){var q=d.k.split('-');txt(svg,x+w/2,H-7,Number(q[2])+'.','middle')}});
 }
-$$('#period button').forEach(function(b){b.classList.toggle('on',b.dataset.v===period);b.addEventListener('click',function(){period=b.dataset.v;store.set('period',period);$$('#period button').forEach(function(x){x.classList.toggle('on',x===b)});drawStats()})});
-$('#price').addEventListener('input',drawStats);$('#showOn').addEventListener('change',drawRun);
 
-/* ---------- ekviterm ---------- */
-var OUT_NOW=-1.2,mode=store.get('mode','ZAP');
+/* ================= programy ================= */
+// den = [{s:minuta začátku, temp: °C nebo null = vypnuto}], první s=0, úsek trvá do dalšího s (poslední do 24:00)
+var TPL={work:[{s:0,temp:18},{s:300,temp:21},{s:510,temp:18},{s:930,temp:21.5},{s:1320,temp:18}],home:[{s:0,temp:18},{s:330,temp:21},{s:1350,temp:18}],wknd:[{s:0,temp:18},{s:390,temp:21.5},{s:1380,temp:18}]};
+var prog=store.get('prog2',null)||[0,1,2,3,4,5,6].map(function(i){return clone(i<5?TPL.work:TPL.wknd)});
+function clone(a){return a.map(function(x){return {s:x.s,temp:x.temp}})}
+var day=(new Date().getDay()+6)%7,sel=1;
+var TMIN=14,TMAX=24,COMFORT_FROM=20;
+function kindOf(seg){return seg.temp==null?'o':seg.temp>=COMFORT_FROM?'k':'e'}
+var KC={k:'--heat',e:'--eco',o:'--off'};
+function segEnd(d,i){return i+1<prog[d].length?prog[d][i+1].s:1440}
+function saveProg(){if(rpl){cancelAnimationFrame(rpl);rpl=0}store.set('prog2',prog);renderProg()}
+function renderDays(){$('#days').innerHTML=t('dayShort').map(function(dn,i){return '<button data-i="'+i+'" class="'+(i===day?'on':'')+'">'+dn+'</button>'}).join('');
+  $$('#days button').forEach(function(b){b.addEventListener('click',function(){day=Number(b.dataset.i);sel=Math.min(sel,prog[day].length-1);renderProg()})})}
+var PW=640,PH=260,PL=36,PR=10,PT=14,PB=28;
+function PX(m){return PL+m/1440*(PW-PL-PR)}function PY(v){return PT+(TMAX-v)/(TMAX-TMIN)*(PH-PT-PB)}
+function OFFY(){return PH-PB-14}
+function renderProg(){
+  renderDays();var svg=$('#chProg');clear(svg);var segs=prog[day];if(sel>=segs.length)sel=segs.length-1;
+  for(var g=TMIN;g<=TMAX;g+=2){el('line',{x1:PL,x2:PW-PR,y1:PY(g),y2:PY(g),stroke:css('--line')},svg);txt(svg,PL-6,PY(g)+4,g+'°','end')}
+  [0,6,12,18,24].forEach(function(h){txt(svg,PX(h*60),PH-8,h+':00','middle')});
+  el('line',{x1:PL,x2:PW-PR,y1:PY(COMFORT_FROM),y2:PY(COMFORT_FROM),stroke:css('--heat'),'stroke-dasharray':'2 4',opacity:.6},svg);
+  segs.forEach(function(sg,i){var x0=PX(sg.s),x1=PX(segEnd(day,i)),k=kindOf(sg),y=sg.temp==null?OFFY():PY(sg.temp);
+    var r=el('rect',{x:x0,y:y,width:Math.max(1,x1-x0),height:PH-PB-y,fill:css(KC[k]),opacity:i===sel?.9:.55},svg);
+    var top=el('line',{x1:x0,x2:x1,y1:y,y2:y,stroke:css(KC[k]),'stroke-width':i===sel?5:3,'stroke-linecap':'round'},svg);
+    if(x1-x0>(compact()?78:44)){var lb=txt(svg,(x0+x1)/2,y-8,sg.temp==null?t('kind.o'):fmt(sg.temp,1)+'°','middle','fill:'+css('--ink')+';font-weight:650;font-size:12px');lb.setAttribute('class','seglbl');}
+    var hit=el('rect',{x:x0,y:PT,width:Math.max(1,x1-x0),height:PH-PT-PB,fill:'transparent',style:'cursor:ns-resize'},svg);
+    dragV(hit,i);
+  });
+  segs.forEach(function(sg,i){if(i===0)return;var x=PX(sg.s);
+    el('line',{x1:x,x2:x,y1:PT,y2:PH-PB,stroke:css('--ink'),'stroke-width':1.5,opacity:.35},svg);
+    el('rect',{x:x-6,y:PT+(PH-PT-PB)/2-16,width:12,height:32,rx:6,fill:css('--card'),stroke:css('--ink'),'stroke-width':1.5},svg);
+    var h=el('rect',{x:x-16,y:PT,width:32,height:PH-PT-PB,fill:'transparent',style:'cursor:ew-resize'},svg);dragH(h,i)});
+  if(day===(new Date().getDay()+6)%7){var n=new Date(),nx=PX(n.getHours()*60+n.getMinutes());el('line',{x1:nx,x2:nx,y1:PT-6,y2:PH-PB,stroke:css('--cold'),'stroke-width':2},svg);txt(svg,nx,PT-4,t('e.nowLbl'),'middle','fill:'+css('--cold')+';font-weight:650')}
+  var s=segs[sel];$('#selTime').textContent=t('dayLong')[day]+' '+hhmm(s.s)+'–'+hhmm(segEnd(day,sel));$('#selTemp').textContent=s.temp==null?'—':fmt(s.temp,1)+' °C';
+  $$('#kinds button').forEach(function(b){b.classList.toggle('on',b.dataset.v===kindOf(s))});
+  updateNowBlock();
+}
+function svgPt(svg,ev){var r=svg.getBoundingClientRect();return {x:(ev.clientX-r.left)/r.width*PW,y:(ev.clientY-r.top)/r.height*PH,r:r}}
+function showTip(html,x,y,r){var tp=$('#tipProg');tp.innerHTML=html;tp.style.left=Math.max(60,Math.min(r.width-60,x/PW*r.width))+'px';tp.style.top=(y/PH*r.height)+'px';tp.style.opacity=1}
+function dragV(hit,i){hit.addEventListener('pointerdown',function(ev){sel=i;var svg=$('#chProg'),moved=false,y0=ev.clientY;
+  drag(ev,function(e){if(Math.abs(e.clientY-y0)<4&&!moved)return;moved=true;var p=svgPt(svg,e),v=TMAX-(p.y-PT)/(PH-PT-PB)*(TMAX-TMIN);v=Math.round(v*2)/2;
+    var sg=prog[day][i];if(v<TMIN+.5){sg.temp=null}else sg.temp=Math.max(TMIN+1,Math.min(TMAX,v));renderProgLight();showTip('<b>'+hhmm(sg.s)+'–'+hhmm(segEnd(day,i))+'</b> · '+(sg.temp==null?t('kind.o'):fmt(sg.temp,1)+' °C'),p.x,p.y,p.r)},
+  function(){$('#tipProg').style.opacity=0;saveProg()});renderProgLight()})}
+function dragH(h,i){h.addEventListener('pointerdown',function(ev){ev.stopPropagation();var svg=$('#chProg');
+  drag(ev,function(e){var p=svgPt(svg,e),m=Math.round(((p.x-PL)/(PW-PL-PR)*1440)/15)*15,lo=prog[day][i-1].s+15,hi=segEnd(day,i)-15;m=Math.max(lo,Math.min(hi,m));prog[day][i].s=m;renderProgLight();showTip('<b>'+hhmm(m)+'</b>',PX(m),PT+20,p.r)},
+  function(){$('#tipProg').style.opacity=0;saveProg()})})}
+var rpl=0;function renderProgLight(){if(rpl)return;rpl=requestAnimationFrame(function(){rpl=0;renderProg()})}
+$('#segAdd').addEventListener('click',function(){var segs=prog[day],s=segs[sel],a=s.s,b=segEnd(day,sel);if(b-a<30){toast(t('minSeg'));return}
+  var mid=Math.round((a+(b-a)/2)/15)*15,k=kindOf(s);segs.splice(sel+1,0,{s:mid,temp:k==='k'?18:21});sel=sel+1;saveProg()});
+$('#segDel').addEventListener('click',function(){var segs=prog[day];if(segs.length<2){toast(t('lastSeg'));return}if(sel===0){segs.splice(1,1)}else{segs.splice(sel,1);sel--}saveProg()});
+$('#tUp').addEventListener('click',function(){var s=prog[day][sel];s.temp=s.temp==null?16:Math.min(TMAX,s.temp+.5);saveProg()});
+$('#tDown').addEventListener('click',function(){var s=prog[day][sel];if(s.temp==null)return;s.temp=s.temp-.5<TMIN+1?null:s.temp-.5;saveProg()});
+$$('#kinds button').forEach(function(b){b.addEventListener('click',function(){var s=prog[day][sel];s.temp=b.dataset.v==='k'?21:b.dataset.v==='e'?18:null;saveProg()})});
+$$('[data-tpl]').forEach(function(b){b.addEventListener('click',function(){prog[day]=clone(TPL[b.dataset.tpl]);sel=1;saveProg();toast(t('tplDone')+': '+b.textContent)})});
+$('#copyAll').addEventListener('click',function(){for(var i=0;i<5;i++)prog[i]=clone(prog[day]);saveProg();toast(t('copied'))});
+var d1=new Date(),d2=new Date();d1.setDate(d1.getDate()+20);d2.setDate(d2.getDate()+27);$('#vFrom').value=ymd(d1);$('#vTo').value=ymd(d2);
+$('#vac').addEventListener('change',function(){toast(t(this.checked?'vac.on':'vac.off'))});
+function updateNowBlock(){var n=new Date(),m=n.getHours()*60+n.getMinutes(),d=(n.getDay()+6)%7,segs=prog[d],i=0;while(i+1<segs.length&&segs[i+1].s<=m)i++;
+  var k=kindOf(segs[i]);var nb=$('#nowBlock');nb.className='chip '+(k==='k'?'heat':k==='e'?'eco':'');nb.textContent=t('kind.'+k)+(segs[i].temp!=null?' '+fmt(segs[i].temp,1)+' °C':'')+' → '+hhmm(segEnd(d,i))}
+
+/* ================= ekviterm ================= */
+var OUT_NOW=-1.2,mode=store.get('mode','ZAP');if(['ZAP','TEST','VYP'].indexOf(mode)<0)mode='ZAP';
 function setMode(m){mode=m;store.set('mode',m);$$('#mode button').forEach(function(b){b.classList.toggle('on',b.dataset.v===m)});updateSet()}
-$$('#mode button').forEach(function(b){b.addEventListener('click',function(){setMode(b.dataset.v);toast('Režim '+b.textContent+' – jen ukázka')})});
-function target(){var v=curveAt(OUT_NOW)+shift;if($('#roomOn').checked){v+=Math.max(-5,Math.min(5,Number($('#rg').value)*(Number($('#rt').value)-21.4)))}return Math.max(25,Math.min(55,v))}
-function updateSet(){$('#eSet').textContent=mode==='VYP'?'bez regulace':Math.round(target())+' °C';$('#eSet').style.color=mode==='VYP'?'var(--muted)':mode==='ZKUŠEBNÍ'?'var(--warn)':'var(--heat)'}
+$$('#mode button').forEach(function(b){b.addEventListener('click',function(){setMode(b.dataset.v);toast(t('mode')+': '+b.textContent+' – '+t('onlyDemo'))})});
+function target(){var v=curveAt(OUT_NOW)+shift;if($('#roomOn').checked)v+=Math.max(-5,Math.min(5,Number($('#rg').value)*(21-21.4)));return Math.max(25,Math.min(55,v))}
+function updateSet(){var e=$('#eSet');e.textContent=mode==='VYP'?t('e.noreg'):Math.round(target())+' °C';e.style.color=mode==='VYP'?'var(--muted)':mode==='TEST'?'var(--warn)':'var(--heat)'}
 function drawCurve(){
   var svg=$('#chCurve'),tip=$('#tipCurve');clear(svg);var W=640,H=300,L=40,R=14,T=14,B=30,XMIN=-16,XMAX=18,YMIN=20,YMAX=60;
-  var X=function(v){return L+(XMAX-v)/(XMAX-XMIN)*(W-L-R)},Y=function(v){return T+(YMAX-v)/(YMAX-YMIN)*(H-T-B)};
-  var inv=function(py){return YMAX-(py-T)/(H-T-B)*(YMAX-YMIN)};
-  for(var g=20;g<=60;g+=10){el('line',{x1:L,x2:W-R,y1:Y(g),y2:Y(g),stroke:css('--line')},svg);var t=el('text',{x:L-8,y:Y(g)+4,'text-anchor':'end'},svg);t.textContent=g+'°'}
-  [15,10,5,0,-5,-10,-15].forEach(function(v){var t=el('text',{x:X(v),y:H-10,'text-anchor':'middle'},svg);t.textContent=(v>0?'+':'')+String(v).replace('-','−')});
+  var X=function(v){return L+(XMAX-v)/(XMAX-XMIN)*(W-L-R)},Y=function(v){return T+(YMAX-v)/(YMAX-YMIN)*(H-T-B)},inv=function(py){return YMAX-(py-T)/(H-T-B)*(YMAX-YMIN)};
+  for(var g=20;g<=60;g+=10){el('line',{x1:L,x2:W-R,y1:Y(g),y2:Y(g),stroke:css('--line')},svg);txt(svg,L-8,Y(g)+4,g+'°','end')}
+  [15,10,5,0,-5,-10,-15].forEach(function(v){txt(svg,X(v),H-10,(v>0?'+':'')+String(v).replace('-','−'),'middle')});
   el('rect',{x:L,y:T,width:W-L-R,height:Y(55)-T,fill:css('--bad-soft'),opacity:.7},svg);
   el('line',{x1:L,x2:W-R,y1:Y(55),y2:Y(55),stroke:css('--bad'),'stroke-width':1.5,'stroke-dasharray':'6 4'},svg);
-  var lt=el('text',{x:W-R-4,y:Y(55)-6,'text-anchor':'end',style:'fill:'+css('--bad')+';font-weight:600'},svg);lt.textContent='nikdy nad 55 °C';
+  txt(svg,W-R-4,Y(55)-6,t('e.never'),'end','fill:'+css('--bad')+';font-weight:600');
   el('rect',{x:X(9),y:T,width:X(7)-X(9),height:H-T-B,fill:css('--warn-soft'),opacity:.8},svg);
   var d='',ds='';for(var v=XMAX;v>=XMIN;v-=.5){d+=(v===XMAX?'M':'L')+X(v).toFixed(1)+' '+Y(curveAt(v)).toFixed(1);ds+=(v===XMAX?'M':'L')+X(v).toFixed(1)+' '+Y(Math.min(55,curveAt(v)+shift)).toFixed(1)}
   if(shift)el('path',{d:d,fill:'none',stroke:css('--faint'),'stroke-width':1.5,'stroke-dasharray':'3 4'},svg);
   el('path',{d:ds,fill:'none',stroke:css('--heat'),'stroke-width':3,'stroke-linejoin':'round','stroke-linecap':'round'},svg);
   var nx=X(OUT_NOW),ny=Y(Math.min(55,curveAt(OUT_NOW)+shift));
   el('line',{x1:nx,x2:nx,y1:ny,y2:H-B,stroke:css('--cold'),'stroke-dasharray':'3 3'},svg);el('circle',{cx:nx,cy:ny,r:5,fill:css('--cold'),stroke:css('--card'),'stroke-width':2},svg);
-  var nt=el('text',{x:nx+8,y:H-B-6,style:'fill:'+css('--cold')+';font-weight:600'},svg);nt.textContent='teď';
-  curve.forEach(function(p,i){
-    var c=el('circle',{cx:X(p[0]),cy:Y(p[1]),r:9,fill:css('--card'),stroke:css('--heat'),'stroke-width':3,style:'cursor:ns-resize'},svg);
+  txt(svg,nx+8,H-B-6,t('e.nowLbl'),'start','fill:'+css('--cold')+';font-weight:600');
+  curve.forEach(function(p){var c=el('circle',{cx:X(p[0]),cy:Y(p[1]),r:9,fill:css('--card'),stroke:css('--heat'),'stroke-width':3},svg);
     var hit=el('circle',{cx:X(p[0]),cy:Y(p[1]),r:22,fill:'transparent',style:'cursor:ns-resize'},svg);
-    hit.addEventListener('pointerdown',function(ev){ev.preventDefault();hit.setPointerCapture(ev.pointerId);
-      function mv(e){var r=svg.getBoundingClientRect(),py=(e.clientY-r.top)/r.height*H;var val=Math.round(Math.max(20,Math.min(55,inv(py))));
-        if(val!==p[1]){p[1]=val;store.set('curve',curve);c.setAttribute('cy',Y(val));hit.setAttribute('cy',Y(val));redrawLater()}
-        tip.innerHTML='Venku '+fmt(p[0],0)+' °C → <b>'+p[1]+' °C</b>'+(p[1]===55?' (max)':'');tip.style.left=(X(p[0])/W*r.width)+'px';tip.style.top=(Y(p[1])/H*r.height-6)+'px';tip.style.opacity=1}
-      function up(){hit.removeEventListener('pointermove',mv);hit.removeEventListener('pointerup',up);hit.removeEventListener('pointercancel',up);tip.style.opacity=0;drawCurve()}
-      hit.addEventListener('pointermove',mv);hit.addEventListener('pointerup',up);hit.addEventListener('pointercancel',up);mv(ev)});
-  });
+    hit.addEventListener('pointerdown',function(ev){
+      function mv(e){var svg2=$('#chCurve'),r=svg2.getBoundingClientRect(),py=(e.clientY-r.top)/r.height*H,val=Math.round(Math.max(20,Math.min(55,inv(py))));
+        if(val!==p[1]){p[1]=val;store.set('curve',curve);redrawCurveLater()}
+        tip.innerHTML=t('e.out')+' '+fmt(p[0],0)+' °C → <b>'+p[1]+' °C</b>';tip.style.left=Math.max(70,Math.min(r.width-70,X(p[0])/W*r.width))+'px';tip.style.top=(Y(p[1])/H*r.height-6)+'px';tip.style.opacity=1}
+      drag(ev,mv,function(){if(rc){cancelAnimationFrame(rc);rc=0}drawCurve();tip.style.opacity=0});mv(ev)})});
   updateSet();
 }
-var raf=0;function redrawLater(){if(raf)return;raf=requestAnimationFrame(function(){raf=0;drawCurve()})}
-$('#shift').value=shift;$('#shiftV').textContent=(shift>0?'+':'')+String(shift).replace('-','−')+' °C';
-$('#shift').addEventListener('input',function(){shift=Number(this.value);store.set('shift',shift);$('#shiftV').textContent=(shift>0?'+':'')+String(shift).replace('-','−')+' °C';drawCurve()});
-$('#resetCurve').addEventListener('click',function(){curve=CURVE0.map(function(p){return p.slice()});shift=0;$('#shift').value=0;$('#shiftV').textContent='0 °C';store.set('curve',curve);store.set('shift',0);drawCurve();toast('Vráceno na výchozí křivku')});
+var rc=0;function redrawCurveLater(){if(rc)return;rc=requestAnimationFrame(function(){rc=0;var k=$('#tipCurve').style.opacity;drawCurve();$('#tipCurve').style.opacity=k})}
+function shiftLbl(){$('#shiftV').textContent=(shift>0?'+':'')+String(shift).replace('-','−')+' °C'}
+$('#shift').value=shift;shiftLbl();
+$('#shift').addEventListener('input',function(){shift=Number(this.value);store.set('shift',shift);shiftLbl();drawCurve()});
+$('#resetCurve').addEventListener('click',function(){curve=CURVE0.map(function(p){return p.slice()});shift=0;$('#shift').value=0;shiftLbl();store.set('curve',curve);store.set('shift',0);drawCurve();toast(t('e.resetDone'))});
 $('#roomOn').addEventListener('change',function(){$('#roomBox').style.opacity=this.checked?1:.45;$('#roomBox').style.pointerEvents=this.checked?'auto':'none';updateSet()});
-$('#rt').addEventListener('input',function(){$('#rtV').textContent=fmt(Number(this.value))+' °C';updateSet()});
 $('#rg').addEventListener('input',function(){$('#rgV').textContent=fmt(Number(this.value))+' °C / °C';updateSet()});
-(function(){var L=[['6:05','beze změny','venku −1,2 °C · cíl 42,4 °C'],['5:50','beze změny','venku MET Norway (záloha)'],['4:35','41 → 42 °C','ochlazení na −1,6 °C'],
-  ['2:20','chyba, zkusí znovu','Viessmann API 502 – výpadek na jejich straně'],['22:35','komfort → útlum','program: večerní útlum']];
-  $('#elog').innerHTML=L.map(function(r){var bad=r[1].indexOf('chyba')>=0,chg=r[1].indexOf('→')>=0;
-    return '<div class="li"><span class="num muted" style="width:44px">'+r[0]+'</span><div class="t"><b>'+r[1]+'</b><small>'+r[2]+'</small></div><span class="badge '+(bad?'warn':chg?'ok':'')+'">'+(bad?'opakování':chg?'zápis':'')+'</span></div>'}).join('')})();
 
-/* ---------- programy ---------- */
-var DN=['Po','Út','St','Čt','Pá','So','Ne'],DFULL=['Pondělí','Úterý','Středa','Čtvrtek','Pátek','Sobota','Neděle'];
-var TPL={work:[['05:00','08:30','k'],['15:30','22:00','k']],home:[['05:30','22:30','k']],wknd:[['06:30','23:00','k']]};
-var KIND={k:['Komfort','--heat'],e:['Útlum','--eco'],o:['Vypnuto','--off']};
-var prog=store.get('prog',null)||DN.map(function(_,i){return (i<5?TPL.work:TPL.wknd).map(function(b){return b.slice()})});
-var day=(new Date().getDay()+6)%7;
-function mins(s){var p=s.split(':');return Number(p[0])*60+Number(p[1])}
-function renderDays(){$('#days').innerHTML=DN.map(function(d,i){return '<button data-i="'+i+'" class="'+(i===day?'on':'')+'">'+d+'</button>'}).join('');
-  $$('#days button').forEach(function(b){b.addEventListener('click',function(){day=Number(b.dataset.i);renderProg()})})}
-function renderProg(){
-  renderDays();$('#dayTitle').textContent=DFULL[day];
-  var tl=$('#tl');tl.innerHTML='';prog[day].slice().sort(function(a,b){return mins(a[0])-mins(b[0])}).forEach(function(b){var a=mins(b[0]),z=mins(b[1]);if(z<=a)return;
-    var dv=document.createElement('div');dv.style.left=(a/1440*100)+'%';dv.style.width=((z-a)/1440*100)+'%';dv.style.background='var('+KIND[b[2]][1]+')';dv.textContent=(z-a)>150?KIND[b[2]][0]:'';tl.appendChild(dv)});
-  if(day===(new Date().getDay()+6)%7){var n=new Date(),nl=document.createElement('span');nl.className='nowline';nl.style.left=((n.getHours()*60+n.getMinutes())/1440*100)+'%';tl.appendChild(nl)}
-  $('#blocks').innerHTML=prog[day].map(function(b,i){return '<div class="block" data-i="'+i+'"><input type="time" value="'+b[0]+'" data-f="0" step="900"><input type="time" value="'+b[1]+'" data-f="1" step="900">'+
-    '<select data-f="2">'+Object.keys(KIND).map(function(k){return '<option value="'+k+'"'+(k===b[2]?' selected':'')+'>'+KIND[k][0]+'</option>'}).join('')+'</select><button class="x" aria-label="Smazat blok">×</button></div>'}).join('')||'<p class="muted small" style="margin:4px 0">Celý den útlum.</p>';
-  $$('#blocks .block').forEach(function(row){var i=Number(row.dataset.i);
-    $$('[data-f]',row).forEach(function(inp){inp.addEventListener('change',function(){prog[day][i][Number(inp.dataset.f)]=inp.value;save()})});
-    $('.x',row).addEventListener('click',function(){prog[day].splice(i,1);save()})});
-  updateNowBlock();
+/* ================= seznamy ================= */
+function renderLists(){
+  $('#elog').innerHTML=t('log').map(function(r){var b=t('logBadge')[r[3]]||'';return '<div class="li"><span class="num muted" style="width:44px">'+r[0]+'</span><div class="t"><b>'+r[1]+'</b><small>'+r[2]+'</small></div>'+(b?'<span class="badge '+r[3]+'">'+b+'</span>':'')+'</div>'}).join('');
+  $('#src').innerHTML=t('src').map(function(r){return '<div class="li"><div class="t"><b>'+r[0]+'</b><small>'+r[1]+'</small></div><span class="badge '+r[2]+'">'+r[3]+'</span></div>'}).join('');
+  $('#alerts').innerHTML=t('alerts').map(function(r){return '<div class="li"><div class="t"><b>'+r[1]+'</b><small>'+r[0]+' · '+r[2]+'</small></div><span class="dot" style="background:var(--'+(r[3]==='ok'?'ok':'warn')+')"></span></div>'}).join('');
+  $('#safe').innerHTML=t('safe').map(function(r){return '<div class="li"><div class="t"><b>'+r[0]+'</b><small>'+r[1]+'</small></div><span class="badge '+r[2]+'">'+r[3]+'</span></div>'}).join('');
 }
-function save(){store.set('prog',prog);renderProg()}
-$('#addBlock').addEventListener('click',function(){prog[day].push(['12:00','13:00','k']);save()});
-$('#copyAll').addEventListener('click',function(){for(var i=0;i<5;i++)prog[i]=prog[day].map(function(b){return b.slice()});save();toast('Zkopírováno na pracovní dny')});
-$$('[data-tpl]').forEach(function(b){b.addEventListener('click',function(){prog[day]=TPL[b.dataset.tpl].map(function(x){return x.slice()});save();toast('Šablona „'+b.textContent+'“ pro '+DFULL[day].toLowerCase())})});
-$('#eco').addEventListener('input',function(){$('#ecoV').textContent=this.value+' °C'});
-var d1=new Date(),d2=new Date();d1.setDate(d1.getDate()+20);d2.setDate(d2.getDate()+27);
-$('#vFrom').value=d1.toISOString().slice(0,10);$('#vTo').value=d2.toISOString().slice(0,10);
-$('#vac').addEventListener('change',function(){toast(this.checked?'Dovolená naplánována – jen ukázka':'Dovolená zrušena')});
-function updateNowBlock(){var t=new Date(),m=t.getHours()*60+t.getMinutes(),di=(t.getDay()+6)%7,cur=null;
-  prog[di].forEach(function(b){if(m>=mins(b[0])&&m<mins(b[1]))cur=b});
-  $('#nowBlock').textContent=cur?KIND[cur[2]][0]+' do '+cur[1]:'Útlum';}
 
-/* ---------- systém ---------- */
-$('#src').innerHTML=[
-  ['Kotel · Viessmann API','poslední data před 2 min','ok','v pořádku'],
-  ['Venku · Open-Meteo','vyčerpaný denní limit (sdílené adresy Googlu)','warn','429'],
-  ['Venku · MET Norway','záloha, používá se teď','ok','aktivní'],
-  ['Venku · ČHMÚ Zlín','naměřená data, zpoždění ~1 h','ok','v pořádku'],
-  ['Místnost · Shelly H&T Gen3','baterie 92 % · Wi-Fi −58 dBm','ok','v pořádku'],
-  ['Data · BigQuery','zápis po 15 min','ok','v pořádku']
-].map(function(r){return '<div class="li"><div class="t"><b>'+r[0]+'</b><small>'+r[1]+'</small></div><span class="badge '+r[2]+'">'+r[3]+'</span></div>'}).join('');
-$('#alerts').innerHTML=[
-  ['27. 11. 2:20','Viessmann API 502','vyřešeno opakováním za 10 s','ok'],
-  ['26. 11. 23:35','Viessmann API 500 · TIMEOUT','vynechán 1 krok, kotel držel 45 °C','warn'],
-  ['12. 11. 10:30','Open-Meteo nedostupné 9 h','přepnuto na MET Norway','warn']
-].map(function(r){return '<div class="li"><div class="t"><b>'+r[1]+'</b><small>'+r[0]+' · '+r[2]+'</small></div><span class="dot" style="background:var(--'+(r[3]==='ok'?'ok':'warn')+')"></span></div>'}).join('');
-
-/* ---------- start ---------- */
-setMode(mode);renderProg();
-var startTab=store.get('tab','prehled');if(!document.getElementById('v-'+startTab))startTab='prehled';go(startTab);
-var mq=matchMedia('(prefers-color-scheme: dark)');(mq.addEventListener?mq.addEventListener('change',function(){go(store.get('tab','prehled'))}):0);
+/* ================= start ================= */
+setMode(mode);applyLang();go((location.hash||'#prehled').slice(1));
+var mq=matchMedia('(prefers-color-scheme: dark)');if(mq.addEventListener)mq.addEventListener('change',function(){go(cur)});
 })();
 </script>
 </body>
