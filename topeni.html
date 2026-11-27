@@ -135,6 +135,16 @@ th:last-child,td:last-child{padding-right:16px}
 thead th{position:sticky;top:0;background:var(--card);color:var(--muted);font-size:12px;font-weight:650;border-bottom:1px solid var(--line);z-index:1}
 tbody tr:nth-child(even){background:var(--card2)}
 tfoot td{font-weight:700;border-top:1px solid var(--line);background:var(--card);position:sticky;bottom:0}
+.cfg{padding:10px 0;border-top:1px solid var(--line)}
+.cfg:first-child{border-top:0}
+.cfg .r1{display:flex;align-items:center;gap:10px}
+.cfg .r1 span{flex:1;font-weight:600}
+.cfg .r2{display:flex;align-items:center;gap:6px;margin:8px 0 0 56px}
+.cfg .r2 select{flex:1;min-height:36px;padding:4px 8px;font-size:13.5px;min-width:0}
+.cfg .r2 .btn{width:36px;padding:0}
+.cfg.off .r2{opacity:.45}
+.stat .lbl em{font-style:normal;color:var(--faint)}
+#cfgHome,#cfgStats{margin-top:6px}
 .selinfo{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center;margin-top:12px}
 @media (max-width:600px){svg.chart text{font-size:19px}svg.chart text.seglbl{font-size:18px}}
 .stepper{display:flex;align-items:center;gap:6px}
@@ -205,12 +215,7 @@ nav.tabs svg{width:24px;height:24px}
         <span class="chip eco" data-go="programy" id="nowBlock">Komfort</span>
       </div>
     </button>
-    <div class="grid g2">
-      <button class="card stat go" data-go="ekviterm"><div class="lbl"><span class="dot" style="background:var(--cold)"></span><span data-t="out">Venku</span></div><div class="val num">−1,2<span>°C</span></div><div class="sub" data-t="out.sub">MET Norway · záloha</div></button>
-      <button class="card stat go" data-go="ekviterm"><div class="lbl"><span class="dot" style="background:var(--heat)"></span><span data-t="supply">Přívod</span></div><div class="val num">44,7<span>°C</span></div><div class="sub num" data-t="supply.sub">nastaveno 42 °C</div></button>
-      <button class="card stat go" data-go="statistiky" data-range="today"><div class="lbl" data-t="gasToday">Plyn dnes</div><div class="val num">1,9<span>m³</span></div><div class="sub num" data-t="gasToday.sub">včera 2,6 m³</div></button>
-      <button class="card stat go" data-go="statistiky" data-range="today"><div class="lbl" data-t="burnToday">Hořák dnes</div><div class="val num">3:12<span>h</span></div><div class="sub num" data-t="burnToday.sub">14 startů</div></button>
-    </div>
+    <div class="grid g2" id="tilesHome"></div>
   </div>
 
   <h3 data-t="quick">Rychlé akce</h3>
@@ -250,14 +255,10 @@ nav.tabs svg{width:24px;height:24px}
     <div class="seg" id="gran" style="margin-top:12px">
       <button data-v="h" data-t="g.h">Hodiny</button><button data-v="d" data-t="g.d">Dny</button><button data-v="w" data-t="g.w">Týdny</button><button data-v="m" data-t="g.m">Měsíce</button>
     </div>
+    <div class="row small muted" style="margin-top:10px;gap:8px"><span data-t="price.lbl">Cena plynu</span><input id="price" type="number" step="0.5" value="28" style="width:70px;min-height:32px;padding:3px 8px"><span data-t="k.price">Kč/m³</span></div>
   </div>
 
-  <div class="grid g4" style="margin-top:12px">
-    <div class="card stat"><div class="lbl" data-t="k.gas">Plyn celkem</div><div class="val num" id="kGas">—</div><div class="sub" id="kDays">&nbsp;</div></div>
-    <div class="card stat"><div class="lbl" data-t="k.cost">Náklady</div><div class="val num" id="kCost">—</div><div class="sub"><input id="price" type="number" step="0.5" value="28" style="width:58px;min-height:26px;padding:1px 6px;font-size:12.5px"> <span data-t="k.price">Kč/m³</span></div></div>
-    <div class="card stat"><div class="lbl" data-t="k.dd">Na denostupeň</div><div class="val num" id="kDd">—</div><div class="sub" data-t="k.dd.sub">spotřeba bez vlivu počasí</div></div>
-    <div class="card stat"><div class="lbl" data-t="k.burn">Hořák hořel</div><div class="val num" id="kBurn">—</div><div class="sub" id="kRate">&nbsp;</div></div>
-  </div>
+  <div class="grid g4" id="tilesStats" style="margin-top:12px"></div>
 
   <h3 data-t="gasUse">Spotřeba plynu</h3>
   <div class="card">
@@ -294,7 +295,7 @@ nav.tabs svg{width:24px;height:24px}
         <button class="btn round" id="segAdd" aria-label="+">+</button>
       </div>
     </div>
-    <div class="chartbox" style="margin-top:6px"><svg class="chart" id="chProg" viewBox="0 0 640 260" role="img" style="touch-action:none"></svg><div class="tip" id="tipProg"></div></div>
+    <div class="chartbox" style="margin-top:6px"><svg class="chart" id="chProg" viewBox="0 0 640 300" role="img" style="touch-action:none"></svg><div class="tip" id="tipProg"></div></div>
     <p class="note" style="margin:6px 0 0" data-t="prog.help">Tažením svislých úchytů měníte čas, tažením vodorovné čáry nahoru a dolů teplotu. Klepnutím vyberete úsek, + ho rozdělí, − smaže.</p>
     <div class="selinfo">
       <div><div class="muted small" data-t="prog.sel">Vybraný úsek</div><div class="num" style="font-size:18px;font-weight:700" id="selTime">—</div></div>
@@ -365,7 +366,11 @@ nav.tabs svg{width:24px;height:24px}
 <!-- ============ SYSTÉM ============ -->
 <section class="view" id="v-system">
   <h2 data-t="tab.system">Systém</h2>
-  <h3 style="margin-top:4px" data-t="s.src">Zdroje dat</h3>
+  <h3 style="margin-top:4px" data-t="cfg.title">Přizpůsobit</h3>
+  <div class="card"><b data-t="cfg.home">Dlaždice na Přehledu</b><div id="cfgHome"></div></div>
+  <div class="card" style="margin-top:12px"><b data-t="cfg.stats">Dlaždice ve Statistikách</b><div id="cfgStats"></div></div>
+  <div class="row" style="margin-top:10px;gap:8px;flex-wrap:wrap"><button class="btn sm" id="cfgReset" data-t="cfg.reset">Obnovit výchozí</button><span class="small muted" data-t="cfg.note">Volba se ukládá v tomto prohlížeči.</span></div>
+  <h3 data-t="s.src">Zdroje dat</h3>
   <div class="card"><div class="list" id="src"></div></div>
   <h3 data-t="s.alerts">Upozornění</h3>
   <div class="card"><div class="list" id="alerts"></div></div>
@@ -405,6 +410,10 @@ cs:{app:'Topení',title:'Topení · Zlín',demo:'Ukázka · bez dat','tab.prehle
  src:[['Kotel · Viessmann API','poslední data před 2 min','ok','v pořádku'],['Venku · Open-Meteo','vyčerpaný denní limit (sdílené adresy Googlu)','warn','429'],['Venku · MET Norway','záloha, používá se teď','ok','aktivní'],['Venku · ČHMÚ Zlín','naměřená data, zpoždění ~1 h','ok','v pořádku'],['Místnost · Shelly H&T Gen3','baterie 92 % · Wi-Fi −58 dBm','ok','v pořádku'],['Data · BigQuery','zápis po 15 min','ok','v pořádku']],
  alerts:[['27. 11. 2:20','Viessmann API 502','vyřešeno opakováním za 10 s','ok'],['26. 11. 23:35','Viessmann API 500 · TIMEOUT','vynechán 1 krok, kotel držel 45 °C','warn'],['12. 11. 10:30','Open-Meteo nedostupné 9 h','přepnuto na MET Norway','warn']],
  safe:[['Absolutní maximum přívodu','Vynucuje regulace ve skriptu, web ho nemůže změnit','bad','55 °C'],['Pauza po ruční změně ve ViCare','Regulace nic nemění','ok','4 h'],['Bez venkovní teploty','Kotel drží poslední hodnotu, e-mail po 3 h','ok','aktivní']],
+ 'c.room.sub':'vlhkost 47 % · Shelly','c.mod':'Modulace hořáku','c.mod.sub':'hořák hoří · jen čtení z API','c.gas':'Plyn','c.burn':'Hořák hořel','c.starts':'Starty hořáku','c.startsN':'{n} startů',
+ 'c.perStart':'průměrně {m} min na start','c.rate':'Plyn na hodinu hoření','c.rate.sub':'nižší = úspornější','c.outavg':'Průměr venku','c.roomavg':'Průměr doma','c.delta':'{d} % proti předchozímu období',
+ 'per.today':'dnes','per.yesterday':'včera','per.week':'tento týden','per.lastweek':'minulý týden','per.d7':'posledních 7 dní','per.month':'tento měsíc','per.lastmonth':'minulý měsíc','per.d30':'posledních 30 dní','per.season':'sezóna','per.sel':'podle výběru nahoře','per.now':'aktuální hodnota',
+ 'cfg.title':'Přizpůsobit','cfg.home':'Dlaždice na Přehledu','cfg.stats':'Dlaždice ve Statistikách','cfg.reset':'Obnovit výchozí','cfg.note':'Volba se ukládá v tomto prohlížeči.','cfg.resetDone':'Dlaždice vráceny na výchozí','price.lbl':'Cena plynu',
  dayShort:['Po','Út','St','Čt','Pá','So','Ne'],dayLong:['Pondělí','Úterý','Středa','Čtvrtek','Pátek','Sobota','Neděle'],months:['led','úno','bře','dub','kvě','čvn','čvc','srp','zář','říj','lis','pro'],wk:'t. {n}'},
 es:{app:'Calefacción',title:'Calefacción · Zlín',demo:'Demo · sin datos','tab.prehled':'Inicio','tab.statistiky':'Estadísticas','tab.programy':'Horarios','tab.ekviterm':'Curva','tab.system':'Sistema',
  'hello.m':'Buenos días','hello.d':'Buenas tardes','hello.e':'Buenas noches','room.where':'Salón · Shelly H&T',ago4:'hace 4 min','room.sub':'Humedad 47 % · objetivo 21,0 °C',
@@ -429,6 +438,10 @@ es:{app:'Calefacción',title:'Calefacción · Zlín',demo:'Demo · sin datos','t
  src:[['Caldera · Viessmann API','últimos datos hace 2 min','ok','correcto'],['Exterior · Open-Meteo','límite diario agotado (IPs compartidas de Google)','warn','429'],['Exterior · MET Norway','respaldo, en uso ahora','ok','activo'],['Exterior · ČHMÚ Zlín','datos medidos, retraso ~1 h','ok','correcto'],['Interior · Shelly H&T Gen3','batería 92 % · Wi-Fi −58 dBm','ok','correcto'],['Datos · BigQuery','escritura cada 15 min','ok','correcto']],
  alerts:[['27/11 2:20','Viessmann API 502','resuelto al reintentar a los 10 s','ok'],['26/11 23:35','Viessmann API 500 · TIMEOUT','se saltó 1 paso, la caldera mantuvo 45 °C','warn'],['12/11 10:30','Open-Meteo caído 9 h','cambiado a MET Norway','warn']],
  safe:[['Máximo absoluto de impulsión','Lo impone el script, la web no puede cambiarlo','bad','55 °C'],['Pausa tras cambio manual en ViCare','La regulación no cambia nada','ok','4 h'],['Sin temperatura exterior','La caldera mantiene el último valor, e-mail a las 3 h','ok','activo']],
+ 'c.room.sub':'humedad 47 % · Shelly','c.mod':'Modulación del quemador','c.mod.sub':'quemador encendido · solo lectura','c.gas':'Gas','c.burn':'Quemador','c.starts':'Arranques del quemador','c.startsN':'{n} arranques',
+ 'c.perStart':'de media {m} min por arranque','c.rate':'Gas por hora de quemador','c.rate.sub':'menos = más eficiente','c.outavg':'Media exterior','c.roomavg':'Media interior','c.delta':'{d} % vs. periodo anterior',
+ 'per.today':'hoy','per.yesterday':'ayer','per.week':'esta semana','per.lastweek':'semana pasada','per.d7':'últimos 7 días','per.month':'este mes','per.lastmonth':'mes pasado','per.d30':'últimos 30 días','per.season':'temporada','per.sel':'según la selección','per.now':'valor actual',
+ 'cfg.title':'Personalizar','cfg.home':'Tarjetas de Inicio','cfg.stats':'Tarjetas de Estadísticas','cfg.reset':'Restablecer','cfg.note':'Se guarda en este navegador.','cfg.resetDone':'Tarjetas restablecidas','price.lbl':'Precio del gas',
  dayShort:['Lu','Ma','Mi','Ju','Vi','Sá','Do'],dayLong:['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'],months:['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'],wk:'sem. {n}'}
 };
 var params=new URLSearchParams(location.search);
@@ -496,7 +509,7 @@ var HOURS=[];
     var comfort=h>=5&&h<22,f=comfort?1.15:.45;
     var burn=Math.max(0,Math.min(60,.9*(19.5-out)*f+(rnd()-.5)*4));if(out>15)burn=0;
     var gas=burn/60*(.40+.012*Math.max(0,8-out));
-    HOURS.push({t:t0,out:out,burn:burn,gas:gas,on:day>36?60:(comfort?60:0)});}
+    HOURS.push({t:t0,out:out,burn:burn,gas:gas,on:day>36?60:(comfort?60:0),starts:burn>0?Math.max(1,Math.round(burn/18+rnd()*.8)):0,room:20.4+(comfort?.8:-.6)+(rnd()-.5)*.3});}
 })();
 var now=new Date();
 var S24=[];(function(){var from=now.getTime()-24*3600e3,sup=34,burn=false;
@@ -536,7 +549,7 @@ $$('#presets [data-p]').forEach(function(b){b.addEventListener('click',function(
 ['#dFrom','#dTo'].forEach(function(s){$(s).addEventListener('change',drawStats)});
 function syncGran(){$$('#gran button').forEach(function(b){b.classList.toggle('on',b.dataset.v===gran)});store.set('gran',gran)}
 $$('#gran button').forEach(function(b){b.addEventListener('click',function(){gran=b.dataset.v;syncGran();drawStats()})});syncGran();
-$('#price').addEventListener('input',drawStats);$('#showOn').addEventListener('change',drawStats);
+$('#price').value=store.get('price',28);$('#price').addEventListener('input',function(){store.set('price',Number(this.value)||0);drawStats();renderTiles('home')});$('#showOn').addEventListener('change',drawStats);
 function isoWeek(d){var x=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));var dn=(x.getUTCDay()+6)%7;x.setUTCDate(x.getUTCDate()-dn+3);var fy=new Date(Date.UTC(x.getUTCFullYear(),0,4));return 1+Math.round(((x-fy)/864e5-3+((fy.getUTCDay()+6)%7))/7)}
 function bucketKey(d){if(gran==='h')return ymd(d)+' '+pad(d.getHours());if(gran==='d')return ymd(d);if(gran==='w'){var m=new Date(d.getFullYear(),d.getMonth(),d.getDate()-((d.getDay()+6)%7));return ymd(m)}return d.getFullYear()+'-'+pad(d.getMonth()+1)}
 function bucketLabel(k,long){var M=t('months');
@@ -552,9 +565,7 @@ function drawStats(){
   var A=aggregate(),rows=A.rows;var svg=$('#chGas'),tip=$('#tipGas');clear(svg);
   var tot=rows.reduce(function(a,r){return a+r.gas},0),burn=rows.reduce(function(a,r){return a+r.burn},0)/60,hrs=rows.reduce(function(a,r){return a+r.n},0);
   var dd=rows.reduce(function(a,r){return a+Math.max(0,20-r.out)*r.n/24},0);
-  $('#kGas').innerHTML=fmt(tot,tot<100?1:0)+'<span>m³</span>';$('#kDays').textContent=t('days',{n:A.days});
-  $('#kCost').innerHTML=Math.round(tot*Number($('#price').value||0)).toLocaleString(lang==='es'?'es-ES':'cs-CZ')+'<span>'+(lang==='es'?'CZK':'Kč')+'</span>';
-  $('#kDd').innerHTML=(dd?fmt(tot/dd,3):'—')+'<span>m³</span>';$('#kBurn').innerHTML=fmt(burn,burn<100?1:0)+'<span>h</span>';$('#kRate').textContent=burn?t('rate',{r:fmt(tot/burn,2)}):'';
+  renderTiles('stats');
   if(!rows.length){txt(svg,320,120,'—','middle');$('#tbl').innerHTML='';drawRun([]);return}
   var W=640,H=240,L=38,R=10,T=12,B=26,n=rows.length,max=Math.max.apply(null,rows.map(function(r){return r.gas}))*1.15||1;
   var bw=(W-L-R)/n,Y=function(v){return T+(1-v/max)*(H-T-B)};
@@ -589,6 +600,62 @@ function drawRun(){
     if(i%every===0){var q=d.k.split('-');txt(svg,x+w/2,H-7,Number(q[2])+'.','middle')}});
 }
 
+
+/* ================= dlaždice ================= */
+var PERIODS=['today','yesterday','week','lastweek','d7','month','lastmonth','d30','season'];
+function periodRange(p){var n=new Date(),d0=new Date(n.getFullYear(),n.getMonth(),n.getDate()),wd=(n.getDay()+6)%7,f,to=n;
+  switch(p){case 'today':f=d0;break;case 'yesterday':f=new Date(d0.getTime()-864e5);to=new Date(d0.getTime()-1);break;
+  case 'week':f=new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()-wd);break;
+  case 'lastweek':f=new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()-wd-7);to=new Date(f.getTime()+7*864e5-1);break;
+  case 'd7':f=new Date(n.getTime()-7*864e5);break;case 'd30':f=new Date(n.getTime()-30*864e5);break;
+  case 'month':f=new Date(n.getFullYear(),n.getMonth(),1);break;
+  case 'lastmonth':f=new Date(n.getFullYear(),n.getMonth()-1,1);to=new Date(new Date(n.getFullYear(),n.getMonth(),1).getTime()-1);break;
+  case 'season':f=SEASON0;break;
+  default:f=new Date($('#dFrom').value+'T00:00:00');to=new Date($('#dTo').value+'T23:59:59')}
+  return [f,to]}
+function shiftBack(r,p){var d=p==='today'||p==='yesterday'?864e5:p==='week'||p==='lastweek'||p==='d7'?7*864e5:p==='month'||p==='lastmonth'||p==='d30'?30*864e5:(r[1]-r[0]+1);return [new Date(r[0]-d),new Date(r[1]-d)]}
+function sumRange(r){var s={gas:0,burn:0,starts:0,outSum:0,roomSum:0,n:0,omin:99,omax:-99,dd:0};
+  HOURS.forEach(function(h){if(h.t<r[0].getTime()||h.t>r[1].getTime())return;s.gas+=h.gas;s.burn+=h.burn;s.starts+=h.starts;s.outSum+=h.out;s.roomSum+=h.room;s.n++;
+    if(h.out<s.omin)s.omin=h.out;if(h.out>s.omax)s.omax=h.out;s.dd+=Math.max(0,20-h.out)/24});return s}
+function money(x){return Math.round(x).toLocaleString(lang==='es'?'es-ES':'cs-CZ')}
+function delta(a,b){if(!b)return '';var d=Math.round((a-b)/b*100);return t('c.delta',{d:(d>0?'+':d<0?'−':'±')+Math.abs(d)})}
+var CARDS={
+  room_now:{now:1,go:'programy',dot:'--room',lbl:'room',v:function(){return ['21,4','°C']},sub:function(){return t('c.room.sub')}},
+  out_now:{now:1,go:'ekviterm',dot:'--cold',lbl:'out',v:function(){return ['−1,2','°C']},sub:function(){return t('out.sub')}},
+  supply_now:{now:1,go:'ekviterm',dot:'--heat',lbl:'supply',v:function(){return ['44,7','°C']},sub:function(){return t('supply.sub')}},
+  mod_now:{now:1,go:'ekviterm',dot:'--heat',lbl:'c.mod',v:function(){return ['34','%']},sub:function(){return t('c.mod.sub')}},
+  gas:{lbl:'c.gas',v:function(s){return [fmt(s.gas,s.gas<100?1:0),'m³']},sub:function(s,pr){return delta(s.gas,pr.gas)}},
+  burn:{lbl:'c.burn',v:function(s){return [fmt(s.burn/60,s.burn<6000?1:0),'h']},sub:function(s){return t('c.startsN',{n:s.starts})}},
+  starts:{lbl:'c.starts',v:function(s){return [String(s.starts),'']},sub:function(s){return s.burn?t('c.perStart',{m:Math.round(s.burn/Math.max(1,s.starts))}):''}},
+  cost:{lbl:'k.cost',v:function(s){return [money(s.gas*Number($('#price').value||0)),lang==='es'?'CZK':'Kč']},sub:function(s,pr){return delta(s.gas,pr.gas)}},
+  dd:{lbl:'k.dd',v:function(s){return [s.dd?fmt(s.gas/s.dd,3):'—','m³']},sub:function(){return t('k.dd.sub')}},
+  rate:{lbl:'c.rate',v:function(s){return [s.burn?fmt(s.gas/(s.burn/60),2):'—','m³/h']},sub:function(){return t('c.rate.sub')}},
+  outavg:{lbl:'c.outavg',dot:'--cold',v:function(s){return [s.n?fmt(s.outSum/s.n):'—','°C']},sub:function(s){return s.n?fmt(s.omin)+' … '+fmt(s.omax)+' °C':''}},
+  roomavg:{lbl:'c.roomavg',dot:'--room',v:function(s){return [s.n?fmt(s.roomSum/s.n):'—','°C']},sub:function(){return 'Shelly H&T'}}
+};
+var CFG0={home:[['out_now',1],['supply_now',1],['gas',1,'today'],['burn',1,'today'],['room_now',0],['mod_now',0],['cost',0,'month'],['starts',0,'today'],['dd',0,'week'],['rate',0,'week'],['outavg',0,'today'],['roomavg',0,'today']],
+          stats:[['gas',1,'sel'],['cost',1,'sel'],['dd',1,'sel'],['burn',1,'sel'],['starts',0,'sel'],['rate',0,'sel'],['outavg',0,'sel'],['roomavg',0,'sel'],['gas',0,'month'],['gas',0,'season']]};
+function cfgGet(a){var c=store.get('cfg-'+a,null);if(!c||!c.length)c=CFG0[a].map(function(x){return {id:x[0],on:!!x[1],p:x[2]||null}});return c.filter(function(x){return CARDS[x.id]})}
+function cfgSet(a,c){store.set('cfg-'+a,c);renderTiles(a);renderCfg(a)}
+function plabel(p){return t('per.'+p)}
+function renderTiles(a){var box=$(a==='home'?'#tilesHome':'#tilesStats');if(!box)return;
+  box.innerHTML=cfgGet(a).filter(function(c){return c.on}).map(function(c,ix){var C=CARDS[c.id],val,sub;
+    if(C.now){val=C.v();sub=C.sub()}else{var r=periodRange(c.p),s=sumRange(r),pr=sumRange(shiftBack(r,c.p));val=C.v(s);sub=C.sub(s,pr)}
+    var per=C.now?'':(c.p==='sel'?'':' <em>· '+plabel(c.p)+'</em>');
+    var tag=a==='home'?'button':'div',cls=a==='home'?'card stat go':'card stat';
+    return '<'+tag+' class="'+cls+'" data-tile="'+ix+'"><div class="lbl">'+(C.dot?'<span class="dot" style="background:var('+C.dot+')"></span>':'')+'<span>'+t(C.lbl)+per+'</span></div><div class="val num">'+val[0]+'<span>'+val[1]+'</span></div><div class="sub">'+(sub||'&nbsp;')+'</div></'+tag+'>'}).join('');
+  if(a==='home')$$('[data-tile]',box).forEach(function(b){b.addEventListener('click',function(){var c=cfgGet('home').filter(function(x){return x.on})[Number(b.dataset.tile)],C=CARDS[c.id];
+    if(C.now){go(C.go);return}var r=periodRange(c.p);$('#dFrom').value=ymd(r[0]);$('#dTo').value=ymd(r[1]);gran=(c.p==='today'||c.p==='yesterday')?'h':(c.p==='season'?'w':'d');syncGran();go('statistiky')})})}
+function renderCfg(a){var box=$(a==='home'?'#cfgHome':'#cfgStats'),c=cfgGet(a),opts=(a==='stats'?['sel']:[]).concat(PERIODS);
+  box.innerHTML=c.map(function(x,i){var C=CARDS[x.id];return '<div class="cfg'+(x.on?'':' off')+'" data-i="'+i+'"><div class="r1"><label class="switch" style="padding:0"><input type="checkbox"'+(x.on?' checked':'')+'></label><span>'+t(C.lbl)+'</span></div>'+
+    '<div class="r2">'+(C.now?'<span class="small muted" style="flex:1">'+t('per.now')+'</span>':'<select>'+opts.map(function(p){return '<option value="'+p+'"'+(p===x.p?' selected':'')+'>'+plabel(p)+'</option>'}).join('')+'</select>')+
+    '<button class="btn sm" data-mv="-1" aria-label="↑">↑</button><button class="btn sm" data-mv="1" aria-label="↓">↓</button></div></div>'}).join('');
+  $$('.cfg',box).forEach(function(row){var i=Number(row.dataset.i);
+    $('input',row).addEventListener('change',function(){var c=cfgGet(a);c[i].on=this.checked;cfgSet(a,c)});
+    var se=$('select',row);if(se)se.addEventListener('change',function(){var c=cfgGet(a);c[i].p=this.value;cfgSet(a,c)});
+    $$('[data-mv]',row).forEach(function(b){b.addEventListener('click',function(){var c=cfgGet(a),j=i+Number(b.dataset.mv);if(j<0||j>=c.length)return;var x=c[i];c[i]=c[j];c[j]=x;cfgSet(a,c)})})})}
+$('#cfgReset').addEventListener('click',function(){store.set('cfg-home',null);store.set('cfg-stats',null);['home','stats'].forEach(function(a){renderTiles(a);renderCfg(a)});toast(t('cfg.resetDone'))});
+
 /* ================= programy ================= */
 // den = [{s:minuta začátku, temp: °C nebo null = vypnuto}], první s=0, úsek trvá do dalšího s (poslední do 24:00)
 var TPL={work:[{s:0,temp:18},{s:300,temp:21},{s:510,temp:18},{s:930,temp:21.5},{s:1320,temp:18}],home:[{s:0,temp:18},{s:330,temp:21},{s:1350,temp:18}],wknd:[{s:0,temp:18},{s:390,temp:21.5},{s:1380,temp:18}]};
@@ -602,26 +669,42 @@ function segEnd(d,i){return i+1<prog[d].length?prog[d][i+1].s:1440}
 function saveProg(){if(rpl){cancelAnimationFrame(rpl);rpl=0}store.set('prog2',prog);renderProg()}
 function renderDays(){$('#days').innerHTML=t('dayShort').map(function(dn,i){return '<button data-i="'+i+'" class="'+(i===day?'on':'')+'">'+dn+'</button>'}).join('');
   $$('#days button').forEach(function(b){b.addEventListener('click',function(){day=Number(b.dataset.i);sel=Math.min(sel,prog[day].length-1);renderProg()})})}
-var PW=640,PH=260,PL=36,PR=10,PT=14,PB=28;
+var PW=640,PH=300,PL=38,PR=12,PT=44,PB=96,TRK=238;function progDims(){PH=compact()?440:300;TRK=PH-62}
 function PX(m){return PL+m/1440*(PW-PL-PR)}function PY(v){return PT+(TMAX-v)/(TMAX-TMIN)*(PH-PT-PB)}
-function OFFY(){return PH-PB-14}
+function CB(){return PH-PB}function OFFY(){return CB()-10}
+function roundTop(x,y,w,h,r){r=Math.max(0,Math.min(r,w/2,h));return 'M'+x+' '+(y+h)+'V'+(y+r)+'Q'+x+' '+y+' '+(x+r)+' '+y+'H'+(x+w-r)+'Q'+(x+w)+' '+y+' '+(x+w)+' '+(y+r)+'V'+(y+h)+'Z'}
 function renderProg(){
-  renderDays();var svg=$('#chProg');clear(svg);var segs=prog[day];if(sel>=segs.length)sel=segs.length-1;
-  for(var g=TMIN;g<=TMAX;g+=2){el('line',{x1:PL,x2:PW-PR,y1:PY(g),y2:PY(g),stroke:css('--line')},svg);txt(svg,PL-6,PY(g)+4,g+'°','end')}
-  [0,6,12,18,24].forEach(function(h){txt(svg,PX(h*60),PH-8,h+':00','middle')});
-  el('line',{x1:PL,x2:PW-PR,y1:PY(COMFORT_FROM),y2:PY(COMFORT_FROM),stroke:css('--heat'),'stroke-dasharray':'2 4',opacity:.6},svg);
-  segs.forEach(function(sg,i){var x0=PX(sg.s),x1=PX(segEnd(day,i)),k=kindOf(sg),y=sg.temp==null?OFFY():PY(sg.temp);
-    var r=el('rect',{x:x0,y:y,width:Math.max(1,x1-x0),height:PH-PB-y,fill:css(KC[k]),opacity:i===sel?.9:.55},svg);
-    var top=el('line',{x1:x0,x2:x1,y1:y,y2:y,stroke:css(KC[k]),'stroke-width':i===sel?5:3,'stroke-linecap':'round'},svg);
-    if(x1-x0>(compact()?78:44)){var lb=txt(svg,(x0+x1)/2,y-8,sg.temp==null?t('kind.o'):fmt(sg.temp,1)+'°','middle','fill:'+css('--ink')+';font-weight:650;font-size:12px');lb.setAttribute('class','seglbl');}
-    var hit=el('rect',{x:x0,y:PT,width:Math.max(1,x1-x0),height:PH-PT-PB,fill:'transparent',style:'cursor:ns-resize'},svg);
-    dragV(hit,i);
+  renderDays();progDims();var svg=$('#chProg');clear(svg);svg.setAttribute('viewBox','0 0 640 '+PH);var segs=prog[day];if(sel>=segs.length)sel=segs.length-1;
+  var cb=CB(),top=PT-30,cp=compact(),fs=cp?18:12,small=cp?15:10.5;
+  el('rect',{x:PL,y:top,width:PW-PL-PR,height:cb-top,rx:14,fill:css('--card2')},svg);
+  for(var h=3;h<24;h+=3)el('line',{x1:PX(h*60),x2:PX(h*60),y1:top+6,y2:cb,stroke:css('--line'),'stroke-width':1},svg);
+  for(var g=16;g<=22;g+=2){el('line',{x1:PL+4,x2:PW-PR-4,y1:PY(g),y2:PY(g),stroke:css('--line'),'stroke-dasharray':g===COMFORT_FROM?'':'2 5'},svg);txt(svg,PL-6,PY(g)+4,g+'°','end')}
+  el('line',{x1:PL+4,x2:PW-PR-4,y1:PY(COMFORT_FROM),y2:PY(COMFORT_FROM),stroke:css('--heat'),'stroke-width':1.2,'stroke-dasharray':'6 4',opacity:.55},svg);
+  segs.forEach(function(sg,i){var x0=PX(sg.s)+1.5,x1=PX(segEnd(day,i))-1.5,w=Math.max(1,x1-x0),k=kindOf(sg),col=css(KC[k]),y=sg.temp==null?OFFY():PY(sg.temp),on=i===sel;
+    el('path',{d:roundTop(x0,y,w,cb-y,9),fill:col,opacity:on?.38:.2},svg);
+    el('line',{x1:x0+Math.min(5,w/2),x2:x1-Math.min(5,w/2),y1:y,y2:y,stroke:col,'stroke-width':on?4.5:3,'stroke-linecap':'round'},svg);
+    if(on)el('path',{d:roundTop(x0,y,w,cb-y,9),fill:'none',stroke:col,'stroke-width':1.5,opacity:.9},svg);
+    var lab=sg.temp==null?t('kind.o'):fmt(sg.temp,1)+'°',pw=lab.length*fs*.6+(cp?22:14),ph=fs+(cp?12:8),cx=(x0+x1)/2;
+    if(w>pw+4){el('rect',{x:cx-pw/2,y:y-ph-9,width:pw,height:ph,rx:ph/2,fill:col},svg);
+      txt(svg,cx,y-9-ph/2+fs*.36,lab,'middle','font-size:'+fs+'px;fill:'+css('--card')+';font-weight:700')}
+    if(w>22){el('circle',{cx:cx,cy:y,r:on?(cp?12:9):(cp?8:6),fill:css('--card'),stroke:col,'stroke-width':on?3.5:2.5},svg);if(on)el('circle',{cx:cx,cy:y,r:cp?4:3,fill:col},svg)}
+    var hit=el('rect',{x:x0,y:top,width:w,height:cb-top,fill:'transparent',style:'cursor:ns-resize'},svg);dragV(hit,i);
   });
-  segs.forEach(function(sg,i){if(i===0)return;var x=PX(sg.s);
-    el('line',{x1:x,x2:x,y1:PT,y2:PH-PB,stroke:css('--ink'),'stroke-width':1.5,opacity:.35},svg);
-    el('rect',{x:x-6,y:PT+(PH-PT-PB)/2-16,width:12,height:32,rx:6,fill:css('--card'),stroke:css('--ink'),'stroke-width':1.5},svg);
-    var h=el('rect',{x:x-16,y:PT,width:32,height:PH-PT-PB,fill:'transparent',style:'cursor:ew-resize'},svg);dragH(h,i)});
-  if(day===(new Date().getDay()+6)%7){var n=new Date(),nx=PX(n.getHours()*60+n.getMinutes());el('line',{x1:nx,x2:nx,y1:PT-6,y2:PH-PB,stroke:css('--cold'),'stroke-width':2},svg);txt(svg,nx,PT-4,t('e.nowLbl'),'middle','fill:'+css('--cold')+';font-weight:650')}
+  if(day===(new Date().getDay()+6)%7){var n=new Date(),nm=n.getHours()*60+n.getMinutes(),nx=PX(nm);
+    el('line',{x1:nx,x2:nx,y1:top+4,y2:cb,stroke:css('--cold'),'stroke-width':2,'stroke-dasharray':'4 3'},svg);
+    el('circle',{cx:nx,cy:top+4,r:cp?6:4,fill:css('--cold')},svg);
+    txt(svg,nx+(nx>PW-90?-10:10),top+4+small*.36,t('e.nowLbl')+' '+hhmm(nm),nx>PW-90?'end':'start','font-size:'+small+'px;fill:'+css('--cold')+';font-weight:700')}
+  el('rect',{x:PL,y:TRK-6,width:PW-PL-PR,height:12,rx:6,fill:css('--line')},svg);
+  segs.forEach(function(sg,i){var x0=PX(sg.s),x1=PX(segEnd(day,i));el('rect',{x:x0+(i?1:0),y:TRK-6,width:Math.max(1,x1-x0-(i?1:0)),height:12,rx:i===0||i===segs.length-1?6:2,fill:css(KC[kindOf(sg)]),opacity:i===sel?1:.7},svg)});
+  [0,6,12,18,24].forEach(function(hh){txt(svg,PX(hh*60),TRK+(cp?52:38),hh+':00',hh===0?'start':hh===24?'end':'middle')});
+  segs.forEach(function(sg,i){if(i===0)return;var x=PX(sg.s),near=i===sel||i===sel+1;
+    el('line',{x1:x,x2:x,y1:top+6,y2:TRK-8,stroke:css('--ink'),'stroke-width':1,opacity:near?.45:.18,'stroke-dasharray':'3 4'},svg);
+    var kw=cp?22:16,kh=cp?36:26;
+    el('rect',{x:x-kw/2,y:TRK-kh/2,width:kw,height:kh,rx:kw/2,fill:css('--card'),stroke:near?css('--ink'):css('--faint'),'stroke-width':near?2:1.5},svg);
+    el('line',{x1:x-2.5,x2:x-2.5,y1:TRK-kh/5,y2:TRK+kh/5,stroke:css('--faint'),'stroke-width':1.5},svg);el('line',{x1:x+2.5,x2:x+2.5,y1:TRK-kh/5,y2:TRK+kh/5,stroke:css('--faint'),'stroke-width':1.5},svg);
+    var prevGap=x-PX(segs[i-1].s),nextGap=PX(segEnd(day,i))-x;
+    if(near||(prevGap>(cp?90:60)&&nextGap>(cp?90:60)))txt(svg,x,TRK+kh/2+small+2,hhmm(sg.s),'middle','font-size:'+small+'px;fill:'+css(near?'--ink':'--muted')+';font-weight:'+(near?700:500));
+    var hh=el('rect',{x:x-22,y:top,width:44,height:TRK+kh/2-top,fill:'transparent',style:'cursor:ew-resize'},svg);dragH(hh,i)});
   var s=segs[sel];$('#selTime').textContent=t('dayLong')[day]+' '+hhmm(s.s)+'–'+hhmm(segEnd(day,sel));$('#selTemp').textContent=s.temp==null?'—':fmt(s.temp,1)+' °C';
   $$('#kinds button').forEach(function(b){b.classList.toggle('on',b.dataset.v===kindOf(s))});
   updateNowBlock();
@@ -633,7 +716,7 @@ function dragV(hit,i){hit.addEventListener('pointerdown',function(ev){sel=i;var 
     var sg=prog[day][i];if(v<TMIN+.5){sg.temp=null}else sg.temp=Math.max(TMIN+1,Math.min(TMAX,v));renderProgLight();showTip('<b>'+hhmm(sg.s)+'–'+hhmm(segEnd(day,i))+'</b> · '+(sg.temp==null?t('kind.o'):fmt(sg.temp,1)+' °C'),p.x,p.y,p.r)},
   function(){$('#tipProg').style.opacity=0;saveProg()});renderProgLight()})}
 function dragH(h,i){h.addEventListener('pointerdown',function(ev){ev.stopPropagation();var svg=$('#chProg');
-  drag(ev,function(e){var p=svgPt(svg,e),m=Math.round(((p.x-PL)/(PW-PL-PR)*1440)/15)*15,lo=prog[day][i-1].s+15,hi=segEnd(day,i)-15;m=Math.max(lo,Math.min(hi,m));prog[day][i].s=m;renderProgLight();showTip('<b>'+hhmm(m)+'</b>',PX(m),PT+20,p.r)},
+  drag(ev,function(e){var p=svgPt(svg,e),m=Math.round(((p.x-PL)/(PW-PL-PR)*1440)/15)*15,lo=prog[day][i-1].s+15,hi=segEnd(day,i)-15;m=Math.max(lo,Math.min(hi,m));prog[day][i].s=m;renderProgLight();showTip('<b>'+hhmm(m)+'</b>',PX(m),TRK-24,p.r)},
   function(){$('#tipProg').style.opacity=0;saveProg()})})}
 var rpl=0;function renderProgLight(){if(rpl)return;rpl=requestAnimationFrame(function(){rpl=0;renderProg()})}
 $('#segAdd').addEventListener('click',function(){var segs=prog[day],s=segs[sel],a=s.s,b=segEnd(day,sel);if(b-a<30){toast(t('minSeg'));return}
@@ -689,6 +772,7 @@ $('#rg').addEventListener('input',function(){$('#rgV').textContent=fmt(Number(th
 
 /* ================= seznamy ================= */
 function renderLists(){
+  renderTiles('home');renderCfg('home');renderCfg('stats');
   $('#elog').innerHTML=t('log').map(function(r){var b=t('logBadge')[r[3]]||'';return '<div class="li"><span class="num muted" style="width:44px">'+r[0]+'</span><div class="t"><b>'+r[1]+'</b><small>'+r[2]+'</small></div>'+(b?'<span class="badge '+r[3]+'">'+b+'</span>':'')+'</div>'}).join('');
   $('#src').innerHTML=t('src').map(function(r){return '<div class="li"><div class="t"><b>'+r[0]+'</b><small>'+r[1]+'</small></div><span class="badge '+r[2]+'">'+r[3]+'</span></div>'}).join('');
   $('#alerts').innerHTML=t('alerts').map(function(r){return '<div class="li"><div class="t"><b>'+r[1]+'</b><small>'+r[0]+' · '+r[2]+'</small></div><span class="dot" style="background:var(--'+(r[3]==='ok'?'ok':'warn')+')"></span></div>'}).join('');
