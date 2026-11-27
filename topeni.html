@@ -10,6 +10,7 @@
 <title>Topení · Zlín</title>
 <style>
 :root{
+  --c-gas:#C98A00;--c-dd:#0E8F9E;--c-gpdd:#B8336A;--c-rate:#7A5A3A;
   --bg:#F5F2ED;--card:#FFFFFF;--card2:#FAF8F4;--ink:#1D1B18;--muted:#6E685F;--faint:#A39C91;--line:#E6E0D6;
   --heat:#E2570B;--heat-soft:#FCE9DC;--cold:#2D6CD2;--cold-soft:#E3ECFA;--room:#119A63;--room-soft:#DDF3E9;
   --set:#9A3A06;--warn:#C27C00;--warn-soft:#FBF0D9;--bad:#C62F2F;--bad-soft:#FBE3E3;--ok:#119A63;
@@ -21,6 +22,7 @@
   --heat:#FF7A33;--heat-soft:#3A2416;--cold:#6EA0FF;--cold-soft:#1B2740;--room:#3BC98C;--room-soft:#14301F;
   --set:#FFB27F;--warn:#F0B53A;--warn-soft:#352A12;--bad:#FF6B6B;--bad-soft:#3A1A1A;--ok:#3BC98C;
   --eco:#9AA6F0;--eco-soft:#23264A;--off:#9C968D;--off-soft:#2C2924;--shadow:none;
+  --c-gas:#F0B53A;--c-dd:#38C5D4;--c-gpdd:#F27BA8;--c-rate:#C9A27E;
 }}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--ink)}
@@ -135,6 +137,17 @@ th:last-child,td:last-child{padding-right:16px}
 thead th{position:sticky;top:0;background:var(--card);color:var(--muted);font-size:12px;font-weight:650;border-bottom:1px solid var(--line);z-index:1}
 tbody tr:nth-child(even){background:var(--card2)}
 tfoot td{font-weight:700;border-top:1px solid var(--line);background:var(--card);position:sticky;bottom:0}
+#chartsHome{grid-template-columns:minmax(0,1fr)}
+.chead{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.chead b{flex:1;font-size:14.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chead select{min-height:34px;padding:3px 8px;font-size:13px;max-width:52%}
+.chead .x{appearance:none;border:1px solid var(--line);background:var(--card2);color:var(--muted);width:34px;height:34px;border-radius:10px;font-size:18px;cursor:pointer;flex:none}
+.schips{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 0}
+.schip{appearance:none;font:inherit;font-size:12.5px;font-weight:600;padding:5px 10px 5px 8px;border-radius:999px;border:1px dashed var(--line);background:transparent;color:var(--faint);display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.schip i{width:10px;height:10px;border-radius:3px;opacity:.35}
+.schip.on{border-style:solid;background:var(--card2);color:var(--ink);border-color:var(--line)}
+.schip.on i{opacity:1}
+.tip .sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
 .cfg{padding:10px 0;border-top:1px solid var(--line)}
 .cfg:first-child{border-top:0}
 .cfg .r1{display:flex;align-items:center;gap:10px}
@@ -225,16 +238,9 @@ nav.tabs svg{width:24px;height:24px}
     <button class="btn" data-go="programy"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span data-t="act.tune">Laď program</span></button>
   </div>
 
-  <h3 data-t="last24">Posledních 24 hodin</h3>
-  <div class="card">
-    <div class="legend">
-      <span><i style="background:var(--cold)"></i><span data-t="out">Venku</span></span>
-      <span><i style="background:var(--room)"></i><span data-t="room">Místnost</span></span>
-      <span><i style="background:var(--heat)"></i><span data-t="supply">Přívod</span></span>
-      <span><i style="background:repeating-linear-gradient(90deg,var(--set) 0 4px,transparent 4px 7px)"></i><span data-t="setp">Nastaveno</span></span>
-    </div>
-    <div class="chartbox"><svg class="chart" id="ch24" viewBox="0 0 640 240" role="img"></svg><div class="tip" id="tip24"></div></div>
-  </div>
+  <h3 data-t="charts">Grafy</h3>
+  <div class="grid" id="chartsHome"></div>
+  <button class="btn sm" id="addChart" style="margin-top:10px;width:100%" data-t="addChart">+ Přidat graf</button>
 
   <button class="card go" data-go="system" style="margin-top:12px;padding:14px 16px">
     <div class="row"><span class="dot" style="background:var(--warn)"></span><b data-t="sys.short">1 upozornění · venkovní teplota ze zálohy</b></div>
@@ -260,11 +266,8 @@ nav.tabs svg{width:24px;height:24px}
 
   <div class="grid g4" id="tilesStats" style="margin-top:12px"></div>
 
-  <h3 data-t="gasUse">Spotřeba plynu</h3>
-  <div class="card">
-    <div class="legend"><span><i class="sq" style="background:var(--heat)"></i><span data-t="gasM3">Plyn (m³)</span></span><span><i style="background:var(--cold)"></i><span data-t="outAvg">Průměr venku</span></span></div>
-    <div class="chartbox"><svg class="chart" id="chGas" viewBox="0 0 640 240" role="img"></svg><div class="tip" id="tipGas"></div></div>
-  </div>
+  <h3 data-t="chartStats">Graf za vybrané období</h3>
+  <div id="chartsStats"></div>
 
   <h3 data-t="summary">Souhrn</h3>
   <div class="card" style="padding-bottom:16px">
@@ -414,6 +417,8 @@ cs:{app:'Topení',title:'Topení · Zlín',demo:'Ukázka · bez dat','tab.prehle
  'c.perStart':'průměrně {m} min na start','c.rate':'Plyn na hodinu hoření','c.rate.sub':'nižší = úspornější','c.outavg':'Průměr venku','c.roomavg':'Průměr doma','c.delta':'{d} % proti předchozímu období',
  'per.today':'dnes','per.yesterday':'včera','per.week':'tento týden','per.lastweek':'minulý týden','per.d7':'posledních 7 dní','per.month':'tento měsíc','per.lastmonth':'minulý měsíc','per.d30':'posledních 30 dní','per.season':'sezóna','per.sel':'podle výběru nahoře','per.now':'aktuální hodnota',
  'cfg.title':'Přizpůsobit','cfg.home':'Dlaždice na Přehledu','cfg.stats':'Dlaždice ve Statistikách','cfg.reset':'Obnovit výchozí','cfg.note':'Volba se ukládá v tomto prohlížeči.','cfg.resetDone':'Dlaždice vráceny na výchozí','price.lbl':'Cena plynu',
+ 's.dd':'Denostupně','s.gpdd':'m³ na denostupeň',charts:'Grafy',addChart:'+ Přidat graf',chartStats:'Graf za vybrané období','chart.empty':'Vyberte údaje pod grafem','chart.nodata':'Za toto období nejsou data',
+ 'chart.rm':'Odebrat graf','chart.new':'Nový graf','chart.none':'Žádný graf. Přidejte ho tlačítkem níže.','chart.added':'Graf přidán – vyberte údaje pod ním','per.d1':'posledních 24 h',
  dayShort:['Po','Út','St','Čt','Pá','So','Ne'],dayLong:['Pondělí','Úterý','Středa','Čtvrtek','Pátek','Sobota','Neděle'],months:['led','úno','bře','dub','kvě','čvn','čvc','srp','zář','říj','lis','pro'],wk:'t. {n}'},
 es:{app:'Calefacción',title:'Calefacción · Zlín',demo:'Demo · sin datos','tab.prehled':'Inicio','tab.statistiky':'Estadísticas','tab.programy':'Horarios','tab.ekviterm':'Curva','tab.system':'Sistema',
  'hello.m':'Buenos días','hello.d':'Buenas tardes','hello.e':'Buenas noches','room.where':'Salón · Shelly H&T',ago4:'hace 4 min','room.sub':'Humedad 47 % · objetivo 21,0 °C',
@@ -442,6 +447,8 @@ es:{app:'Calefacción',title:'Calefacción · Zlín',demo:'Demo · sin datos','t
  'c.perStart':'de media {m} min por arranque','c.rate':'Gas por hora de quemador','c.rate.sub':'menos = más eficiente','c.outavg':'Media exterior','c.roomavg':'Media interior','c.delta':'{d} % vs. periodo anterior',
  'per.today':'hoy','per.yesterday':'ayer','per.week':'esta semana','per.lastweek':'semana pasada','per.d7':'últimos 7 días','per.month':'este mes','per.lastmonth':'mes pasado','per.d30':'últimos 30 días','per.season':'temporada','per.sel':'según la selección','per.now':'valor actual',
  'cfg.title':'Personalizar','cfg.home':'Tarjetas de Inicio','cfg.stats':'Tarjetas de Estadísticas','cfg.reset':'Restablecer','cfg.note':'Se guarda en este navegador.','cfg.resetDone':'Tarjetas restablecidas','price.lbl':'Precio del gas',
+ 's.dd':'Grados-día','s.gpdd':'m³ por grado-día',charts:'Gráficos',addChart:'+ Añadir gráfico',chartStats:'Gráfico del periodo elegido','chart.empty':'Elige datos debajo del gráfico','chart.nodata':'No hay datos para este periodo',
+ 'chart.rm':'Quitar gráfico','chart.new':'Gráfico nuevo','chart.none':'Ningún gráfico. Añade uno con el botón de abajo.','chart.added':'Gráfico añadido – elige los datos debajo','per.d1':'últimas 24 h',
  dayShort:['Lu','Ma','Mi','Ju','Vi','Sá','Do'],dayLong:['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'],months:['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'],wk:'sem. {n}'}
 };
 var params=new URLSearchParams(location.search);
@@ -509,7 +516,7 @@ var HOURS=[];
     var comfort=h>=5&&h<22,f=comfort?1.15:.45;
     var burn=Math.max(0,Math.min(60,.9*(19.5-out)*f+(rnd()-.5)*4));if(out>15)burn=0;
     var gas=burn/60*(.40+.012*Math.max(0,8-out));
-    HOURS.push({t:t0,out:out,burn:burn,gas:gas,on:day>36?60:(comfort?60:0),starts:burn>0?Math.max(1,Math.round(burn/18+rnd()*.8)):0,room:20.4+(comfort?.8:-.6)+(rnd()-.5)*.3});}
+    HOURS.push({t:t0,out:out,burn:burn,gas:gas,on:day>36?60:(comfort?60:0),starts:burn>0?Math.max(1,Math.round(burn/18+rnd()*.8)):0,room:20.4+(comfort?.8:-.6)+(rnd()-.5)*.3,set:comfort?Math.round(Math.min(55,curveAt(out)+shift)):null,sup:comfort?Math.min(55,curveAt(out)+shift-4+burn/60*9+(rnd()-.5)*2):24+burn/10+rnd()*2});}
 })();
 var now=new Date();
 var S24=[];(function(){var from=now.getTime()-24*3600e3,sup=34,burn=false;
@@ -535,7 +542,8 @@ function lineChart(svg,tip,o){
   function leave(){cross.setAttribute('opacity',0);tip.style.opacity=0}
   hit.addEventListener('mousemove',move);hit.addEventListener('touchmove',move,{passive:true});hit.addEventListener('touchstart',move,{passive:true});hit.addEventListener('mouseleave',leave);hit.addEventListener('touchend',function(){setTimeout(leave,1500)});
 }
-function draw24(){lineChart($('#ch24'),$('#tip24'),{data:S24,series:[{k:'out',c:'--cold'},{k:'room',c:'--room'},{k:'sup',c:'--heat'},{k:'set',c:'--set',dash:'5 4',w:1.8}],
+function draw24(){renderCharts('home')}
+function draw24old(){lineChart($('#ch24'),$('#tip24'),{data:S24,series:[{k:'out',c:'--cold'},{k:'room',c:'--room'},{k:'sup',c:'--heat'},{k:'set',c:'--set',dash:'5 4',w:1.8}],
   tip:function(r){var d=new Date(r.t);return '<b>'+d.getHours()+':'+pad(d.getMinutes())+'</b><br>'+t('out')+' '+fmt(r.out)+' °C · '+t('room')+' '+fmt(r.room)+' °C<br>'+t('supply')+' '+fmt(r.sup)+' °C'+(r.set?' · '+t('setp')+' '+r.set+' °C':' · '+t('kind.e'))}})}
 
 /* ================= statistiky ================= */
@@ -562,24 +570,10 @@ function aggregate(){var f=new Date($('#dFrom').value+'T00:00:00'),to=new Date($
     var b=map[k];b.gas+=r.gas;b.burn+=r.burn;b.outSum+=r.out;b.n++;b.on+=r.on});
   return {rows:order.map(function(k){var b=map[k];b.out=b.outSum/b.n;return b}),days:Math.round((to-f)/864e5)}}
 function drawStats(){
-  var A=aggregate(),rows=A.rows;var svg=$('#chGas'),tip=$('#tipGas');clear(svg);
+  var A=aggregate(),rows=A.rows;
   var tot=rows.reduce(function(a,r){return a+r.gas},0),burn=rows.reduce(function(a,r){return a+r.burn},0)/60,hrs=rows.reduce(function(a,r){return a+r.n},0);
-  var dd=rows.reduce(function(a,r){return a+Math.max(0,20-r.out)*r.n/24},0);
-  renderTiles('stats');
-  if(!rows.length){txt(svg,320,120,'—','middle');$('#tbl').innerHTML='';drawRun([]);return}
-  var W=640,H=240,L=38,R=10,T=12,B=26,n=rows.length,max=Math.max.apply(null,rows.map(function(r){return r.gas}))*1.15||1;
-  var bw=(W-L-R)/n,Y=function(v){return T+(1-v/max)*(H-T-B)};
-  var omin=Math.min.apply(null,rows.map(function(r){return r.out}))-2,omax=Math.max.apply(null,rows.map(function(r){return r.out}))+2,YO=function(v){return T+(omax-v)/(omax-omin)*(H-T-B)};
-  for(var i=0;i<=4;i++){var v=max/4*i;el('line',{x1:L,x2:W-R,y1:Y(v),y2:Y(v),stroke:css('--line')},svg);txt(svg,L-6,Y(v)+4,v<1?fmt(v,2):v<10?fmt(v,1):Math.round(v),'end')}
-  var every=Math.ceil(n/(compact()?5:10)),line='';
-  rows.forEach(function(r,i){var x=L+i*bw+bw*.15,w=Math.max(1,bw*.7),y=Y(r.gas);
-    el('rect',{x:x,y:y,width:w,height:Math.max(0,H-B-y),rx:Math.min(5,w/3),fill:css('--heat')},svg);
-    if(i%every===0)txt(svg,x+w/2,H-8,bucketLabel(r.k),'middle');line+=(i?'L':'M')+(x+w/2).toFixed(1)+' '+YO(r.out).toFixed(1)});
-  el('path',{d:line,fill:'none',stroke:css('--cold'),'stroke-width':n>100?1.4:2,'stroke-linejoin':'round'},svg);
-  var hit=el('rect',{x:L,y:T,width:W-L-R,height:H-T-B,fill:'transparent'},svg);
-  function mv(ev){var rr=svg.getBoundingClientRect(),cx=(ev.touches?ev.touches[0].clientX:ev.clientX)-rr.left,i=Math.floor((cx/rr.width*W-L)/bw);if(i<0||i>=n)return;var r=rows[i];
-    tip.innerHTML='<b>'+bucketLabel(r.k,true)+'</b><br>'+fmt(r.gas,2)+' m³ · '+fmt(r.burn/60,1)+' h · '+t('out').toLowerCase()+' '+fmt(r.out)+' °C';tip.style.left=Math.max(80,Math.min(rr.width-80,(L+i*bw+bw/2)/W*rr.width))+'px';tip.style.top=(Y(r.gas)/H*rr.height)+'px';tip.style.opacity=1}
-  hit.addEventListener('mousemove',mv);hit.addEventListener('touchstart',mv,{passive:true});hit.addEventListener('touchmove',mv,{passive:true});hit.addEventListener('mouseleave',function(){tip.style.opacity=0});hit.addEventListener('touchend',function(){setTimeout(function(){tip.style.opacity=0},1500)});
+  renderTiles('stats');renderCharts('stats');
+  if(!rows.length){$('#tbl').innerHTML='';drawRun();return}
   // tabulka
   var head='<thead><tr><th>'+t('col.p.'+gran)+'</th><th>'+t('col.gas')+'</th><th>'+t('col.burn')+'</th><th>'+t('col.out')+'</th><th>'+t('col.rate')+'</th></tr></thead>';
   var body=rows.slice().reverse().map(function(r){return '<tr><td>'+bucketLabel(r.k,true)+'</td><td>'+fmt(r.gas,gran==='h'?2:1)+'</td><td>'+fmt(r.burn/60,1)+'</td><td>'+fmt(r.out)+'</td><td>'+(r.burn>0?fmt(r.gas/(r.burn/60),2):'—')+'</td></tr>'}).join('');
@@ -601,19 +595,88 @@ function drawRun(){
 }
 
 
+
+/* ================= nastavitelné grafy ================= */
+var SER={out:{l:'out',u:'°C',c:'--cold',k:'t'},room:{l:'room',u:'°C',c:'--room',k:'t'},sup:{l:'supply',u:'°C',c:'--heat',k:'t'},set:{l:'setp',u:'°C',c:'--set',k:'t',dash:'5 4'},
+  gas:{l:'c.gas',u:'m³',c:'--c-gas',k:'b',d:2},burn:{l:'c.burn',u:'h',c:'--eco',k:'b',d:1},starts:{l:'c.starts',u:'×',c:'--off',k:'b',d:0},dd:{l:'s.dd',u:'°D',c:'--c-dd',k:'b',d:1},
+  gpdd:{l:'s.gpdd',u:'m³/°D',c:'--c-gpdd',k:'r',d:3},rate:{l:'c.rate',u:'m³/h',c:'--c-rate',k:'r',d:2}};
+var SER_ORDER=['out','room','sup','set','gas','burn','starts','dd','gpdd','rate'];
+function sv(b,k){switch(k){case 'out':return b.out;case 'room':return b.room;case 'sup':return b.sup;case 'set':return b.set;case 'gas':return b.gas;case 'burn':return b.burn/60;
+  case 'starts':return b.starts;case 'dd':return b.dd;case 'gpdd':return b.dd>.05?b.gas/b.dd:null;case 'rate':return b.burn>0?b.gas/(b.burn/60):null}return null}
+function gKey(d,g){if(g==='h')return ymd(d)+' '+pad(d.getHours());if(g==='d')return ymd(d);if(g==='w'){var m=new Date(d.getFullYear(),d.getMonth(),d.getDate()-((d.getDay()+6)%7));return ymd(m)}return d.getFullYear()+'-'+pad(d.getMonth()+1)}
+function gLabel(k,g,long){var keep=gran;gran=g;var r=bucketLabel(k,long);gran=keep;return r}
+function bucketize(r,g){var map={},order=[];HOURS.forEach(function(h){if(h.t<r[0].getTime()||h.t>r[1].getTime())return;var k=gKey(new Date(h.t),g),b=map[k];
+    if(!b){b=map[k]={k:k,gas:0,burn:0,starts:0,dd:0,outS:0,roomS:0,supS:0,setS:0,setN:0,n:0};order.push(k)}
+    b.gas+=h.gas;b.burn+=h.burn;b.starts+=h.starts;b.dd+=Math.max(0,20-h.out)/24;b.outS+=h.out;b.roomS+=h.room;b.supS+=h.sup;if(h.set!=null){b.setS+=h.set;b.setN++}b.n++});
+  return order.map(function(k){var b=map[k];b.out=b.outS/b.n;b.room=b.roomS/b.n;b.sup=b.supS/b.n;b.set=b.setN?b.setS/b.setN:null;return b})}
+function autoGran(r){var days=(r[1]-r[0])/864e5;return days<=2.1?'h':days<=62?'d':'w'}
+function multiChart(svg,tip,rows,keys,g){
+  clear(svg);var cp=compact(),W=640,H=cp?380:250,T=14,B=cp?40:28,n=rows.length;svg.setAttribute('viewBox','0 0 640 '+H);
+  if(!keys.length||!n){txt(svg,W/2,H/2,t(keys.length?'chart.nodata':'chart.empty'),'middle');return}
+  var temps=keys.filter(function(k){return SER[k].k==='t'}),others=keys.filter(function(k){return SER[k].k!=='t'}),bars=others.filter(function(k){return SER[k].k==='b'});
+  var rightAxis=temps.length&&others.length===1,L=cp?50:40,R=rightAxis?(cp?62:44):10,plotW=W-L-R,bw=plotW/n;
+  var X=function(i){return L+i*bw+bw/2};
+  var scale={};others.forEach(function(k){var mx=0;rows.forEach(function(b){var v=sv(b,k);if(v!=null&&v>mx)mx=v});scale[k]=(mx||1)*1.12});
+  var lo=0,hi=1;if(temps.length){lo=Infinity;hi=-Infinity;temps.forEach(function(k){rows.forEach(function(b){var v=sv(b,k);if(v!=null){lo=Math.min(lo,v);hi=Math.max(hi,v)}})});lo=Math.floor(lo/5)*5;hi=Math.ceil(hi/5)*5;if(hi-lo<10)hi=lo+10}
+  var YT=function(v){return T+(hi-v)/(hi-lo)*(H-T-B)},YO=function(k,v){return T+(1-v/scale[k])*(H-T-B)};
+  var axisK=temps.length?null:others[0];
+  for(var q=0;q<=4;q++){var y=T+q/4*(H-T-B);el('line',{x1:L,x2:W-R,y1:y,y2:y,stroke:css('--line')},svg);
+    var lv=temps.length?hi-(hi-lo)*q/4:scale[axisK]*(1-q/4);txt(svg,L-6,y+4,temps.length?Math.round(lv)+'°':(lv<1?fmt(lv,2):lv<10?fmt(lv,1):Math.round(lv)),'end');
+    if(rightAxis){var rk=others[0],rv=scale[rk]*(1-q/4);txt(svg,W-R+6,y+4,rv<1?fmt(rv,2):rv<10?fmt(rv,1):String(Math.round(rv)),'start','fill:'+css(SER[rk].c))}}
+  if(!temps.length&&others.length===1)txt(svg,L,T-3,SER[axisK].u,'start','font-weight:600');
+  var every=Math.max(1,Math.ceil(n/(cp?5:9)));rows.forEach(function(b,i){if(i%every===0)txt(svg,X(i),H-(cp?10:8),gLabel(b.k,g),'middle')});
+  var gw=bw*.72,bwi=bars.length?gw/bars.length:0;
+  bars.forEach(function(k,j){rows.forEach(function(b,i){var v=sv(b,k);if(v==null||v<=0)return;var y=YO(k,v),x=X(i)-gw/2+j*bwi;
+    el('rect',{x:x,y:y,width:Math.max(.8,bwi-(bars.length>1?1:0)),height:H-B-y,rx:Math.min(4,bwi/3),fill:css(SER[k].c),opacity:.9},svg)})});
+  function line(k,Yf,dash,w){var d='',pen=false;rows.forEach(function(b,i){var v=sv(b,k);if(v==null){pen=false;return}d+=(pen?'L':'M')+X(i).toFixed(1)+' '+Yf(v).toFixed(1);pen=true});
+    el('path',{d:d,fill:'none',stroke:css(SER[k].c),'stroke-width':w||2.2,'stroke-linejoin':'round','stroke-linecap':'round','stroke-dasharray':dash||''},svg);
+    if(n<=40&&!dash)rows.forEach(function(b,i){var v=sv(b,k);if(v!=null)el('circle',{cx:X(i),cy:Yf(v),r:cp?4:2.8,fill:css(SER[k].c)},svg)})}
+  others.filter(function(k){return SER[k].k==='r'}).forEach(function(k){line(k,function(v){return YO(k,v)},'',2.4)});
+  temps.forEach(function(k){line(k,YT,SER[k].dash,k==='set'?1.8:2.4)});
+  var cross=el('line',{y1:T,y2:H-B,stroke:css('--faint'),opacity:0},svg),hit=el('rect',{x:L,y:T,width:plotW,height:H-T-B,fill:'transparent'},svg);
+  function mv(ev){var rr=svg.getBoundingClientRect(),cx=(ev.touches?ev.touches[0].clientX:ev.clientX)-rr.left,i=Math.floor((cx/rr.width*W-L)/bw);if(i<0||i>=n)return;var b=rows[i];
+    cross.setAttribute('x1',X(i));cross.setAttribute('x2',X(i));cross.setAttribute('opacity',1);
+    tip.innerHTML='<b>'+gLabel(b.k,g,true)+'</b>'+keys.map(function(k){var v=sv(b,k),S=SER[k];return '<br><span class="sw" style="background:var('+S.c+')"></span>'+t(S.l)+': '+(v==null?'—':fmt(v,S.d!=null?S.d:1)+' '+S.u)}).join('');
+    tip.style.left=Math.max(90,Math.min(rr.width-90,X(i)/W*rr.width))+'px';tip.style.top='14px';tip.style.opacity=1}
+  function hideTip(){cross.setAttribute('opacity',0);tip.style.opacity=0}
+  hit.addEventListener('mousemove',mv);hit.addEventListener('touchstart',mv,{passive:true});hit.addEventListener('touchmove',mv,{passive:true});hit.addEventListener('mouseleave',hideTip);hit.addEventListener('touchend',function(){setTimeout(hideTip,1800)});
+}
+var CH0={home:[{p:'d1',s:['out','room','sup','set']},{p:'d30',s:['gas','dd','gpdd']}],stats:[{p:'sel',s:['gas','out']}]};
+function chGet(a){var c=store.get('charts-'+a,null);return (c&&c.length?c:JSON.parse(JSON.stringify(CH0[a]))).map(function(x){x.s=x.s.filter(function(k){return SER[k]});return x})}
+function chSet(a,c){store.set('charts-'+a,c);renderCharts(a)}
+function renderCharts(a){var box=$(a==='home'?'#chartsHome':'#chartsStats');if(!box)return;var cfg=chGet(a);box.innerHTML='';
+  cfg.forEach(function(c,ix){var card=document.createElement('div');card.className='card';
+    var title=c.s.length?c.s.slice(0,3).map(function(k){return t(SER[k].l)}).join(' · ')+(c.s.length>3?' …':''):t('chart.new');
+    var head='<div class="chead"><b>'+title+'</b>';
+    if(a==='home'){head+='<select>'+['d1'].concat(PERIODS).map(function(p){return '<option value="'+p+'"'+(p===c.p?' selected':'')+'>'+plabel(p)+'</option>'}).join('')+'</select>';
+      head+='<button class="x" aria-label="'+t('chart.rm')+'" title="'+t('chart.rm')+'">×</button>'}
+    head+='</div>';
+    card.innerHTML=head+'<div class="chartbox"><svg class="chart" role="img"></svg><div class="tip"></div></div><div class="schips">'+
+      SER_ORDER.map(function(k){var S=SER[k];return '<button class="schip'+(c.s.indexOf(k)>=0?' on':'')+'" data-k="'+k+'"><i style="background:var('+S.c+')"></i>'+t(S.l)+'</button>'}).join('')+'</div>';
+    box.appendChild(card);
+    var r=c.p==='sel'?periodRange('sel'):periodRange(c.p),g=a==='stats'?gran:autoGran(r);
+    multiChart($('svg',card),$('.tip',card),bucketize(r,g),c.s,g);
+    $$('.schip',card).forEach(function(b){b.addEventListener('click',function(){var cf=chGet(a),k=b.dataset.k,arr=cf[ix].s,at=arr.indexOf(k);if(at>=0)arr.splice(at,1);else arr.push(k);arr.sort(function(x,y){return SER_ORDER.indexOf(x)-SER_ORDER.indexOf(y)});chSet(a,cf)})});
+    var se=$('select',card);if(se)se.addEventListener('change',function(){var cf=chGet(a);cf[ix].p=this.value;chSet(a,cf)});
+    var x=$('.x',card);if(x)x.addEventListener('click',function(){var cf=chGet(a);cf.splice(ix,1);chSet(a,cf)});
+  });
+  if(a==='home'&&!cfg.length)box.innerHTML='<p class="note">'+t('chart.none')+'</p>';
+}
+$('#addChart').addEventListener('click',function(){var cf=chGet('home');cf.push({p:'d7',s:['gas','dd']});chSet('home',cf);toast(t('chart.added'))});
+
 /* ================= dlaždice ================= */
 var PERIODS=['today','yesterday','week','lastweek','d7','month','lastmonth','d30','season'];
 function periodRange(p){var n=new Date(),d0=new Date(n.getFullYear(),n.getMonth(),n.getDate()),wd=(n.getDay()+6)%7,f,to=n;
   switch(p){case 'today':f=d0;break;case 'yesterday':f=new Date(d0.getTime()-864e5);to=new Date(d0.getTime()-1);break;
   case 'week':f=new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()-wd);break;
   case 'lastweek':f=new Date(d0.getFullYear(),d0.getMonth(),d0.getDate()-wd-7);to=new Date(f.getTime()+7*864e5-1);break;
-  case 'd7':f=new Date(n.getTime()-7*864e5);break;case 'd30':f=new Date(n.getTime()-30*864e5);break;
+  case 'd1':f=new Date(n.getTime()-864e5);break;case 'd7':f=new Date(n.getTime()-7*864e5);break;case 'd30':f=new Date(n.getTime()-30*864e5);break;
   case 'month':f=new Date(n.getFullYear(),n.getMonth(),1);break;
   case 'lastmonth':f=new Date(n.getFullYear(),n.getMonth()-1,1);to=new Date(new Date(n.getFullYear(),n.getMonth(),1).getTime()-1);break;
   case 'season':f=SEASON0;break;
   default:f=new Date($('#dFrom').value+'T00:00:00');to=new Date($('#dTo').value+'T23:59:59')}
   return [f,to]}
-function shiftBack(r,p){var d=p==='today'||p==='yesterday'?864e5:p==='week'||p==='lastweek'||p==='d7'?7*864e5:p==='month'||p==='lastmonth'||p==='d30'?30*864e5:(r[1]-r[0]+1);return [new Date(r[0]-d),new Date(r[1]-d)]}
+function shiftBack(r,p){var d=p==='d1'||p==='today'||p==='yesterday'?864e5:p==='week'||p==='lastweek'||p==='d7'?7*864e5:p==='month'||p==='lastmonth'||p==='d30'?30*864e5:(r[1]-r[0]+1);return [new Date(r[0]-d),new Date(r[1]-d)]}
 function sumRange(r){var s={gas:0,burn:0,starts:0,outSum:0,roomSum:0,n:0,omin:99,omax:-99,dd:0};
   HOURS.forEach(function(h){if(h.t<r[0].getTime()||h.t>r[1].getTime())return;s.gas+=h.gas;s.burn+=h.burn;s.starts+=h.starts;s.outSum+=h.out;s.roomSum+=h.room;s.n++;
     if(h.out<s.omin)s.omin=h.out;if(h.out>s.omax)s.omax=h.out;s.dd+=Math.max(0,20-h.out)/24});return s}
