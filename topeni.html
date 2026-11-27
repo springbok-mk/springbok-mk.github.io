@@ -299,6 +299,7 @@ nav.tabs svg{width:24px;height:24px}
       </div>
     </div>
     <div class="chartbox" style="margin-top:6px"><svg class="chart" id="chProg" viewBox="0 0 640 300" role="img" style="touch-action:none"></svg><div class="tip" id="tipProg"></div></div>
+    <label class="switch" style="margin-top:8px"><span><span data-t="prog.room">Zobrazit naměřenou teplotu doma</span><br><small class="muted" data-t="prog.room.sub">aktuálně a zpětně posledních 24 hodin (Shelly)</small></span><input type="checkbox" id="progRoom"></label>
     <p class="note" style="margin:6px 0 0" data-t="prog.help">Čáru mezi úseky táhněte do stran pro změnu času, úsek táhněte nahoru a dolů pro změnu teploty. Klepnutím úsek vyberete, + ho rozdělí, − smaže.</p>
     <div class="selinfo">
       <div><div class="muted small" data-t="prog.sel">Vybraný úsek</div><div class="num" style="font-size:18px;font-weight:700" id="selTime">—</div></div>
@@ -392,9 +393,9 @@ nav.tabs svg{width:24px;height:24px}
 var I18N={
 cs:{app:'Topení',title:'Topení · Zlín',demo:'Ukázka · bez dat','tab.prehled':'Přehled','tab.statistiky':'Statistiky','tab.programy':'Programy','tab.ekviterm':'Ekviterm','tab.system':'Systém',
  'hello.m':'Dobré ráno','hello.d':'Dobrý den','hello.e':'Dobrý večer','room.where':'Obývák · Shelly H&T',ago4:'před 4 min','room.sub':'Vlhkost 47 % · cíl 21,0 °C',
- 'chip.burner':'Hořák hoří · 34 %','chip.ekv':'Ekviterm ZAP',out:'Venku','out.sub':'MET Norway · záloha',supply:'Přívod','supply.sub':'nastaveno 42 °C',gasToday:'Plyn dnes','gasToday.sub':'včera 2,6 m³',
+ 'chip.burner':'Hořák hoří · 34 %','chip.ekv':'Ekviterm ZAP',out:'Venku','out.sub':'MET Norway · záloha',supply:'Voda – skutečnost','supply.sub':'nastavení 42 °C',gasToday:'Plyn dnes','gasToday.sub':'včera 2,6 m³',
  burnToday:'Hořák dnes','burnToday.sub':'14 startů',quick:'Rychlé akce','act.on':'Zapni','act.eco':'Útlum','act.tune':'Laď program','act.on.toast':'Komfort až do dalšího úseku programu','act.eco.toast':'Útlum až do dalšího úseku programu',
- last24:'Posledních 24 hodin',room:'Místnost',setp:'Nastaveno','sys.short':'1 upozornění · venkovní teplota ze zálohy','demo.note':'Ukázka: všechna čísla jsou vymyšlená a tlačítka nic nemění.',
+ last24:'Posledních 24 hodin',room:'Místnost',setp:'Voda – nastavení','sys.short':'1 upozornění · venkovní teplota ze zálohy','demo.note':'Ukázka: všechna čísla jsou vymyšlená a tlačítka nic nemění.',
  'p.14':'14 dní + dnes','p.month':'Tento měsíc','p.season':'Celá sezóna','g.h':'Hodiny','g.d':'Dny','g.w':'Týdny','g.m':'Měsíce',
  'k.gas':'Plyn celkem','k.cost':'Náklady','k.price':'Kč/m³','k.dd':'Na denostupeň','k.dd.sub':'spotřeba bez vlivu počasí','k.burn':'Hořák hořel',days:'{n} dní',rate:'{r} m³ za hodinu hoření',
  gasUse:'Spotřeba plynu','gasM3':'Plyn (m³)',outAvg:'Průměr venku',summary:'Souhrn','col.p.h':'Hodina','col.p.d':'Den','col.p.w':'Týden','col.p.m':'Měsíc','col.gas':'Plyn m³','col.burn':'Hoření h','col.out':'Venku Ø °C','col.rate':'m³/h hoření',total:'Celkem',
@@ -419,12 +420,13 @@ cs:{app:'Topení',title:'Topení · Zlín',demo:'Ukázka · bez dat','tab.prehle
  'cfg.title':'Přizpůsobit','cfg.home':'Dlaždice na Přehledu','cfg.stats':'Dlaždice ve Statistikách','cfg.reset':'Obnovit výchozí','cfg.note':'Volba se ukládá v tomto prohlížeči.','cfg.resetDone':'Dlaždice vráceny na výchozí','price.lbl':'Cena plynu',
  's.dd':'Denostupně','s.gpdd':'m³ na denostupeň',charts:'Grafy',addChart:'+ Přidat graf',chartStats:'Graf za vybrané období','chart.empty':'Vyberte údaje pod grafem','chart.nodata':'Za toto období nejsou data',
  'chart.rm':'Odebrat graf','chart.new':'Nový graf','chart.none':'Žádný graf. Přidejte ho tlačítkem níže.','chart.added':'Graf přidán – vyberte údaje pod ním','per.d1':'posledních 24 h',
+ 'prog.room':'Zobrazit naměřenou teplotu doma','prog.room.sub':'aktuálně a zpětně posledních 24 hodin (Shelly)','prog.room.today':'Naměřená teplota je vidět u dnešního dne',
  dayShort:['Po','Út','St','Čt','Pá','So','Ne'],dayLong:['Pondělí','Úterý','Středa','Čtvrtek','Pátek','Sobota','Neděle'],months:['led','úno','bře','dub','kvě','čvn','čvc','srp','zář','říj','lis','pro'],wk:'t. {n}'},
 es:{app:'Calefacción',title:'Calefacción · Zlín',demo:'Demo · sin datos','tab.prehled':'Inicio','tab.statistiky':'Estadísticas','tab.programy':'Horarios','tab.ekviterm':'Curva','tab.system':'Sistema',
  'hello.m':'Buenos días','hello.d':'Buenas tardes','hello.e':'Buenas noches','room.where':'Salón · Shelly H&T',ago4:'hace 4 min','room.sub':'Humedad 47 % · objetivo 21,0 °C',
- 'chip.burner':'Quemador encendido · 34 %','chip.ekv':'Curva ACTIVA',out:'Exterior','out.sub':'MET Norway · respaldo',supply:'Impulsión','supply.sub':'consigna 42 °C',gasToday:'Gas hoy','gasToday.sub':'ayer 2,6 m³',
+ 'chip.burner':'Quemador encendido · 34 %','chip.ekv':'Curva ACTIVA',out:'Exterior','out.sub':'MET Norway · respaldo',supply:'Agua – real','supply.sub':'consigna 42 °C',gasToday:'Gas hoy','gasToday.sub':'ayer 2,6 m³',
  burnToday:'Quemador hoy','burnToday.sub':'14 arranques',quick:'Acciones rápidas','act.on':'Encender','act.eco':'Reducido','act.tune':'Ajustar horario','act.on.toast':'Confort hasta el siguiente tramo','act.eco.toast':'Reducido hasta el siguiente tramo',
- last24:'Últimas 24 horas',room:'Interior',setp:'Consigna','sys.short':'1 aviso · temperatura exterior de respaldo','demo.note':'Demo: todos los números son inventados y los botones no cambian nada.',
+ last24:'Últimas 24 horas',room:'Interior',setp:'Agua – consigna','sys.short':'1 aviso · temperatura exterior de respaldo','demo.note':'Demo: todos los números son inventados y los botones no cambian nada.',
  'p.14':'14 días + hoy','p.month':'Este mes','p.season':'Toda la temporada','g.h':'Horas','g.d':'Días','g.w':'Semanas','g.m':'Meses',
  'k.gas':'Gas total','k.cost':'Coste','k.price':'CZK/m³','k.dd':'Por grado-día','k.dd.sub':'consumo sin efecto del tiempo','k.burn':'Quemador',days:'{n} días',rate:'{r} m³ por hora de quemador',
  gasUse:'Consumo de gas','gasM3':'Gas (m³)',outAvg:'Media exterior',summary:'Resumen','col.p.h':'Hora','col.p.d':'Día','col.p.w':'Semana','col.p.m':'Mes','col.gas':'Gas m³','col.burn':'Quemador h','col.out':'Ext. Ø °C','col.rate':'m³/h quem.',total:'Total',
@@ -449,6 +451,7 @@ es:{app:'Calefacción',title:'Calefacción · Zlín',demo:'Demo · sin datos','t
  'cfg.title':'Personalizar','cfg.home':'Tarjetas de Inicio','cfg.stats':'Tarjetas de Estadísticas','cfg.reset':'Restablecer','cfg.note':'Se guarda en este navegador.','cfg.resetDone':'Tarjetas restablecidas','price.lbl':'Precio del gas',
  's.dd':'Grados-día','s.gpdd':'m³ por grado-día',charts:'Gráficos',addChart:'+ Añadir gráfico',chartStats:'Gráfico del periodo elegido','chart.empty':'Elige datos debajo del gráfico','chart.nodata':'No hay datos para este periodo',
  'chart.rm':'Quitar gráfico','chart.new':'Gráfico nuevo','chart.none':'Ningún gráfico. Añade uno con el botón de abajo.','chart.added':'Gráfico añadido – elige los datos debajo','per.d1':'últimas 24 h',
+ 'prog.room':'Mostrar la temperatura medida en casa','prog.room.sub':'ahora y las últimas 24 horas (Shelly)','prog.room.today':'La temperatura medida se ve en el día de hoy',
  dayShort:['Lu','Ma','Mi','Ju','Vi','Sá','Do'],dayLong:['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'],months:['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'],wk:'sem. {n}'}
 };
 var params=new URLSearchParams(location.search);
@@ -766,6 +769,18 @@ function renderProg(){
     var hh=el('rect',{x:x-22,y:top,width:44,height:cb-top,fill:'transparent',style:'cursor:ew-resize'},svg);dragH(hh,i)});
   var s=segs[sel];$('#selTime').textContent=t('dayLong')[day]+' '+hhmm(s.s)+'–'+hhmm(segEnd(day,sel));$('#selTemp').textContent=s.temp==null?'—':fmt(s.temp,1)+' °C';
   $$('#kinds button').forEach(function(b){b.classList.toggle('on',b.dataset.v===kindOf(s))});
+  if($('#progRoom').checked){var todayIdx=(new Date().getDay()+6)%7;
+    if(day!==todayIdx){txt(svg,(PL+PW-PR)/2,top+(cp?44:30),t('prog.room.today'),'middle','font-size:'+small+'px;fill:'+css('--room')+';font-weight:650')}
+    else{var mid0=new Date();mid0.setHours(0,0,0,0);var dToday='',dYest='',last=null;
+      S24.forEach(function(r){var d=new Date(r.t),m=d.getHours()*60+d.getMinutes(),pt=PX(m).toFixed(1)+' '+PY(Math.max(TMIN,Math.min(TMAX,r.room))).toFixed(1);
+        if(r.t>=mid0.getTime()){dToday+=(dToday?'L':'M')+pt;last=r}else{dYest+=(dYest?'L':'M')+pt}});
+      if(dYest)el('path',{d:dYest,fill:'none',stroke:css('--room'),'stroke-width':2,'stroke-dasharray':'3 4',opacity:.75,'stroke-linejoin':'round','pointer-events':'none'},svg);
+      if(dToday)el('path',{d:dToday,fill:'none',stroke:css('--room'),'stroke-width':cp?4:3,'stroke-linejoin':'round','stroke-linecap':'round','pointer-events':'none'},svg);
+      var nowT=new Date(),nm2=nowT.getHours()*60+nowT.getMinutes(),cur=21.4,cx2=PX(nm2),cy2=PY(cur);
+      el('circle',{cx:cx2,cy:cy2,r:cp?8:6,fill:css('--room'),stroke:css('--card'),'stroke-width':3,'pointer-events':'none'},svg);
+      var lbl=fmt(cur,1)+' °C',lw=lbl.length*small*.62+(cp?20:14),lh=small+(cp?12:8),lx=cx2+(cx2>PW-150?-(lw+14):14);
+      el('rect',{x:lx,y:cy2-lh/2,width:lw,height:lh,rx:lh/2,fill:css('--room'),'pointer-events':'none'},svg);
+      txt(svg,lx+lw/2,cy2+small*.36,lbl,'middle','font-size:'+small+'px;fill:'+css('--card')+';font-weight:700')}}
   updateNowBlock();
 }
 function svgPt(svg,ev){var r=svg.getBoundingClientRect();return {x:(ev.clientX-r.left)/r.width*PW,y:(ev.clientY-r.top)/r.height*PH,r:r}}
@@ -778,6 +793,7 @@ function dragH(h,i){h.addEventListener('pointerdown',function(ev){ev.stopPropaga
   drag(ev,function(e){var p=svgPt(svg,e),m=Math.round(((p.x-PL)/(PW-PL-PR)*1440)/15)*15,lo=prog[day][i-1].s+15,hi=segEnd(day,i)-15;m=Math.max(lo,Math.min(hi,m));prog[day][i].s=m;renderProgLight();showTip('<b>'+hhmm(m)+'</b>',PX(m),TRK-30,p.r)},
   function(){$('#tipProg').style.opacity=0;saveProg()})})}
 var rpl=0;function renderProgLight(){if(rpl)return;rpl=requestAnimationFrame(function(){rpl=0;renderProg()})}
+$('#progRoom').checked=store.get('progRoom',false);$('#progRoom').addEventListener('change',function(){store.set('progRoom',this.checked);renderProg()});
 $('#segAdd').addEventListener('click',function(){var segs=prog[day],s=segs[sel],a=s.s,b=segEnd(day,sel);if(b-a<30){toast(t('minSeg'));return}
   var mid=Math.round((a+(b-a)/2)/15)*15,k=kindOf(s);segs.splice(sel+1,0,{s:mid,temp:k==='k'?18:21});sel=sel+1;saveProg()});
 $('#segDel').addEventListener('click',function(){var segs=prog[day];if(segs.length<2){toast(t('lastSeg'));return}if(sel===0){segs.splice(1,1)}else{segs.splice(sel,1);sel--}saveProg()});
