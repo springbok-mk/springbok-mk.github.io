@@ -84,7 +84,8 @@ a.card:active,button.card:active{transform:scale(.985)}
 .btn.primary{background:var(--heat);border-color:var(--heat);color:#fff}
 .btn.sm{min-height:36px;padding:7px 11px;font-size:13.5px;border-radius:10px}
 .btn.round{width:44px;height:44px;padding:0;border-radius:50%;font-size:24px;font-weight:500;line-height:1}
-.actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:440px){.actions{grid-template-columns:repeat(2,minmax(0,1fr))}.actions .btn{flex-direction:row;gap:8px;padding:12px 8px}}
 .actions .btn{flex-direction:column;gap:4px;padding:12px 6px;font-size:13px}
 .actions .btn svg{color:var(--heat)}
 .seg{display:flex;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
@@ -241,6 +242,7 @@ nav.tabs svg{width:24px;height:24px}
     <button class="btn" data-demo="act.on.toast"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v10M6.3 6.3a8 8 0 1 0 11.4 0"/></svg><span data-t="act.on">Zapni</span></button>
     <button class="btn" data-demo="act.eco.toast"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg><span data-t="act.eco">Útlum</span></button>
     <button class="btn" data-go="programy"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span data-t="act.tune">Laď program</span></button>
+    <button class="btn" data-go="ekviterm" data-man="1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3 4 6 7.2 6 10.5a6 6 0 0 1-12 0C6 10.2 9 7 12 3z"/><path d="M12 17v-5M10 14l2 2 2-2"/></svg><span data-t="act.man">Voda ručně</span></button>
   </div>
 
   <h3 data-t="charts">Grafy</h3>
@@ -412,7 +414,7 @@ var I18N={
 cs:{app:'Topení',title:'Topení · Zlín',demo:'Ukázka · bez dat','tab.prehled':'Přehled','tab.statistiky':'Statistiky','tab.programy':'Programy','tab.ekviterm':'Ekviterm','tab.system':'Systém',
  'hello.m':'Dobré ráno','hello.d':'Dobrý den','hello.e':'Dobrý večer','room.where':'Obývák · Shelly H&T',ago4:'před 4 min','room.sub':'Vlhkost 47 % · cíl 21,0 °C',
  'chip.burner':'Hořák hoří · 34 %','chip.ekv':'Ekviterm ZAP',out:'Venku','out.sub':'MET Norway · záloha',supply:'Voda – skutečnost','supply.sub':'nastavení 42 °C',gasToday:'Plyn dnes','gasToday.sub':'včera 2,6 m³',
- burnToday:'Hořák dnes','burnToday.sub':'14 startů',quick:'Rychlé akce','act.on':'Zapni','act.eco':'Útlum','act.tune':'Laď program','act.on.toast':'Komfort až do dalšího úseku programu','act.eco.toast':'Útlum až do dalšího úseku programu',
+ burnToday:'Hořák dnes','burnToday.sub':'14 startů',quick:'Rychlé akce','act.on':'Zapni','act.eco':'Útlum','act.tune':'Laď program','act.man':'Voda ručně','act.on.toast':'Komfort až do dalšího úseku programu','act.eco.toast':'Útlum až do dalšího úseku programu',
  last24:'Posledních 24 hodin',room:'Místnost',setp:'Voda – nastavení','sys.short':'1 upozornění · venkovní teplota ze zálohy','demo.note':'Ukázka: všechna čísla jsou vymyšlená a tlačítka nic nemění.',
  'p.14':'14 dní + dnes','p.month':'Tento měsíc','p.season':'Celá sezóna','g.h':'Hodiny','g.d':'Dny','g.w':'Týdny','g.m':'Měsíce',
  'k.gas':'Plyn celkem','k.cost':'Náklady','k.price':'Kč/m³','k.dd':'Na denostupeň','k.dd.sub':'spotřeba bez vlivu počasí','k.burn':'Hořák hořel',days:'{n} dní',rate:'{r} m³ za hodinu hoření',
@@ -446,7 +448,7 @@ cs:{app:'Topení',title:'Topení · Zlín',demo:'Ukázka · bez dat','tab.prehle
 es:{app:'Calefacción',title:'Calefacción · Zlín',demo:'Demo · sin datos','tab.prehled':'Inicio','tab.statistiky':'Estadísticas','tab.programy':'Horarios','tab.ekviterm':'Curva','tab.system':'Sistema',
  'hello.m':'Buenos días','hello.d':'Buenas tardes','hello.e':'Buenas noches','room.where':'Salón · Shelly H&T',ago4:'hace 4 min','room.sub':'Humedad 47 % · objetivo 21,0 °C',
  'chip.burner':'Quemador encendido · 34 %','chip.ekv':'Curva ACTIVA',out:'Exterior','out.sub':'MET Norway · respaldo',supply:'Agua – real','supply.sub':'consigna 42 °C',gasToday:'Gas hoy','gasToday.sub':'ayer 2,6 m³',
- burnToday:'Quemador hoy','burnToday.sub':'14 arranques',quick:'Acciones rápidas','act.on':'Encender','act.eco':'Reducido','act.tune':'Ajustar horario','act.on.toast':'Confort hasta el siguiente tramo','act.eco.toast':'Reducido hasta el siguiente tramo',
+ burnToday:'Quemador hoy','burnToday.sub':'14 arranques',quick:'Acciones rápidas','act.on':'Encender','act.eco':'Reducido','act.tune':'Ajustar horario','act.man':'Agua manual','act.on.toast':'Confort hasta el siguiente tramo','act.eco.toast':'Reducido hasta el siguiente tramo',
  last24:'Últimas 24 horas',room:'Interior',setp:'Agua – consigna','sys.short':'1 aviso · temperatura exterior de respaldo','demo.note':'Demo: todos los números son inventados y los botones no cambian nada.',
  'p.14':'14 días + hoy','p.month':'Este mes','p.season':'Toda la temporada','g.h':'Horas','g.d':'Días','g.w':'Semanas','g.m':'Meses',
  'k.gas':'Gas total','k.cost':'Coste','k.price':'CZK/m³','k.dd':'Por grado-día','k.dd.sub':'consumo sin efecto del tiempo','k.burn':'Quemador',days:'{n} días',rate:'{r} m³ por hora de quemador',
@@ -524,7 +526,7 @@ function go(tab,opts){
 $$('nav.tabs button').forEach(function(b){b.addEventListener('click',function(){go(b.dataset.tab)})});
 document.addEventListener('click',function(ev){
   var g=ev.target.closest('[data-go]');
-  if(g){ev.stopPropagation();if(g.dataset.range==='today'){setRange(0);gran='h';syncGran()}go(g.dataset.go);return}
+  if(g){ev.stopPropagation();if(g.dataset.range==='today'){setRange(0);gran='h';syncGran()}if(g.dataset.man){setMode('MAN')}go(g.dataset.go);if(g.dataset.man){var mb=$('#manualBox');setTimeout(function(){window.scrollTo({top:mb.getBoundingClientRect().top+scrollY-80,behavior:'smooth'})},60)}return}
   var d=ev.target.closest('[data-demo]');if(d)toast(t(d.dataset.demo)+' – '+t('onlyDemo'));
 });
 window.addEventListener('scroll',function(){$('#top').classList.toggle('scrolled',scrollY>4)},{passive:true});
