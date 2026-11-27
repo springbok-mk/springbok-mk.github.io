@@ -93,6 +93,7 @@ a.card:active,button.card:active{transform:scale(.985)}
 .seg button.on{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
 .seg.mode button.on[data-v="ZAP"],.seg.kinds button.on[data-v="k"]{background:var(--heat);color:#fff}
 .seg.mode button.on[data-v="TEST"]{background:var(--warn);color:#fff}
+.seg.mode button.on[data-v="MAN"]{background:var(--cold);color:#fff}
 .seg.mode button.on[data-v="VYP"],.seg.kinds button.on[data-v="o"]{background:var(--off);color:#fff}
 .seg.kinds button.on[data-v="e"]{background:var(--eco);color:#fff}
 .legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12.5px;color:var(--muted);margin:2px 0 8px}
@@ -148,6 +149,10 @@ tfoot td{font-weight:700;border-top:1px solid var(--line);background:var(--card)
 .schip.on{border-style:solid;background:var(--card2);color:var(--ink);border-color:var(--line)}
 .schip.on i{opacity:1}
 .tip .sw{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.manual{display:flex;align-items:center;justify-content:center;gap:14px;margin:6px 0 4px}
+.manual b{font-size:44px;font-weight:750;letter-spacing:-.03em;min-width:130px;text-align:center;color:var(--cold)}
+.seg.dur{flex-wrap:wrap}
+.seg.dur button{flex:1 1 30%;font-size:13px;padding:8px 4px}
 .cfg{padding:10px 0;border-top:1px solid var(--line)}
 .cfg:first-child{border-top:0}
 .cfg .r1{display:flex;align-items:center;gap:10px}
@@ -330,11 +335,24 @@ nav.tabs svg{width:24px;height:24px}
 <section class="view" id="v-ekviterm">
   <h2 data-t="tab.ekviterm">Ekviterm</h2>
   <div class="card">
-    <div class="seg mode" id="mode"><button data-v="ZAP" data-t="m.on">ZAP</button><button data-v="TEST" data-t="m.test">Zkušební</button><button data-v="VYP" data-t="m.off">VYP</button></div>
+    <div class="seg mode" id="mode"><button data-v="ZAP" data-t="m.on">ZAP</button><button data-v="TEST" data-t="m.test">Zkušební</button><button data-v="MAN" data-t="m.man">Ručně</button><button data-v="VYP" data-t="m.off">VYP</button></div>
     <div class="row between" style="margin-top:14px;align-items:flex-end">
       <div><div class="muted small" data-t="e.now">Teď venku (průměr −3 h…+2 h)</div><div class="num" style="font-size:22px;font-weight:700">−1,2 °C</div></div>
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2" stroke-linecap="round" style="flex:none"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       <div style="text-align:right"><div class="muted small" data-t="e.gets">Kotel dostane</div><div class="num" style="font-size:30px;font-weight:750;color:var(--heat)" id="eSet">42 °C</div></div>
+    </div>
+  </div>
+
+  <div id="manualBox" style="display:none">
+    <h3 data-t="man.title">Ruční teplota vody</h3>
+    <div class="card">
+      <div class="manual"><button class="btn round" id="manDown" aria-label="−1 °C">−</button><b class="num" id="manV">45 °C</b><button class="btn round" id="manUp" aria-label="+1 °C">+</button></div>
+      <input type="range" id="manR" min="25" max="55" step="1" value="45" aria-label="°C">
+      <div class="row between small muted"><span>25 °C</span><span class="lock"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>max 55 °C</span></div>
+      <div class="muted small" style="margin:14px 2px 6px" data-t="man.for">Na jak dlouho</div>
+      <div class="seg dur" id="manDur"><button data-v="1" data-t="dur.1">1 h</button><button data-v="2" data-t="dur.2">2 h</button><button data-v="4" data-t="dur.4">4 h</button><button data-v="next" data-t="dur.next">Do dalšího úseku</button><button data-v="perm" data-t="dur.perm">Trvale</button></div>
+      <button class="btn primary" id="manSet" style="width:100%;margin-top:14px" data-t="man.set">Nastavit</button>
+      <p class="note" style="margin:8px 0 0" data-t="man.sub">Ekviterm i program se po tuto dobu pozastaví, pak se regulace vrátí sama. Ruční změna ve ViCare funguje dál.</p>
     </div>
   </div>
 
@@ -421,6 +439,9 @@ cs:{app:'Topení',title:'Topení · Zlín',demo:'Ukázka · bez dat','tab.prehle
  's.dd':'Denostupně','s.gpdd':'m³ na denostupeň',charts:'Grafy',addChart:'+ Přidat graf',chartStats:'Graf za vybrané období','chart.empty':'Vyberte údaje pod grafem','chart.nodata':'Za toto období nejsou data',
  'chart.rm':'Odebrat graf','chart.new':'Nový graf','chart.none':'Žádný graf. Přidejte ho tlačítkem níže.','chart.added':'Graf přidán – vyberte údaje pod ním','per.d1':'posledních 24 h',
  'prog.room':'Zobrazit naměřenou teplotu doma','prog.room.sub':'aktuálně a zpětně posledních 24 hodin (Shelly)','prog.room.today':'Naměřená teplota je vidět u dnešního dne',
+ 'm.man':'Ručně','man.title':'Ruční teplota vody','man.for':'Na jak dlouho','dur.1':'1 h','dur.2':'2 h','dur.4':'4 h','dur.next':'Do dalšího úseku','dur.perm':'Trvale','man.set':'Nastavit',
+ 'man.sub':'Ekviterm i program se po tuto dobu pozastaví, pak se regulace vrátí sama. Ruční změna ve ViCare funguje dál.','man.done':'Voda {v} °C na {d} – jen ukázka',
+ 'chip.ekv.ZAP':'Ekviterm ZAP','chip.ekv.TEST':'Ekviterm zkušební','chip.ekv.VYP':'Ekviterm VYP','chip.ekv.MAN':'Voda ručně {v} °C',
  dayShort:['Po','Út','St','Čt','Pá','So','Ne'],dayLong:['Pondělí','Úterý','Středa','Čtvrtek','Pátek','Sobota','Neděle'],months:['led','úno','bře','dub','kvě','čvn','čvc','srp','zář','říj','lis','pro'],wk:'t. {n}'},
 es:{app:'Calefacción',title:'Calefacción · Zlín',demo:'Demo · sin datos','tab.prehled':'Inicio','tab.statistiky':'Estadísticas','tab.programy':'Horarios','tab.ekviterm':'Curva','tab.system':'Sistema',
  'hello.m':'Buenos días','hello.d':'Buenas tardes','hello.e':'Buenas noches','room.where':'Salón · Shelly H&T',ago4:'hace 4 min','room.sub':'Humedad 47 % · objetivo 21,0 °C',
@@ -452,6 +473,9 @@ es:{app:'Calefacción',title:'Calefacción · Zlín',demo:'Demo · sin datos','t
  's.dd':'Grados-día','s.gpdd':'m³ por grado-día',charts:'Gráficos',addChart:'+ Añadir gráfico',chartStats:'Gráfico del periodo elegido','chart.empty':'Elige datos debajo del gráfico','chart.nodata':'No hay datos para este periodo',
  'chart.rm':'Quitar gráfico','chart.new':'Gráfico nuevo','chart.none':'Ningún gráfico. Añade uno con el botón de abajo.','chart.added':'Gráfico añadido – elige los datos debajo','per.d1':'últimas 24 h',
  'prog.room':'Mostrar la temperatura medida en casa','prog.room.sub':'ahora y las últimas 24 horas (Shelly)','prog.room.today':'La temperatura medida se ve en el día de hoy',
+ 'm.man':'Manual','man.title':'Temperatura del agua manual','man.for':'Durante','dur.1':'1 h','dur.2':'2 h','dur.4':'4 h','dur.next':'Hasta el siguiente tramo','dur.perm':'Siempre','man.set':'Aplicar',
+ 'man.sub':'La curva y el horario se pausan durante ese tiempo; después la regulación vuelve sola. Un cambio manual en ViCare sigue funcionando.','man.done':'Agua a {v} °C durante {d} – solo demo',
+ 'chip.ekv.ZAP':'Curva ACTIVA','chip.ekv.TEST':'Curva en prueba','chip.ekv.VYP':'Curva APAGADA','chip.ekv.MAN':'Agua manual {v} °C',
  dayShort:['Lu','Ma','Mi','Ju','Vi','Sá','Do'],dayLong:['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'],months:['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'],wk:'sem. {n}'}
 };
 var params=new URLSearchParams(location.search);
@@ -808,11 +832,19 @@ function updateNowBlock(){var n=new Date(),m=n.getHours()*60+n.getMinutes(),d=(n
   var k=kindOf(segs[i]);var nb=$('#nowBlock');nb.className='chip '+(k==='k'?'heat':k==='e'?'eco':'');nb.textContent=t('kind.'+k)+(segs[i].temp!=null?' '+fmt(segs[i].temp,1)+' °C':'')+' → '+hhmm(segEnd(d,i))}
 
 /* ================= ekviterm ================= */
-var OUT_NOW=-1.2,mode=store.get('mode','ZAP');if(['ZAP','TEST','VYP'].indexOf(mode)<0)mode='ZAP';
-function setMode(m){mode=m;store.set('mode',m);$$('#mode button').forEach(function(b){b.classList.toggle('on',b.dataset.v===m)});updateSet()}
+var OUT_NOW=-1.2,mode=store.get('mode','ZAP');if(['ZAP','TEST','MAN','VYP'].indexOf(mode)<0)mode='ZAP';
+var man=store.get('man',{v:45,d:'2'});
+function setMode(m){mode=m;store.set('mode',m);$$('#mode button').forEach(function(b){b.classList.toggle('on',b.dataset.v===m)});$('#manualBox').style.display=m==='MAN'?'':'none';updateSet();updateChip()}
+function updateChip(){var c=$('[data-t="chip.ekv"]');if(!c)return;c.textContent=t('chip.ekv.'+mode,{v:man.v});c.className='chip '+(mode==='ZAP'?'ok':mode==='MAN'?'eco':'');}
+function manRender(){$('#manV').textContent=man.v+' °C';$('#manR').value=man.v;$$('#manDur button').forEach(function(b){b.classList.toggle('on',b.dataset.v===man.d)});updateSet();updateChip()}
+function manSet(v){man.v=Math.max(25,Math.min(55,v));store.set('man',man);manRender()}
+$('#manDown').addEventListener('click',function(){manSet(man.v-1)});$('#manUp').addEventListener('click',function(){manSet(man.v+1)});
+$('#manR').addEventListener('input',function(){manSet(Number(this.value))});
+$$('#manDur button').forEach(function(b){b.addEventListener('click',function(){man.d=b.dataset.v;store.set('man',man);manRender()})});
+$('#manSet').addEventListener('click',function(){var d=man.d,txt2=d==='perm'?t('dur.perm').toLowerCase():d==='next'?t('dur.next').toLowerCase():d+' h';toast(t('man.done',{v:man.v,d:txt2}))});
 $$('#mode button').forEach(function(b){b.addEventListener('click',function(){setMode(b.dataset.v);toast(t('mode')+': '+b.textContent+' – '+t('onlyDemo'))})});
 function target(){var v=curveAt(OUT_NOW)+shift;if($('#roomOn').checked)v+=Math.max(-5,Math.min(5,Number($('#rg').value)*(21-21.4)));return Math.max(25,Math.min(55,v))}
-function updateSet(){var e=$('#eSet');e.textContent=mode==='VYP'?t('e.noreg'):Math.round(target())+' °C';e.style.color=mode==='VYP'?'var(--muted)':mode==='TEST'?'var(--warn)':'var(--heat)'}
+function updateSet(){var e=$('#eSet');e.textContent=mode==='VYP'?t('e.noreg'):mode==='MAN'?man.v+' °C':Math.round(target())+' °C';e.style.color=mode==='VYP'?'var(--muted)':mode==='TEST'?'var(--warn)':mode==='MAN'?'var(--cold)':'var(--heat)'}
 function drawCurve(){
   var svg=$('#chCurve'),tip=$('#tipCurve');clear(svg);var W=640,H=300,L=40,R=14,T=14,B=30,XMIN=-16,XMAX=18,YMIN=20,YMAX=60;
   var X=function(v){return L+(XMAX-v)/(XMAX-XMIN)*(W-L-R)},Y=function(v){return T+(YMAX-v)/(YMAX-YMIN)*(H-T-B)},inv=function(py){return YMAX-(py-T)/(H-T-B)*(YMAX-YMIN)};
@@ -847,6 +879,7 @@ $('#rg').addEventListener('input',function(){$('#rgV').textContent=fmt(Number(th
 
 /* ================= seznamy ================= */
 function renderLists(){
+  if(typeof updateChip==='function'&&$('#manualBox'))try{updateChip()}catch(e){}
   renderTiles('home');renderCfg('home');renderCfg('stats');
   $('#elog').innerHTML=t('log').map(function(r){var b=t('logBadge')[r[3]]||'';return '<div class="li"><span class="num muted" style="width:44px">'+r[0]+'</span><div class="t"><b>'+r[1]+'</b><small>'+r[2]+'</small></div>'+(b?'<span class="badge '+r[3]+'">'+b+'</span>':'')+'</div>'}).join('');
   $('#src').innerHTML=t('src').map(function(r){return '<div class="li"><div class="t"><b>'+r[0]+'</b><small>'+r[1]+'</small></div><span class="badge '+r[2]+'">'+r[3]+'</span></div>'}).join('');
@@ -855,7 +888,7 @@ function renderLists(){
 }
 
 /* ================= start ================= */
-setMode(mode);applyLang();go((location.hash||'#prehled').slice(1));
+manRender();setMode(mode);applyLang();go((location.hash||'#prehled').slice(1));
 var mq=matchMedia('(prefers-color-scheme: dark)');if(mq.addEventListener)mq.addEventListener('change',function(){go(cur)});
 })();
 </script>
