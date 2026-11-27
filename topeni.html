@@ -296,7 +296,7 @@ nav.tabs svg{width:24px;height:24px}
       </div>
     </div>
     <div class="chartbox" style="margin-top:6px"><svg class="chart" id="chProg" viewBox="0 0 640 300" role="img" style="touch-action:none"></svg><div class="tip" id="tipProg"></div></div>
-    <p class="note" style="margin:6px 0 0" data-t="prog.help">Svislé úchyty táhněte do stran pro změnu času, úsek táhněte nahoru a dolů pro změnu teploty. Klepnutím úsek vyberete, + ho rozdělí, − smaže.</p>
+    <p class="note" style="margin:6px 0 0" data-t="prog.help">Čáru mezi úseky táhněte do stran pro změnu času, úsek táhněte nahoru a dolů pro změnu teploty. Klepnutím úsek vyberete, + ho rozdělí, − smaže.</p>
     <div class="selinfo">
       <div><div class="muted small" data-t="prog.sel">Vybraný úsek</div><div class="num" style="font-size:18px;font-weight:700" id="selTime">—</div></div>
       <div class="stepper"><button class="btn round" id="tDown" aria-label="−0,5 °C">−</button><b class="num" id="selTemp">—</b><button class="btn round" id="tUp" aria-label="+0,5 °C">+</button></div>
@@ -396,7 +396,7 @@ cs:{app:'Topení',title:'Topení · Zlín',demo:'Ukázka · bez dat','tab.prehle
  'k.gas':'Plyn celkem','k.cost':'Náklady','k.price':'Kč/m³','k.dd':'Na denostupeň','k.dd.sub':'spotřeba bez vlivu počasí','k.burn':'Hořák hořel',days:'{n} dní',rate:'{r} m³ za hodinu hoření',
  gasUse:'Spotřeba plynu','gasM3':'Plyn (m³)',outAvg:'Průměr venku',summary:'Souhrn','col.p.h':'Hodina','col.p.d':'Den','col.p.w':'Týden','col.p.m':'Měsíc','col.gas':'Plyn m³','col.burn':'Hoření h','col.out':'Venku Ø °C','col.rate':'m³/h hoření',total:'Celkem',
  runtime:'Doba chodu',showOn:'Zobrazit dobu zapnutí topení','showOn.sub':'od 6. 11. je topení zapnuté 24 h denně',burned:'Hořák hořel',heatOn:'Topení zapnuto',
- 'kind.k':'Komfort','kind.e':'Útlum','kind.o':'Vypnuto','prog.help':'Svislé úchyty táhněte do stran pro změnu času, úsek táhněte nahoru a dolů pro změnu teploty. Klepnutím úsek vyberete, + ho rozdělí, − smaže.',
+ 'kind.k':'Komfort','kind.e':'Útlum','kind.o':'Vypnuto','prog.help':'Čáru mezi úseky táhněte do stran pro změnu času, úsek táhněte nahoru a dolů pro změnu teploty. Klepnutím úsek vyberete, + ho rozdělí, − smaže.',
  'prog.sel':'Vybraný úsek','tpl.work':'Pracovní den','tpl.home':'Home office','tpl.wknd':'Víkend',copyAll:'Kopírovat tento den na Po–Pá',copied:'Zkopírováno na pracovní dny',tplDone:'Šablona použita',
  vac:'Dovolená','vac.title':'Režim dovolené','vac.sub':'Celou dobu útlum 16 °C, den před návratem zase podle programu.',from:'Od',to:'Do','vac.on':'Dovolená naplánována – jen ukázka','vac.off':'Dovolená zrušena',
  'prog.note':'Programy řídí naše regulace. Časový program ve ViCare se nastaví na celý den normální, aby se plány nepraly.',minSeg:'Úsek už nejde zmenšit',lastSeg:'Den musí mít aspoň jeden úsek',
@@ -424,7 +424,7 @@ es:{app:'Calefacción',title:'Calefacción · Zlín',demo:'Demo · sin datos','t
  'k.gas':'Gas total','k.cost':'Coste','k.price':'CZK/m³','k.dd':'Por grado-día','k.dd.sub':'consumo sin efecto del tiempo','k.burn':'Quemador',days:'{n} días',rate:'{r} m³ por hora de quemador',
  gasUse:'Consumo de gas','gasM3':'Gas (m³)',outAvg:'Media exterior',summary:'Resumen','col.p.h':'Hora','col.p.d':'Día','col.p.w':'Semana','col.p.m':'Mes','col.gas':'Gas m³','col.burn':'Quemador h','col.out':'Ext. Ø °C','col.rate':'m³/h quem.',total:'Total',
  runtime:'Tiempo de funcionamiento',showOn:'Mostrar tiempo de calefacción encendida','showOn.sub':'desde el 6/11 la calefacción está encendida 24 h',burned:'Quemador',heatOn:'Calefacción encendida',
- 'kind.k':'Confort','kind.e':'Reducido','kind.o':'Apagado','prog.help':'Arrastra las marcas verticales a los lados para cambiar la hora y el tramo arriba o abajo para la temperatura. Toca un tramo para elegirlo; + lo divide, − lo borra.',
+ 'kind.k':'Confort','kind.e':'Reducido','kind.o':'Apagado','prog.help':'Arrastra la línea entre tramos a los lados para cambiar la hora y el tramo arriba o abajo para la temperatura. Toca un tramo para elegirlo; + lo divide, − lo borra.',
  'prog.sel':'Tramo seleccionado','tpl.work':'Día laboral','tpl.home':'Teletrabajo','tpl.wknd':'Fin de semana',copyAll:'Copiar este día a lun–vie',copied:'Copiado a los días laborables',tplDone:'Plantilla aplicada',
  vac:'Vacaciones','vac.title':'Modo vacaciones','vac.sub':'Todo el tiempo reducido a 16 °C; el día antes de volver, según el horario.',from:'Desde',to:'Hasta','vac.on':'Vacaciones programadas – solo demo','vac.off':'Vacaciones canceladas',
  'prog.note':'Los horarios los aplica nuestra regulación. El horario de ViCare se deja en normal todo el día para que no choquen.',minSeg:'El tramo no puede ser más corto',lastSeg:'El día necesita al menos un tramo',
@@ -686,7 +686,7 @@ function renderProg(){
     if(on)el('path',{d:roundTop(x0,y,w,cb-y,10),fill:'none',stroke:col,'stroke-width':2},svg);
     var lab=sg.temp==null?t('kind.o'):fmt(sg.temp,1)+'°',pw=lab.length*fs*.6+(cp?24:16),ph=fs+(cp?14:9),cx=(x0+x1)/2;
     var inside=(cb-y)>=ph+10,cy=inside?(y+cb)/2:y-ph/2-8;
-    if(w>pw+kw+6){el('rect',{x:cx-pw/2,y:cy-ph/2,width:pw,height:ph,rx:ph/2,fill:col,opacity:on?1:.92},svg);
+    if(w>pw+8){el('rect',{x:cx-pw/2,y:cy-ph/2,width:pw,height:ph,rx:ph/2,fill:col,opacity:on?1:.92},svg);
       txt(svg,cx,cy+fs*.36,lab,'middle','font-size:'+fs+'px;fill:'+css('--card')+';font-weight:700')}
     var hit=el('rect',{x:x0,y:top,width:w,height:cb-top,fill:'transparent',style:'cursor:ns-resize'},svg);dragV(hit,i);
   });
@@ -697,8 +697,6 @@ function renderProg(){
   [0,6,12,18,24].forEach(function(hh){txt(svg,PX(hh*60),cb+(cp?32:22),hh+':00',hh===0?'start':hh===24?'end':'middle')});
   segs.forEach(function(sg,i){if(i===0)return;var x=PX(sg.s),near=i===sel||i===sel+1;
     el('line',{x1:x,x2:x,y1:top+8,y2:cb,stroke:css('--ink'),'stroke-width':near?1.6:1.2,opacity:near?.55:.3},svg);
-    el('rect',{x:x-kw/2,y:mid-kh/2,width:kw,height:kh,rx:kw/2,fill:css('--card'),stroke:near?css('--ink'):css('--faint'),'stroke-width':near?2:1.5},svg);
-    el('line',{x1:x-2.5,x2:x-2.5,y1:mid-kh/5,y2:mid+kh/5,stroke:css('--faint'),'stroke-width':1.5},svg);el('line',{x1:x+2.5,x2:x+2.5,y1:mid-kh/5,y2:mid+kh/5,stroke:css('--faint'),'stroke-width':1.5},svg);
     var prevGap=x-PX(segs[i-1].s),nextGap=PX(segEnd(day,i))-x,tw=cp?62:44;
     if(near||(prevGap>tw*1.4&&nextGap>tw*1.4)){el('rect',{x:x-tw/2,y:cb-small-12,width:tw,height:small+8,rx:(small+8)/2,fill:css('--card'),opacity:.9},svg);
       txt(svg,x,cb-8,hhmm(sg.s),'middle','font-size:'+small+'px;fill:'+css(near?'--ink':'--muted')+';font-weight:'+(near?700:550))}
