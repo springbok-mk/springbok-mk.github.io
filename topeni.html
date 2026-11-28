@@ -187,11 +187,22 @@ nav.tabs svg{width:24px;height:24px}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .note{font-size:12.5px;color:var(--muted);margin:8px 4px 0}
 .lock{white-space:nowrap;display:inline-flex;align-items:center;gap:4px;color:var(--bad);font-weight:650;font-size:12px}
+.login{position:fixed;inset:0;z-index:30;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+.login .card{max-width:380px;width:100%;text-align:center;padding:28px 22px}
+.login h1{font-size:26px;margin:12px 0 6px;letter-spacing:-.02em}
+.login .brandi{width:52px;height:52px;border-radius:14px;background:var(--heat);display:inline-grid;place-items:center;color:#fff}
+#gbtn{display:flex;justify-content:center;margin:18px 0 6px;min-height:44px}
 .foot{text-align:center;color:var(--faint);font-size:12px;margin:28px 0 8px}
 .foot a{color:inherit}
 </style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
+<div class="login" id="login"><div class="card">
+  <span class="brandi"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-1.6.7-2.7 1.5-3.5.2 1.5 1 2.3 2 2.5C11 8 11 5.5 12 3z"/><path d="M8 18h8M9 21h6"/></svg></span>
+  <h1 data-t="app">Topení</h1><p class="muted" data-t="login.text">Přihlaste se Google účtem s přístupem k topení.</p>
+  <div id="gbtn"></div><p class="note" id="loginErr" style="margin:8px 0 0"></p>
+</div></div>
 
 <header class="top" id="top">
   <div class="top-in">
@@ -199,7 +210,7 @@ nav.tabs svg{width:24px;height:24px}
       <i><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c1 3 4 4.5 4 8.5a4 4 0 0 1-8 0c0-1.6.7-2.7 1.5-3.5.2 1.5 1 2.3 2 2.5C11 8 11 5.5 12 3z"/><path d="M8 18h8M9 21h6"/></svg></i>
       <div><span data-t="app">Topení</span><small>Zlín · Vitodens 100-W</small></div>
     </div>
-    <span class="pill" data-t="demo">Ukázka · bez dat</span>
+    <span class="pill" id="who" style="background:var(--room-soft);color:var(--room)"></span>
     <div class="lang" role="group" aria-label="Jazyk / Idioma"><button data-lang="cs">CZ</button><button data-lang="es">ES</button></div>
   </div>
 </header>
@@ -223,12 +234,12 @@ nav.tabs svg{width:24px;height:24px}
     <button class="card main go" data-go="programy">
       <div class="row between" style="padding-right:16px">
         <div class="muted small row"><span class="dot" style="background:var(--room)"></span><span data-t="room.where">Obývák · Shelly H&amp;T</span></div>
-        <div class="muted small num" data-t="ago4">před 4 min</div>
+        <div class="muted small num" id="heroAgo"></div>
       </div>
-      <div class="big num" style="margin-top:10px">21,4<span>°C</span></div>
-      <div class="muted num" style="margin-top:6px" data-t="room.sub">Vlhkost 47 % · cíl 21,0 °C</div>
+      <div class="big num" style="margin-top:10px" id="heroT">—<span>°C</span></div>
+      <div class="muted num" style="margin-top:6px" id="heroSub"></div>
       <div class="chips">
-        <span class="chip heat" data-go="statistiky"><svg class="flame" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1.2 3.6 5 5.3 5 10a5 5 0 0 1-10 0c0-2 .9-3.4 1.9-4.4.2 1.9 1.2 2.9 2.4 3.2C10.8 7.6 10.8 4.6 12 2z"/></svg><span data-t="chip.burner">Hořák hoří · 34 %</span></span>
+        <span class="chip heat" data-go="statistiky" id="chipB"><svg class="flame" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2c1.2 3.6 5 5.3 5 10a5 5 0 0 1-10 0c0-2 .9-3.4 1.9-4.4.2 1.9 1.2 2.9 2.4 3.2C10.8 7.6 10.8 4.6 12 2z"/></svg><span id="chipBurner">—</span></span>
         <span class="chip ok" data-go="ekviterm" data-t="chip.ekv">Ekviterm ZAP</span>
         <span class="chip eco" data-go="programy" id="nowBlock">Komfort</span>
       </div>
@@ -238,8 +249,8 @@ nav.tabs svg{width:24px;height:24px}
 
   <h3 data-t="quick">Rychlé akce</h3>
   <div class="actions">
-    <button class="btn" data-demo="act.on.toast"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v10M6.3 6.3a8 8 0 1 0 11.4 0"/></svg><span data-t="act.on">Zapni</span></button>
-    <button class="btn" data-demo="act.eco.toast"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg><span data-t="act.eco">Útlum</span></button>
+    <button class="btn" id="actOn"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2v10M6.3 6.3a8 8 0 1 0 11.4 0"/></svg><span data-t="act.on">Zapni</span></button>
+    <button class="btn" id="actEco"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg><span data-t="act.eco">Útlum</span></button>
     <button class="btn" data-go="programy"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg><span data-t="act.tune">Laď program</span></button>
     <button class="btn" data-go="ekviterm" data-man="1"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3 4 6 7.2 6 10.5a6 6 0 0 1-12 0C6 10.2 9 7 12 3z"/><path d="M12 17v-5M10 14l2 2 2-2"/></svg><span data-t="act.man">Voda ručně</span></button>
   </div>
@@ -249,9 +260,8 @@ nav.tabs svg{width:24px;height:24px}
   <button class="btn sm" id="addChart" style="margin-top:10px;width:100%" data-t="addChart">+ Přidat graf</button>
 
   <button class="card go" data-go="system" style="margin-top:12px;padding:14px 16px">
-    <div class="row"><span class="dot" style="background:var(--warn)"></span><b data-t="sys.short">1 upozornění · venkovní teplota ze zálohy</b></div>
+    <div class="row"><span class="dot" id="sysDot" style="background:var(--ok)"></span><b id="sysShort">—</b></div>
   </button>
-  <p class="note" data-t="demo.note">Ukázka: všechna čísla jsou vymyšlená a tlačítka nic nemění.</p>
 </section>
 
 <!-- ============ STATISTIKY ============ -->
@@ -292,6 +302,7 @@ nav.tabs svg{width:24px;height:24px}
 <section class="view" id="v-programy">
   <h2 data-t="tab.programy">Programy</h2>
   <div class="card">
+    <label class="switch" style="margin-bottom:12px"><span><b data-t="prog.on">Řídit topení podle programu</b><br><small class="muted" data-t="prog.on.sub">Nejdřív nastavte ve ViCare časový program na celý den „normální“.</small></span><input type="checkbox" id="progOn"></label>
     <div class="days" id="days"></div>
     <div class="row between" style="margin-top:12px">
       <div class="legend" style="margin:0">
@@ -305,7 +316,7 @@ nav.tabs svg{width:24px;height:24px}
       </div>
     </div>
     <div class="chartbox" style="margin-top:6px"><svg class="chart" id="chProg" viewBox="0 0 640 300" role="img" style="touch-action:none"></svg><div class="tip" id="tipProg"></div></div>
-    <label class="switch" style="margin-top:8px"><span><span data-t="prog.room">Zobrazit naměřenou teplotu doma</span><br><small class="muted" data-t="prog.room.sub">aktuálně a zpětně posledních 24 hodin (Shelly)</small></span><input type="checkbox" id="progRoom"></label>
+    <label class="switch" style="margin-top:8px"><span><span data-t="prog.room">Zobrazit naměřenou teplotu doma</span><br><small class="muted" data-t="prog.room.sub">aktuálně a zpětně posledních 24 hodin (tablet)</small></span><input type="checkbox" id="progRoom"></label>
     <p class="note" style="margin:6px 0 0" data-t="prog.help">Čáru mezi úseky táhněte do stran pro změnu času, úsek táhněte nahoru a dolů pro změnu teploty. Klepnutím úsek vyberete, + ho rozdělí, − smaže.</p>
     <div class="selinfo">
       <div><div class="muted small" data-t="prog.sel">Vybraný úsek</div><div class="num" style="font-size:18px;font-weight:700" id="selTime">—</div></div>
@@ -342,7 +353,7 @@ nav.tabs svg{width:24px;height:24px}
   <div class="card">
     <div class="seg mode" id="mode"><button data-v="ZAP" data-t="m.on">ZAP</button><button data-v="MAN" data-t="m.man">Ručně</button><button data-v="VYP" data-t="m.off">VYP</button></div>
     <div class="row between" style="margin-top:14px;align-items:flex-end">
-      <div><div class="muted small" data-t="e.now">Teď venku (průměr −3 h…+2 h)</div><div class="num" style="font-size:22px;font-weight:700">−1,2 °C</div></div>
+      <div><div class="muted small" data-t="e.now">Teď venku (průměr −3 h…+2 h)</div><div class="num" style="font-size:22px;font-weight:700" id="eOut">—</div></div>
       <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--faint)" stroke-width="2" stroke-linecap="round" style="flex:none"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
       <div style="text-align:right"><div class="muted small" data-t="e.gets">Kotel dostane</div><div class="num" style="font-size:30px;font-weight:750;color:var(--heat)" id="eSet">42 °C</div></div>
     </div>
@@ -372,13 +383,13 @@ nav.tabs svg{width:24px;height:24px}
     </div>
     <div class="row" style="margin-top:12px;gap:8px;flex-wrap:wrap">
       <button class="btn sm" id="resetCurve" data-t="e.reset">Výchozí křivka</button>
-      <button class="btn sm primary" data-demo="e.saved" data-t="save">Uložit</button>
+      <button class="btn sm primary" id="saveCurve" data-t="save">Uložit</button>
     </div>
   </div>
 
   <h3 data-t="e.room">Korekce podle místnosti</h3>
   <div class="card">
-    <label class="switch"><span><b data-t="e.room.on">Zapnout korekci</b><br><small class="muted" data-t="e.room.sub">Za každý stupeň pod cílem přidá přívod. Jen když Shelly měří.</small></span><input type="checkbox" id="roomOn"></label>
+    <label class="switch"><span><b data-t="e.room.on">Zapnout korekci</b><br><small class="muted" data-t="e.room.sub">Za každý stupeň pod cílem přidá přívod. Jen když tablet posílá teplotu.</small></span><input type="checkbox" id="roomOn"></label>
     <div id="roomBox" style="opacity:.45;pointer-events:none;margin-top:10px">
       <div class="row between"><span data-t="e.gain">Síla korekce</span><span class="num" id="rgV">1,0 °C / °C</span></div>
       <input type="range" id="rg" min="0.5" max="3" step="0.5" value="1">
@@ -401,8 +412,11 @@ nav.tabs svg{width:24px;height:24px}
   <div class="card"><div class="list" id="src"></div></div>
   <h3 data-t="s.alerts">Upozornění</h3>
   <div class="card"><div class="list" id="alerts"></div></div>
+  <h3 data-t="clog">Poslední změny z aplikace</h3>
+  <div class="card"><div class="list" id="clog"></div></div>
   <h3 data-t="s.safe">Pojistky</h3>
   <div class="card"><div class="list" id="safe"></div></div>
+  <div class="card" style="margin-top:12px"><div class="row between"><span class="small" id="meLine"></span><button class="btn sm" id="logoutBtn" data-t="logout">Odhlásit</button></div></div>
   <p class="foot"><span data-t="s.foot">Ukázková verze bez připojení dat</span> · <a href="./">springbok</a></p>
 </section>
 
@@ -415,7 +429,7 @@ nav.tabs svg{width:24px;height:24px}
 /* ================= překlady ================= */
 var I18N={
 cs:{app:'Topení',title:'Topení · Zlín',demo:'Ukázka · bez dat','tab.prehled':'Přehled','tab.statistiky':'Statistiky','tab.programy':'Programy','tab.ekviterm':'Ekviterm','tab.system':'Systém',
- 'hello.m':'Dobré ráno','hello.d':'Dobrý den','hello.e':'Dobrý večer','room.where':'Obývák · Shelly H&T',ago4:'před 4 min','room.sub':'Vlhkost 47 % · cíl 21,0 °C',
+ 'hello.m':'Dobré ráno','hello.d':'Dobrý den','hello.e':'Dobrý večer','room.where':'Doma · tablet klimatizace',ago4:'před 4 min','room.sub':'Vlhkost 47 % · cíl 21,0 °C',
  'chip.burner':'Hořák hoří · 34 %','chip.ekv':'Ekviterm ZAP',out:'Venku','out.sub':'MET Norway · záloha',supply:'Voda – skutečnost','supply.sub':'nastavení 42 °C',gasToday:'Plyn dnes','gasToday.sub':'včera 2,6 m³',
  burnToday:'Hořák dnes','burnToday.sub':'14 startů',quick:'Rychlé akce','act.on':'Zapni','act.eco':'Útlum','act.tune':'Laď program','act.man':'Voda ručně','act.on.toast':'Komfort až do dalšího úseku programu','act.eco.toast':'Útlum až do dalšího úseku programu',
  last24:'Posledních 24 hodin',room:'Místnost',setp:'Voda – nastavení','sys.short':'1 upozornění · venkovní teplota ze zálohy','demo.note':'Ukázka: všechna čísla jsou vymyšlená a tlačítka nic nemění.',
@@ -425,11 +439,11 @@ cs:{app:'Topení',title:'Topení · Zlín',demo:'Ukázka · bez dat','tab.prehle
  runtime:'Doba chodu',showOn:'Zobrazit dobu zapnutí topení','showOn.sub':'od 6. 11. je topení zapnuté 24 h denně',burned:'Hořák hořel',heatOn:'Topení zapnuto',
  'kind.k':'Komfort','kind.e':'Útlum','kind.o':'Vypnuto','prog.help':'Čáru mezi úseky táhněte do stran pro změnu času, úsek táhněte nahoru a dolů pro změnu teploty. Klepnutím úsek vyberete, + ho rozdělí, − smaže.',
  'prog.sel':'Vybraný úsek','tpl.work':'Pracovní den','tpl.home':'Home office','tpl.wknd':'Víkend',copyAll:'Kopírovat tento den na Po–Pá',copied:'Zkopírováno na pracovní dny',tplDone:'Šablona použita',
- vac:'Dovolená','vac.title':'Režim dovolené','vac.sub':'Po celou dobu drží zvolenou teplotu, den před návratem se vrátí běžný program.','vac.by':'Během dovolené držet','vac.air':'Vzduch doma (Shelly)','vac.water':'Vodu v topení','vac.note.air':'Regulace bude upravovat vodu tak, aby Shelly doma ukazovalo tuto teplotu (5–22 °C).','vac.note.water':'Kotel dostane pevně tuto teplotu vody bez ohledu na počasí (25–55 °C, víc než 55 °C nejde).',from:'Od',to:'Do','vac.on':'Dovolená naplánována – jen ukázka','vac.off':'Dovolená zrušena',
+ vac:'Dovolená','vac.title':'Režim dovolené','vac.sub':'Po celou dobu drží zvolenou teplotu, den před návratem se vrátí běžný program.','vac.by':'Během dovolené držet','vac.air':'Vzduch doma (tablet)','vac.water':'Vodu v topení','vac.note.air':'Regulace bude upravovat vodu tak, aby tablet doma ukazoval tuto teplotu (5–22 °C).','vac.note.water':'Kotel dostane pevně tuto teplotu vody bez ohledu na počasí (25–55 °C, víc než 55 °C nejde).',from:'Od',to:'Do','vac.on':'Dovolená naplánována – jen ukázka','vac.off':'Dovolená zrušena',
  'prog.note':'Programy řídí naše regulace. Časový program ve ViCare se nastaví na celý den normální, aby se plány nepraly.',minSeg:'Úsek už nejde zmenšit',lastSeg:'Den musí mít aspoň jeden úsek',
- 'm.on':'ZAP','m.test':'Zkušební','m.off':'VYP','e.now':'Teď venku (průměr −3 h…+2 h)','e.gets':'Kotel dostane','e.noreg':'bez regulace','e.curve':'Topná křivka','e.drag':'Tažením bodů nahoru a dolů křivku upravíte',
+ 'm.on':'ZAP','m.test':'Zkušební','m.off':'VYP','e.now':'Teď venku (průměr −3 h…+2 h)','e.gets':'Kotel má nastaveno','e.noreg':'bez regulace','e.curve':'Topná křivka','e.drag':'Tažením bodů nahoru a dolů křivku upravíte',
  'e.shift':'Posun křivky','e.colder':'chladněji','e.warmer':'tepleji','e.reset':'Výchozí křivka','e.resetDone':'Vráceno na výchozí křivku',save:'Uložit','e.saved':'Křivka uložena','e.room':'Korekce podle místnosti','e.room.on':'Zapnout korekci',
- 'e.room.sub':'Za každý stupeň pod cílem přidá přívod. Jen když Shelly měří.','e.gain':'Síla korekce','e.target':'Cílová teplota se bere z aktuálního úseku programu.','e.log':'Poslední kroky','e.never':'nikdy nad 55 °C','e.nowLbl':'teď',
+ 'e.room.sub':'Za každý stupeň pod cílem přidá přívod. Jen když tablet posílá teplotu.','e.gain':'Síla korekce','e.target':'Cílová teplota se bere z aktuálního úseku programu.','e.log':'Poslední kroky','e.never':'nikdy nad 55 °C','e.nowLbl':'teď',
  'e.out':'Venku','mode':'Režim',onlyDemo:'jen ukázka',
  's.src':'Zdroje dat','s.alerts':'Upozornění','s.safe':'Pojistky','s.foot':'Ukázková verze bez připojení dat',
  log:[['6:05','beze změny','venku −1,2 °C · cíl 42,4 °C',''],['5:50','beze změny','venku z MET Norway (záloha)',''],['4:35','41 → 42 °C','ochlazení na −1,6 °C','ok'],['2:20','chyba, zkusí znovu','Viessmann API 502 – výpadek u nich','warn'],['22:35','komfort → útlum','program: večerní útlum','ok']],
@@ -437,19 +451,24 @@ cs:{app:'Topení',title:'Topení · Zlín',demo:'Ukázka · bez dat','tab.prehle
  src:[['Kotel · Viessmann API','poslední data před 2 min','ok','v pořádku'],['Venku · Open-Meteo','vyčerpaný denní limit (sdílené adresy Googlu)','warn','429'],['Venku · MET Norway','záloha, používá se teď','ok','aktivní'],['Venku · ČHMÚ Zlín','naměřená data, zpoždění ~1 h','ok','v pořádku'],['Místnost · Shelly H&T Gen3','baterie 92 % · Wi-Fi −58 dBm','ok','v pořádku'],['Data · BigQuery','zápis po 15 min','ok','v pořádku']],
  alerts:[['27. 11. 2:20','Viessmann API 502','vyřešeno opakováním za 10 s','ok'],['26. 11. 23:35','Viessmann API 500 · TIMEOUT','vynechán 1 krok, kotel držel 45 °C','warn'],['12. 11. 10:30','Open-Meteo nedostupné 9 h','přepnuto na MET Norway','warn']],
  safe:[['Absolutní maximum přívodu','Vynucuje regulace ve skriptu, web ho nemůže změnit','bad','55 °C'],['Pauza po ruční změně ve ViCare','Regulace nic nemění','ok','4 h'],['Bez venkovní teploty','Kotel drží poslední hodnotu, e-mail po 3 h','ok','aktivní']],
- 'c.room.sub':'vlhkost 47 % · Shelly','c.mod':'Modulace hořáku','c.mod.sub':'hořák hoří · jen čtení z API','c.gas':'Plyn','c.burn':'Hořák hořel','c.starts':'Starty hořáku','c.startsN':'{n} startů',
+ 'c.room.sub':'tablet','c.mod':'Modulace hořáku','c.mod.sub':'hořák hoří · jen čtení z API','c.gas':'Plyn','c.burn':'Hořák hořel','c.starts':'Starty hořáku','c.startsN':'{n} startů',
  'c.perStart':'průměrně {m} min na start','c.rate':'Plyn na hodinu hoření','c.rate.sub':'nižší = úspornější','c.outavg':'Průměr venku','c.roomavg':'Průměr doma','c.delta':'{d} % proti předchozímu období',
  'per.today':'dnes','per.yesterday':'včera','per.week':'tento týden','per.lastweek':'minulý týden','per.d7':'posledních 7 dní','per.month':'tento měsíc','per.lastmonth':'minulý měsíc','per.d30':'posledních 30 dní','per.season':'sezóna','per.sel':'podle výběru nahoře','per.now':'aktuální hodnota',
  'cfg.title':'Přizpůsobit','cfg.home':'Dlaždice na Přehledu','cfg.stats':'Dlaždice ve Statistikách','cfg.reset':'Obnovit výchozí','cfg.note':'Volba se ukládá v tomto prohlížeči.','cfg.resetDone':'Dlaždice vráceny na výchozí','price.lbl':'Cena plynu',
  's.dd':'Denostupně','s.gpdd':'m³ na denostupeň',charts:'Grafy',addChart:'+ Přidat graf',chartStats:'Graf za vybrané období','chart.empty':'Vyberte údaje pod grafem','chart.nodata':'Za toto období nejsou data',
  'chart.rm':'Odebrat graf','chart.new':'Nový graf','chart.none':'Žádný graf. Přidejte ho tlačítkem níže.','chart.added':'Graf přidán – vyberte údaje pod ním','per.d1':'posledních 24 h',
- 'prog.room':'Zobrazit naměřenou teplotu doma','prog.room.sub':'aktuálně a zpětně posledních 24 hodin (Shelly)','prog.room.today':'Naměřená teplota je vidět u dnešního dne',
+ 'prog.room':'Zobrazit naměřenou teplotu doma','prog.room.sub':'aktuálně a zpětně posledních 24 hodin (tablet)','prog.room.today':'Naměřená teplota je vidět u dnešního dne',
  'm.man':'Ručně','man.title':'Ruční teplota vody','man.for':'Na jak dlouho','dur.1':'1 h','dur.2':'2 h','dur.4':'4 h','dur.next':'Do dalšího úseku','dur.perm':'Trvale','man.set':'Nastavit',
  'man.sub':'Ekviterm i program se po tuto dobu pozastaví, pak se regulace vrátí sama. Ruční změna ve ViCare funguje dál.','man.done':'Voda {v} °C na {d} – jen ukázka',
  'chip.ekv.ZAP':'Ekviterm ZAP','chip.ekv.VYP':'Ekviterm VYP','chip.ekv.MAN':'Voda ručně {v} °C',
+ 'login.text':'Přihlaste se Google účtem s přístupem k topení.','login.notready':'Přihlášení se ještě nastavuje.','login.denied':'Tento účet nemá k topení přístup.','login.again':'Přihlaste se prosím znovu.','login.loading':'Načítám…','login.err':'Nepodařilo se načíst data:',
+ saved:'Uloženo – kotel se upraví do 5 minut',saveErr:'Neuloženo:','supply.sub2':'nastavení {v} °C',ago:'před {m} min',agoH:'před {h} h',burnOn:'Hořák hoří · {m} %',burnOn0:'hořák hoří',burnOff:'Hořák nehoří',target:'cíl {v} °C','prog.off':'program vypnutý',
+ 'prog.on':'Řídit topení podle programu','prog.on.sub':'Nejdřív nastavte ve ViCare časový program na celý den „normální“.',sysOk:'Vše v pořádku',sysWarn:'{n} upozornění za 24 h',clog:'Poslední změny z aplikace',logout:'Odhlásit',me:'Přihlášen: {e}',
+ 'src.boiler':'Kotel · Viessmann API','src.out':'Venku · ','src.room':'Doma · tablet klimatizace','src.data':'Data · Google tabulka','src.ok':'v pořádku','src.old':'stará data','none':'nic',
+ 'act.on.done':'Komfort {v} °C do {u}','act.eco.done':'Útlum {v} °C do {u}','man.saved':'Ruční voda {v} °C nastavena – kotel ji dostane do 5 minut',unchanged:'beze změny',
  dayShort:['Po','Út','St','Čt','Pá','So','Ne'],dayLong:['Pondělí','Úterý','Středa','Čtvrtek','Pátek','Sobota','Neděle'],months:['led','úno','bře','dub','kvě','čvn','čvc','srp','zář','říj','lis','pro'],wk:'t. {n}'},
 es:{app:'Calefacción',title:'Calefacción · Zlín',demo:'Demo · sin datos','tab.prehled':'Inicio','tab.statistiky':'Estadísticas','tab.programy':'Horarios','tab.ekviterm':'Curva','tab.system':'Sistema',
- 'hello.m':'Buenos días','hello.d':'Buenas tardes','hello.e':'Buenas noches','room.where':'Salón · Shelly H&T',ago4:'hace 4 min','room.sub':'Humedad 47 % · objetivo 21,0 °C',
+ 'hello.m':'Buenos días','hello.d':'Buenas tardes','hello.e':'Buenas noches','room.where':'Casa · tablet del aire',ago4:'hace 4 min','room.sub':'Humedad 47 % · objetivo 21,0 °C',
  'chip.burner':'Quemador encendido · 34 %','chip.ekv':'Curva ACTIVA',out:'Exterior','out.sub':'MET Norway · respaldo',supply:'Agua – real','supply.sub':'consigna 42 °C',gasToday:'Gas hoy','gasToday.sub':'ayer 2,6 m³',
  burnToday:'Quemador hoy','burnToday.sub':'14 arranques',quick:'Acciones rápidas','act.on':'Encender','act.eco':'Reducido','act.tune':'Ajustar horario','act.man':'Agua manual','act.on.toast':'Confort hasta el siguiente tramo','act.eco.toast':'Reducido hasta el siguiente tramo',
  last24:'Últimas 24 horas',room:'Interior',setp:'Agua – consigna','sys.short':'1 aviso · temperatura exterior de respaldo','demo.note':'Demo: todos los números son inventados y los botones no cambian nada.',
@@ -459,11 +478,11 @@ es:{app:'Calefacción',title:'Calefacción · Zlín',demo:'Demo · sin datos','t
  runtime:'Tiempo de funcionamiento',showOn:'Mostrar tiempo de calefacción encendida','showOn.sub':'desde el 6/11 la calefacción está encendida 24 h',burned:'Quemador',heatOn:'Calefacción encendida',
  'kind.k':'Confort','kind.e':'Reducido','kind.o':'Apagado','prog.help':'Arrastra la línea entre tramos a los lados para cambiar la hora y el tramo arriba o abajo para la temperatura. Toca un tramo para elegirlo; + lo divide, − lo borra.',
  'prog.sel':'Tramo seleccionado','tpl.work':'Día laboral','tpl.home':'Teletrabajo','tpl.wknd':'Fin de semana',copyAll:'Copiar este día a lun–vie',copied:'Copiado a los días laborables',tplDone:'Plantilla aplicada',
- vac:'Vacaciones','vac.title':'Modo vacaciones','vac.sub':'Mantiene la temperatura elegida todo el tiempo; el día antes de volver vuelve el horario normal.','vac.by':'Durante las vacaciones mantener','vac.air':'Aire en casa (Shelly)','vac.water':'Agua de la calefacción','vac.note.air':'La regulación ajustará el agua para que el Shelly marque esta temperatura (5–22 °C).','vac.note.water':'La caldera recibe esta temperatura del agua fija, sin importar el tiempo (25–55 °C, nunca más de 55 °C).',from:'Desde',to:'Hasta','vac.on':'Vacaciones programadas – solo demo','vac.off':'Vacaciones canceladas',
+ vac:'Vacaciones','vac.title':'Modo vacaciones','vac.sub':'Mantiene la temperatura elegida todo el tiempo; el día antes de volver vuelve el horario normal.','vac.by':'Durante las vacaciones mantener','vac.air':'Aire en casa (tablet)','vac.water':'Agua de la calefacción','vac.note.air':'La regulación ajustará el agua para que el tablet marque esta temperatura (5–22 °C).','vac.note.water':'La caldera recibe esta temperatura del agua fija, sin importar el tiempo (25–55 °C, nunca más de 55 °C).',from:'Desde',to:'Hasta','vac.on':'Vacaciones programadas – solo demo','vac.off':'Vacaciones canceladas',
  'prog.note':'Los horarios los aplica nuestra regulación. El horario de ViCare se deja en normal todo el día para que no choquen.',minSeg:'El tramo no puede ser más corto',lastSeg:'El día necesita al menos un tramo',
- 'm.on':'ACTIVA','m.test':'Prueba','m.off':'APAGADA','e.now':'Exterior ahora (media −3 h…+2 h)','e.gets':'La caldera recibe','e.noreg':'sin regulación','e.curve':'Curva de calefacción','e.drag':'Arrastra los puntos arriba y abajo para ajustar la curva',
+ 'm.on':'ACTIVA','m.test':'Prueba','m.off':'APAGADA','e.now':'Exterior ahora (media −3 h…+2 h)','e.gets':'La caldera tiene','e.noreg':'sin regulación','e.curve':'Curva de calefacción','e.drag':'Arrastra los puntos arriba y abajo para ajustar la curva',
  'e.shift':'Desplazar curva','e.colder':'más frío','e.warmer':'más calor','e.reset':'Curva por defecto','e.resetDone':'Curva restablecida',save:'Guardar','e.saved':'Curva guardada','e.room':'Corrección por temperatura interior','e.room.on':'Activar corrección',
- 'e.room.sub':'Por cada grado bajo el objetivo sube la impulsión. Solo si el Shelly mide.','e.gain':'Intensidad','e.target':'El objetivo se toma del tramo actual del horario.','e.log':'Últimos pasos','e.never':'nunca más de 55 °C','e.nowLbl':'ahora',
+ 'e.room.sub':'Por cada grado bajo el objetivo sube la impulsión. Solo si el tablet envía la temperatura.','e.gain':'Intensidad','e.target':'El objetivo se toma del tramo actual del horario.','e.log':'Últimos pasos','e.never':'nunca más de 55 °C','e.nowLbl':'ahora',
  'e.out':'Exterior','mode':'Modo',onlyDemo:'solo demo',
  's.src':'Fuentes de datos','s.alerts':'Avisos','s.safe':'Seguridad','s.foot':'Versión demo sin datos conectados',
  log:[['6:05','sin cambios','exterior −1,2 °C · objetivo 42,4 °C',''],['5:50','sin cambios','exterior de MET Norway (respaldo)',''],['4:35','41 → 42 °C','bajó a −1,6 °C','ok'],['2:20','error, reintenta','Viessmann API 502 – caída de su servidor','warn'],['22:35','confort → reducido','horario: reducido nocturno','ok']],
@@ -471,16 +490,21 @@ es:{app:'Calefacción',title:'Calefacción · Zlín',demo:'Demo · sin datos','t
  src:[['Caldera · Viessmann API','últimos datos hace 2 min','ok','correcto'],['Exterior · Open-Meteo','límite diario agotado (IPs compartidas de Google)','warn','429'],['Exterior · MET Norway','respaldo, en uso ahora','ok','activo'],['Exterior · ČHMÚ Zlín','datos medidos, retraso ~1 h','ok','correcto'],['Interior · Shelly H&T Gen3','batería 92 % · Wi-Fi −58 dBm','ok','correcto'],['Datos · BigQuery','escritura cada 15 min','ok','correcto']],
  alerts:[['27/11 2:20','Viessmann API 502','resuelto al reintentar a los 10 s','ok'],['26/11 23:35','Viessmann API 500 · TIMEOUT','se saltó 1 paso, la caldera mantuvo 45 °C','warn'],['12/11 10:30','Open-Meteo caído 9 h','cambiado a MET Norway','warn']],
  safe:[['Máximo absoluto de impulsión','Lo impone el script, la web no puede cambiarlo','bad','55 °C'],['Pausa tras cambio manual en ViCare','La regulación no cambia nada','ok','4 h'],['Sin temperatura exterior','La caldera mantiene el último valor, e-mail a las 3 h','ok','activo']],
- 'c.room.sub':'humedad 47 % · Shelly','c.mod':'Modulación del quemador','c.mod.sub':'quemador encendido · solo lectura','c.gas':'Gas','c.burn':'Quemador','c.starts':'Arranques del quemador','c.startsN':'{n} arranques',
+ 'c.room.sub':'tablet','c.mod':'Modulación del quemador','c.mod.sub':'quemador encendido · solo lectura','c.gas':'Gas','c.burn':'Quemador','c.starts':'Arranques del quemador','c.startsN':'{n} arranques',
  'c.perStart':'de media {m} min por arranque','c.rate':'Gas por hora de quemador','c.rate.sub':'menos = más eficiente','c.outavg':'Media exterior','c.roomavg':'Media interior','c.delta':'{d} % vs. periodo anterior',
  'per.today':'hoy','per.yesterday':'ayer','per.week':'esta semana','per.lastweek':'semana pasada','per.d7':'últimos 7 días','per.month':'este mes','per.lastmonth':'mes pasado','per.d30':'últimos 30 días','per.season':'temporada','per.sel':'según la selección','per.now':'valor actual',
  'cfg.title':'Personalizar','cfg.home':'Tarjetas de Inicio','cfg.stats':'Tarjetas de Estadísticas','cfg.reset':'Restablecer','cfg.note':'Se guarda en este navegador.','cfg.resetDone':'Tarjetas restablecidas','price.lbl':'Precio del gas',
  's.dd':'Grados-día','s.gpdd':'m³ por grado-día',charts:'Gráficos',addChart:'+ Añadir gráfico',chartStats:'Gráfico del periodo elegido','chart.empty':'Elige datos debajo del gráfico','chart.nodata':'No hay datos para este periodo',
  'chart.rm':'Quitar gráfico','chart.new':'Gráfico nuevo','chart.none':'Ningún gráfico. Añade uno con el botón de abajo.','chart.added':'Gráfico añadido – elige los datos debajo','per.d1':'últimas 24 h',
- 'prog.room':'Mostrar la temperatura medida en casa','prog.room.sub':'ahora y las últimas 24 horas (Shelly)','prog.room.today':'La temperatura medida se ve en el día de hoy',
+ 'prog.room':'Mostrar la temperatura medida en casa','prog.room.sub':'ahora y las últimas 24 horas (tablet)','prog.room.today':'La temperatura medida se ve en el día de hoy',
  'm.man':'Manual','man.title':'Temperatura del agua manual','man.for':'Durante','dur.1':'1 h','dur.2':'2 h','dur.4':'4 h','dur.next':'Hasta el siguiente tramo','dur.perm':'Siempre','man.set':'Aplicar',
  'man.sub':'La curva y el horario se pausan durante ese tiempo; después la regulación vuelve sola. Un cambio manual en ViCare sigue funcionando.','man.done':'Agua a {v} °C durante {d} – solo demo',
  'chip.ekv.ZAP':'Curva ACTIVA','chip.ekv.VYP':'Curva APAGADA','chip.ekv.MAN':'Agua manual {v} °C',
+ 'login.text':'Inicia sesión con tu cuenta de Google con acceso a la calefacción.','login.notready':'El acceso aún se está configurando.','login.denied':'Esta cuenta no tiene acceso a la calefacción.','login.again':'Vuelve a iniciar sesión, por favor.','login.loading':'Cargando…','login.err':'No se pudieron cargar los datos:',
+ saved:'Guardado – la caldera se ajusta en 5 minutos',saveErr:'No guardado:','supply.sub2':'consigna {v} °C',ago:'hace {m} min',agoH:'hace {h} h',burnOn:'Quemador encendido · {m} %',burnOn0:'quemador encendido',burnOff:'Quemador apagado',target:'objetivo {v} °C','prog.off':'horario desactivado',
+ 'prog.on':'Controlar la calefacción con el horario','prog.on.sub':'Primero pon en ViCare el horario en «normal» todo el día.',sysOk:'Todo en orden',sysWarn:'{n} avisos en 24 h',clog:'Últimos cambios desde la app',logout:'Cerrar sesión',me:'Sesión: {e}',
+ 'src.boiler':'Caldera · Viessmann API','src.out':'Exterior · ','src.room':'Casa · tablet del aire','src.data':'Datos · hoja de Google','src.ok':'correcto','src.old':'datos antiguos','none':'nada',
+ 'act.on.done':'Confort {v} °C hasta {u}','act.eco.done':'Reducido {v} °C hasta {u}','man.saved':'Agua manual {v} °C – la caldera la recibe en 5 minutos',unchanged:'sin cambios',
  dayShort:['Lu','Ma','Mi','Ju','Vi','Sá','Do'],dayLong:['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'],months:['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'],wk:'sem. {n}'}
 };
 var params=new URLSearchParams(location.search);
@@ -490,8 +514,8 @@ function t(k,v){var s=(I18N[lang][k]!==undefined?I18N[lang][k]:I18N.cs[k]);if(ty
 /* ================= pomocné ================= */
 var $=function(s,el){return (el||document).querySelector(s)}, $$=function(s,el){return Array.prototype.slice.call((el||document).querySelectorAll(s))};
 var css=function(v){return getComputedStyle(document.documentElement).getPropertyValue(v).trim()};
-var fmt=function(x,d){return (d===undefined?x.toFixed(1):x.toFixed(d)).replace('.',',').replace(/^-/,'−')};
-var store={get:function(k,d){try{var v=localStorage.getItem('topeni-'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set:function(k,v){try{localStorage.setItem('topeni-'+k,JSON.stringify(v))}catch(e){}}};
+var fmt=function(x,d){if(x==null||!isFinite(x))return '—';return (d===undefined?x.toFixed(1):x.toFixed(d)).replace('.',',').replace(/^-/,'−')};
+var store={get:function(k,d){try{var v=localStorage.getItem('topeni-'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set:function(k,v){try{localStorage.setItem('topeni-'+k,JSON.stringify(v))}catch(e){}if(!APPLYING&&TOKEN&&SYNC[k])queueSync(k)}};
 var NS='http://www.w3.org/2000/svg';
 function el(tag,attrs,parent){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e}
 function txt(parent,x,y,s,anchor,style){var e=el('text',{x:x,y:y,'text-anchor':anchor||'start'},parent);if(style)e.setAttribute('style',style);e.textContent=s;return e}
@@ -539,24 +563,10 @@ var rnd=(function(s){return function(){s=(s*16807)%2147483647;return (s-1)/21474
 var CURVE0=[[15,28],[9,33],[7,34],[0,41],[-6,48],[-12,55]];
 var curve=store.get('curve',CURVE0.map(function(p){return p.slice()})),shift=store.get('shift',0);
 function curveAt(x,pts){pts=pts||curve;if(x>=pts[0][0])return pts[0][1];for(var i=1;i<pts.length;i++)if(x>=pts[i][0]){var a=pts[i-1],b=pts[i];return b[1]+(a[1]-b[1])*(x-b[0])/(a[0]-b[0])}return pts[pts.length-1][1]}
-var SEASON0=new Date(2026,9,1);
+var SEASON0=new Date(2026,9,21);
 var HOURS=[];
-(function(){var end=new Date();end.setMinutes(0,0,0);var w1=0,w2=0;
-  for(var t0=SEASON0.getTime();t0<=end.getTime();t0+=3600e3){var d=new Date(t0),h=d.getHours(),day=(t0-SEASON0.getTime())/864e5;
-    w1+= (rnd()-.5)*.35; w1*=.97; w2=Math.sin(day/5.3)*2.2+Math.sin(day/11.7)*1.6;
-    var out=11.5-day*.17+w2+w1*3-2.8*Math.cos((h-14.5)/24*2*Math.PI);
-    var comfort=h>=5&&h<22,f=comfort?1.15:.45;
-    var burn=Math.max(0,Math.min(60,.9*(19.5-out)*f+(rnd()-.5)*4));if(out>15)burn=0;
-    var gas=burn/60*(.40+.012*Math.max(0,8-out));
-    HOURS.push({t:t0,out:out,burn:burn,gas:gas,on:day>36?60:(comfort?60:0),starts:burn>0?Math.max(1,Math.round(burn/18+rnd()*.8)):0,room:20.4+(comfort?.8:-.6)+(rnd()-.5)*.3,set:comfort?Math.round(Math.min(55,curveAt(out)+shift)):null,sup:comfort?Math.min(55,curveAt(out)+shift-4+burn/60*9+(rnd()-.5)*2):24+burn/10+rnd()*2});}
-})();
 var now=new Date();
-var S24=[];(function(){var from=now.getTime()-24*3600e3,sup=34,burn=false;
-  HOURS.filter(function(r){return r.t>=from-3600e3}).forEach(function(r){for(var q=0;q<4;q++){var t0=r.t+q*900e3;if(t0<from||t0>now.getTime())continue;var h=new Date(t0).getHours();
-    var comfort=h>=5&&h<22,set=comfort?Math.round(Math.min(55,curveAt(r.out)+shift)):null;
-    if(set){if(sup<set-4)burn=true;if(sup>set+3)burn=false}else burn=false;
-    sup+=burn?3+rnd()*2:-(sup-24)*.12;
-    S24.push({t:t0,out:r.out,room:20.5+(comfort?.7:-.5)+.3*Math.sin(h/24*6.28)+(rnd()-.5)*.15,sup:sup,set:set})}})})();
+var S24=[];
 
 /* ================= graf 24 h ================= */
 function lineChart(svg,tip,o){
@@ -598,9 +608,9 @@ function bucketLabel(k,long){var M=t('months');
   if(gran==='w'){var w=new Date(k+'T12:00:00');return long?t('wk',{n:isoWeek(w)})+' ('+w.getDate()+'. '+(w.getMonth()+1)+'.)':t('wk',{n:isoWeek(w)})}
   var r=k.split('-');return M[Number(r[1])-1]+(long?' '+r[0]:'')}
 function aggregate(){var f=new Date($('#dFrom').value+'T00:00:00'),to=new Date($('#dTo').value+'T23:59:59');if(f>to){var x=f;f=new Date(to.getFullYear(),to.getMonth(),to.getDate());to=new Date(x.getTime()+864e5-1)}
-  var map={},order=[];HOURS.forEach(function(r){if(r.t<f.getTime()||r.t>to.getTime())return;var k=bucketKey(new Date(r.t));if(!map[k]){map[k]={k:k,gas:0,burn:0,outSum:0,n:0,on:0};order.push(k)}
-    var b=map[k];b.gas+=r.gas;b.burn+=r.burn;b.outSum+=r.out;b.n++;b.on+=r.on});
-  return {rows:order.map(function(k){var b=map[k];b.out=b.outSum/b.n;return b}),days:Math.round((to-f)/864e5)}}
+  var map={},order=[];HOURS.forEach(function(r){if(r.t<f.getTime()||r.t>to.getTime())return;var k=bucketKey(new Date(r.t));if(!map[k]){map[k]={k:k,gas:0,burn:0,outSum:0,n:0,nO:0,on:0};order.push(k)}
+    var b=map[k];b.gas+=r.gas;b.burn+=r.burn;if(r.out!=null){b.outSum+=r.out;b.nO++}b.n++;b.on+=r.on});
+  return {rows:order.map(function(k){var b=map[k];b.out=b.nO?b.outSum/b.nO:null;return b}),days:Math.round((to-f)/864e5)}}
 function drawStats(){
   var A=aggregate(),rows=A.rows;
   var tot=rows.reduce(function(a,r){return a+r.gas},0),burn=rows.reduce(function(a,r){return a+r.burn},0)/60,hrs=rows.reduce(function(a,r){return a+r.n},0);
@@ -609,7 +619,7 @@ function drawStats(){
   // tabulka
   var head='<thead><tr><th>'+t('col.p.'+gran)+'</th><th>'+t('col.gas')+'</th><th>'+t('col.burn')+'</th><th>'+t('col.out')+'</th><th>'+t('col.rate')+'</th></tr></thead>';
   var body=rows.slice().reverse().map(function(r){return '<tr><td>'+bucketLabel(r.k,true)+'</td><td>'+fmt(r.gas,gran==='h'?2:1)+'</td><td>'+fmt(r.burn/60,1)+'</td><td>'+fmt(r.out)+'</td><td>'+(r.burn>0?fmt(r.gas/(r.burn/60),2):'—')+'</td></tr>'}).join('');
-  var outAvg=rows.reduce(function(a,r){return a+r.out*r.n},0)/hrs;
+  var outAvg=(function(){var a=0,n=0;rows.forEach(function(r){if(r.out!=null){a+=r.out*r.nO;n+=r.nO}});return n?a/n:null})();
   var foot='<tfoot><tr><td>'+t('total')+'</td><td>'+fmt(tot,1)+'</td><td>'+fmt(burn,1)+'</td><td>'+fmt(outAvg)+'</td><td>'+(burn?fmt(tot/burn,2):'—')+'</td></tr></tfoot>';
   $('#tbl').innerHTML=head+'<tbody>'+body+'</tbody>'+foot;
   drawRun();
@@ -638,9 +648,9 @@ function sv(b,k){switch(k){case 'out':return b.out;case 'room':return b.room;cas
 function gKey(d,g){if(g==='h')return ymd(d)+' '+pad(d.getHours());if(g==='d')return ymd(d);if(g==='w'){var m=new Date(d.getFullYear(),d.getMonth(),d.getDate()-((d.getDay()+6)%7));return ymd(m)}return d.getFullYear()+'-'+pad(d.getMonth()+1)}
 function gLabel(k,g,long){var keep=gran;gran=g;var r=bucketLabel(k,long);gran=keep;return r}
 function bucketize(r,g){var map={},order=[];HOURS.forEach(function(h){if(h.t<r[0].getTime()||h.t>r[1].getTime())return;var k=gKey(new Date(h.t),g),b=map[k];
-    if(!b){b=map[k]={k:k,gas:0,burn:0,starts:0,dd:0,outS:0,roomS:0,supS:0,setS:0,setN:0,n:0};order.push(k)}
-    b.gas+=h.gas;b.burn+=h.burn;b.starts+=h.starts;b.dd+=Math.max(0,20-h.out)/24;b.outS+=h.out;b.roomS+=h.room;b.supS+=h.sup;if(h.set!=null){b.setS+=h.set;b.setN++}b.n++});
-  return order.map(function(k){var b=map[k];b.out=b.outS/b.n;b.room=b.roomS/b.n;b.sup=b.supS/b.n;b.set=b.setN?b.setS/b.setN:null;return b})}
+    if(!b){b=map[k]={k:k,gas:0,burn:0,starts:0,dd:0,outS:0,roomS:0,supS:0,setS:0,setN:0,n:0,nR:0,nS:0};order.push(k)}
+    b.gas+=h.gas;b.burn+=h.burn;b.starts+=h.starts;if(h.out!=null){b.dd+=Math.max(0,20-h.out)/24;b.outS+=h.out;b.n++}if(h.room!=null){b.roomS+=h.room;b.nR++}if(h.sup!=null){b.supS+=h.sup;b.nS++}if(h.set!=null){b.setS+=h.set;b.setN++}});
+  return order.map(function(k){var b=map[k];b.out=b.n?b.outS/b.n:null;b.room=b.nR?b.roomS/b.nR:null;b.sup=b.nS?b.supS/b.nS:null;b.set=b.setN?b.setS/b.setN:null;return b})}
 function autoGran(r){var days=(r[1]-r[0])/864e5;return days<=2.1?'h':days<=62?'d':'w'}
 function multiChart(svg,tip,rows,keys,g){
   clear(svg);var cp=compact(),W=640,H=cp?380:250,T=14,B=cp?40:28,n=rows.length;svg.setAttribute('viewBox','0 0 640 '+H);
@@ -709,16 +719,16 @@ function periodRange(p){var n=new Date(),d0=new Date(n.getFullYear(),n.getMonth(
   default:f=new Date($('#dFrom').value+'T00:00:00');to=new Date($('#dTo').value+'T23:59:59')}
   return [f,to]}
 function shiftBack(r,p){var d=p==='d1'||p==='today'||p==='yesterday'?864e5:p==='week'||p==='lastweek'||p==='d7'?7*864e5:p==='month'||p==='lastmonth'||p==='d30'?30*864e5:(r[1]-r[0]+1);return [new Date(r[0]-d),new Date(r[1]-d)]}
-function sumRange(r){var s={gas:0,burn:0,starts:0,outSum:0,roomSum:0,n:0,omin:99,omax:-99,dd:0};
-  HOURS.forEach(function(h){if(h.t<r[0].getTime()||h.t>r[1].getTime())return;s.gas+=h.gas;s.burn+=h.burn;s.starts+=h.starts;s.outSum+=h.out;s.roomSum+=h.room;s.n++;
-    if(h.out<s.omin)s.omin=h.out;if(h.out>s.omax)s.omax=h.out;s.dd+=Math.max(0,20-h.out)/24});return s}
+function sumRange(r){var s={gas:0,burn:0,starts:0,outSum:0,roomSum:0,n:0,nR:0,omin:99,omax:-99,dd:0};
+  HOURS.forEach(function(h){if(h.t<r[0].getTime()||h.t>r[1].getTime())return;s.gas+=h.gas;s.burn+=h.burn;s.starts+=h.starts;if(h.room!=null){s.roomSum+=h.room;s.nR++}
+    if(h.out!=null){s.outSum+=h.out;s.n++;if(h.out<s.omin)s.omin=h.out;if(h.out>s.omax)s.omax=h.out;s.dd+=Math.max(0,20-h.out)/24}});return s}
 function money(x){return Math.round(x).toLocaleString(lang==='es'?'es-ES':'cs-CZ')}
 function delta(a,b){if(!b)return '';var d=Math.round((a-b)/b*100);return t('c.delta',{d:(d>0?'+':d<0?'−':'±')+Math.abs(d)})}
 var CARDS={
-  room_now:{now:1,go:'programy',dot:'--room',lbl:'room',v:function(){return ['21,4','°C']},sub:function(){return t('c.room.sub')}},
-  out_now:{now:1,go:'ekviterm',dot:'--cold',lbl:'out',v:function(){return ['−1,2','°C']},sub:function(){return t('out.sub')}},
-  supply_now:{now:1,go:'ekviterm',dot:'--heat',lbl:'supply',v:function(){return ['44,7','°C']},sub:function(){return t('supply.sub')}},
-  mod_now:{now:1,go:'ekviterm',dot:'--heat',lbl:'c.mod',v:function(){return ['34','%']},sub:function(){return t('c.mod.sub')}},
+  room_now:{now:1,go:'programy',dot:'--room',lbl:'room',v:function(){return [ST&&ST.room.temp!=null?fmt(ST.room.temp,0):'—','°C']},sub:function(){return ST?t('c.room.sub')+' · '+ago(ST.room.t):''}},
+  out_now:{now:1,go:'ekviterm',dot:'--cold',lbl:'out',v:function(){return [ST&&ST.outside.now!=null?fmt(ST.outside.now):'—','°C']},sub:function(){return ST?ST.outside.source:''}},
+  supply_now:{now:1,go:'ekviterm',dot:'--heat',lbl:'supply',v:function(){return [ST&&ST.boiler.supply!=null?fmt(ST.boiler.supply):'—','°C']},sub:function(){return ST?t('supply.sub2',{v:ST.boiler.setpoint}):''}},
+  mod_now:{now:1,go:'ekviterm',dot:'--heat',lbl:'c.mod',v:function(){return [ST?fmt(ST.boiler.burner?ST.boiler.modulation:0,0):'—','%']},sub:function(){return ST?(ST.boiler.burner?t('burnOn0'):t('burnOff')):''}},
   gas:{lbl:'c.gas',v:function(s){return [fmt(s.gas,s.gas<100?1:0),'m³']},sub:function(s,pr){return delta(s.gas,pr.gas)}},
   burn:{lbl:'c.burn',v:function(s){return [fmt(s.burn/60,s.burn<6000?1:0),'h']},sub:function(s){return t('c.startsN',{n:s.starts})}},
   starts:{lbl:'c.starts',v:function(s){return [String(s.starts),'']},sub:function(s){return s.burn?t('c.perStart',{m:Math.round(s.burn/Math.max(1,s.starts))}):''}},
@@ -726,7 +736,7 @@ var CARDS={
   dd:{lbl:'k.dd',v:function(s){return [s.dd?fmt(s.gas/s.dd,3):'—','m³']},sub:function(){return t('k.dd.sub')}},
   rate:{lbl:'c.rate',v:function(s){return [s.burn?fmt(s.gas/(s.burn/60),2):'—','m³/h']},sub:function(){return t('c.rate.sub')}},
   outavg:{lbl:'c.outavg',dot:'--cold',v:function(s){return [s.n?fmt(s.outSum/s.n):'—','°C']},sub:function(s){return s.n?fmt(s.omin)+' … '+fmt(s.omax)+' °C':''}},
-  roomavg:{lbl:'c.roomavg',dot:'--room',v:function(s){return [s.n?fmt(s.roomSum/s.n):'—','°C']},sub:function(){return 'Shelly H&T'}}
+  roomavg:{lbl:'c.roomavg',dot:'--room',v:function(s){return [s.nR?fmt(s.roomSum/s.nR):'—','°C']},sub:function(){return 'tablet'}}
 };
 var CFG0={home:[['out_now',1],['supply_now',1],['gas',1,'today'],['burn',1,'today'],['room_now',0],['mod_now',0],['cost',0,'month'],['starts',0,'today'],['dd',0,'week'],['rate',0,'week'],['outavg',0,'today'],['roomavg',0,'today']],
           stats:[['gas',1,'sel'],['cost',1,'sel'],['dd',1,'sel'],['burn',1,'sel'],['starts',0,'sel'],['rate',0,'sel'],['outavg',0,'sel'],['roomavg',0,'sel'],['gas',0,'month'],['gas',0,'season']]};
@@ -805,7 +815,7 @@ function renderProg(){
         if(r.t>=mid0.getTime()){dToday+=(dToday?'L':'M')+pt;last=r}else{dYest+=(dYest?'L':'M')+pt}});
       if(dYest)el('path',{d:dYest,fill:'none',stroke:css('--room'),'stroke-width':2,'stroke-dasharray':'3 4',opacity:.75,'stroke-linejoin':'round','pointer-events':'none'},svg);
       if(dToday)el('path',{d:dToday,fill:'none',stroke:css('--room'),'stroke-width':cp?4:3,'stroke-linejoin':'round','stroke-linecap':'round','pointer-events':'none'},svg);
-      var nowT=new Date(),nm2=nowT.getHours()*60+nowT.getMinutes(),cur=21.4,cx2=PX(nm2),cy2=PY(cur);
+      var nowT=new Date(),nm2=nowT.getHours()*60+nowT.getMinutes(),cur=ST&&ST.room.temp!=null?ST.room.temp:(S24.length?S24[S24.length-1].room:20),cx2=PX(nm2),cy2=PY(cur);
       el('circle',{cx:cx2,cy:cy2,r:cp?8:6,fill:css('--room'),stroke:css('--card'),'stroke-width':3,'pointer-events':'none'},svg);
       var lbl=fmt(cur,1)+' °C',lw=lbl.length*small*.62+(cp?20:14),lh=small+(cp?12:8),lx=cx2+(cx2>PW-150?-(lw+14):14);
       el('rect',{x:lx,y:cy2-lh/2,width:lw,height:lh,rx:lh/2,fill:css('--room'),'pointer-events':'none'},svg);
@@ -832,7 +842,7 @@ $$('#kinds button').forEach(function(b){b.addEventListener('click',function(){va
 $$('[data-tpl]').forEach(function(b){b.addEventListener('click',function(){prog[day]=clone(TPL[b.dataset.tpl]);sel=1;saveProg();toast(t('tplDone')+': '+b.textContent)})});
 $('#copyAll').addEventListener('click',function(){for(var i=0;i<5;i++)prog[i]=clone(prog[day]);saveProg();toast(t('copied'))});
 var d1=new Date(),d2=new Date();d1.setDate(d1.getDate()+20);d2.setDate(d2.getDate()+27);$('#vFrom').value=ymd(d1);$('#vTo').value=ymd(d2);
-$('#vac').addEventListener('change',function(){toast(t(this.checked?'vac.on':'vac.off'))});
+$('#vac').addEventListener('change',function(){store.set('vac',vac)});['#vFrom','#vTo'].forEach(function(x){$(x).addEventListener('change',function(){store.set('vac',vac)})});
 var vac=store.get('vac',{by:'air',air:16,water:30});
 function vacRender(){var air=vac.by==='air';$$('#vacBy button').forEach(function(b){b.classList.toggle('on',b.dataset.v===vac.by)});
   $('#vacV').textContent=air?fmt(vac.air,1)+' °C':vac.water+' °C';$('#vacV').style.color=air?'var(--room)':'var(--cold)';$('#vacNote').textContent=t(air?'vac.note.air':'vac.note.water')}
@@ -840,7 +850,7 @@ function vacStep(d){if(vac.by==='air')vac.air=Math.max(5,Math.min(22,Math.round(
 $$('#vacBy button').forEach(function(b){b.addEventListener('click',function(){vac.by=b.dataset.v;store.set('vac',vac);vacRender()})});
 $('#vacDown').addEventListener('click',function(){vacStep(-1)});$('#vacUp').addEventListener('click',function(){vacStep(1)});
 
-function updateNowBlock(){var n=new Date(),m=n.getHours()*60+n.getMinutes(),d=(n.getDay()+6)%7,segs=prog[d],i=0;while(i+1<segs.length&&segs[i+1].s<=m)i++;
+function updateNowBlock(){if(typeof ST!=='undefined'&&ST&&!(ST.ctrl&&ST.ctrl.progOn)){var nb0=$('#nowBlock');nb0.className='chip';nb0.textContent=t('prog.off');return}var n=new Date(),m=n.getHours()*60+n.getMinutes(),d=(n.getDay()+6)%7,segs=prog[d],i=0;while(i+1<segs.length&&segs[i+1].s<=m)i++;
   var k=kindOf(segs[i]);var nb=$('#nowBlock');nb.className='chip '+(k==='k'?'heat':k==='e'?'eco':'');nb.textContent=t('kind.'+k)+(segs[i].temp!=null?' '+fmt(segs[i].temp,1)+' °C':'')+' → '+hhmm(segEnd(d,i))}
 
 /* ================= ekviterm ================= */
@@ -853,10 +863,10 @@ function manSet(v){man.v=Math.max(25,Math.min(55,v));store.set('man',man);manRen
 $('#manDown').addEventListener('click',function(){manSet(man.v-1)});$('#manUp').addEventListener('click',function(){manSet(man.v+1)});
 $('#manR').addEventListener('input',function(){manSet(Number(this.value))});
 $$('#manDur button').forEach(function(b){b.addEventListener('click',function(){man.d=b.dataset.v;store.set('man',man);manRender()})});
-$('#manSet').addEventListener('click',function(){var d=man.d,txt2=d==='perm'?t('dur.perm').toLowerCase():d==='next'?t('dur.next').toLowerCase():d+' h';toast(t('man.done',{v:man.v,d:txt2}))});
-$$('#mode button').forEach(function(b){b.addEventListener('click',function(){setMode(b.dataset.v);toast(t('mode')+': '+b.textContent+' – '+t('onlyDemo'))})});
+$('#manSet').addEventListener('click',function(){var d=man.d,until=d==='perm'?null:d==='next'?nextBoundary():Date.now()+Number(d)*3600e3;save({mode:'MAN',man:{v:man.v,until:until}},t('man.saved',{v:man.v}))});
+$$('#mode button').forEach(function(b){b.addEventListener('click',function(){setMode(b.dataset.v);if(b.dataset.v!=='MAN')save({mode:b.dataset.v})})});
 function target(){var v=curveAt(OUT_NOW)+shift;if($('#roomOn').checked)v+=Math.max(-5,Math.min(5,Number($('#rg').value)*(21-21.4)));return Math.max(25,Math.min(55,v))}
-function updateSet(){var e=$('#eSet');e.textContent=mode==='VYP'?t('e.noreg'):mode==='MAN'?man.v+' °C':Math.round(target())+' °C';e.style.color=mode==='VYP'?'var(--muted)':mode==='MAN'?'var(--cold)':'var(--heat)'}
+function updateSet(){var e=$('#eSet');e.textContent=mode==='VYP'?t('e.noreg'):mode==='MAN'?man.v+' °C':(ST&&ST.boiler.setpoint!=null?ST.boiler.setpoint+' °C':'—');e.style.color=mode==='VYP'?'var(--muted)':mode==='MAN'?'var(--cold)':'var(--heat)'}
 function drawCurve(){
   var svg=$('#chCurve'),tip=$('#tipCurve');clear(svg);var W=640,H=300,L=40,R=14,T=14,B=30,XMIN=-16,XMAX=18,YMIN=20,YMAX=60;
   var X=function(v){return L+(XMAX-v)/(XMAX-XMIN)*(W-L-R)},Y=function(v){return T+(YMAX-v)/(YMAX-YMIN)*(H-T-B)},inv=function(py){return YMAX-(py-T)/(H-T-B)*(YMAX-YMIN)};
@@ -886,11 +896,12 @@ function shiftLbl(){$('#shiftV').textContent=(shift>0?'+':'')+String(shift).repl
 $('#shift').value=shift;shiftLbl();
 $('#shift').addEventListener('input',function(){shift=Number(this.value);store.set('shift',shift);shiftLbl();drawCurve()});
 $('#resetCurve').addEventListener('click',function(){curve=CURVE0.map(function(p){return p.slice()});shift=0;$('#shift').value=0;shiftLbl();store.set('curve',curve);store.set('shift',0);drawCurve();toast(t('e.resetDone'))});
-$('#roomOn').addEventListener('change',function(){$('#roomBox').style.opacity=this.checked?1:.45;$('#roomBox').style.pointerEvents=this.checked?'auto':'none';updateSet()});
-$('#rg').addEventListener('input',function(){$('#rgV').textContent=fmt(Number(this.value))+' °C / °C';updateSet()});
+$('#roomOn').addEventListener('change',function(){saveGain();$('#roomBox').style.opacity=this.checked?1:.45;$('#roomBox').style.pointerEvents=this.checked?'auto':'none';updateSet()});
+$('#rg').addEventListener('change',saveGain);$('#rg').addEventListener('input',function(){$('#rgV').textContent=fmt(Number(this.value))+' °C / °C';updateSet()});
 
 /* ================= seznamy ================= */
 function renderLists(){
+  if(typeof renderLive==='function'&&ST)try{setTimeout(renderLive,0)}catch(e){}
   if($('#vacNote')&&typeof vacRender==='function')try{vacRender()}catch(e){}
   if(typeof updateChip==='function'&&$('#manualBox'))try{updateChip()}catch(e){}
   renderTiles('home');renderCfg('home');renderCfg('stats');
@@ -901,7 +912,87 @@ function renderLists(){
 }
 
 /* ================= start ================= */
+
+/* ================= živá data, přihlášení, ukládání ================= */
+var API_URL='https://script.google.com/macros/s/AKfycbzMTCEipcD1rCjCFnV7S7sewpsq0PTbUPEDnL_uCB6tixkhZvt1zsCCDUIVmY2avtjwEQ/exec',CLIENT_ID='__CLIENT_ID__';
+var TOKEN=null,ST=null,APPLYING=false,SYNC_T={},BUSY=0;
+function ago(ms){if(!ms)return '';var m=Math.max(0,Math.round((Date.now()-ms)/60000));return m<90?t('ago',{m:m}):t('agoH',{h:Math.round(m/60)})}
+function api(action,extra){var body=JSON.stringify(Object.assign({action:action,token:TOKEN},extra||{}));
+  return fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:body,redirect:'follow'}).then(function(r){return r.json()})
+    .then(function(j){if(!j.ok&&j.error==='unauthorized'){logout(j.reason);throw new Error('unauthorized')}if(!j.ok)throw new Error(j.error||'error');return j})}
+function save(patch,msg){if(!patch)return;BUSY++;api('save',{patch:patch}).then(function(j){BUSY--;j.state._user=ST?ST._user:'';applyState(j.state);toast(msg||t('saved'))}).catch(function(e){BUSY--;if(e.message!=='unauthorized')toast(t('saveErr')+' '+e.message)})}
+var SYNC={curve:function(){return {curve:curve}},shift:function(){return {shift:shift}},prog2:function(){return {prog:prog}},
+  vac:function(){return {vac:{on:$('#vac').checked,from:$('#vFrom').value,to:$('#vTo').value,by:vac.by,air:vac.air,water:vac.water}}}};
+function queueSync(k){clearTimeout(SYNC_T[k]);SYNC_T[k]=setTimeout(function(){save(SYNC[k]())},k==='curve'?1500:900)}
+function saveGain(){save({gain:$('#roomOn').checked?Number($('#rg').value):0})}
+function segAt(d,m){var segs=prog[d],i=0;while(i+1<segs.length&&segs[i+1].s<=m)i++;return i}
+function nextBoundary(){var n=new Date(),d=(n.getDay()+6)%7,m=n.getHours()*60+n.getMinutes(),i=segAt(d,m),end=segEnd(d,i);var x=new Date(n);x.setHours(0,0,0,0);return x.getTime()+end*60000}
+function quick(temp,key){var u=nextBoundary();if(u-Date.now()<30*60000)u=Date.now()+2*3600e3;save({override:{temp:temp,until:u}},t(key,{v:fmt(temp,1),u:new Date(u).getHours()+':'+pad(new Date(u).getMinutes())}))}
+function comfortTemp(){var mx=0;prog.forEach(function(d){d.forEach(function(s){if(s.temp!=null&&s.temp>mx)mx=s.temp})});return mx>=20?mx:21}
+$('#actOn').addEventListener('click',function(){quick(comfortTemp(),'act.on.done')});
+$('#actEco').addEventListener('click',function(){quick(18,'act.eco.done')});
+$('#saveCurve').addEventListener('click',function(){save({curve:curve,shift:shift})});
+$('#progOn').addEventListener('change',function(){save({progOn:this.checked})});
+$('#logoutBtn').addEventListener('click',function(){logout('');try{google.accounts.id.disableAutoSelect()}catch(e){}});
+function planNow(){if(!ST)return null;var c=ST.ctrl||{},now=Date.now(),today=ymd(new Date());
+  var v=c.vac;if(v&&v.on&&v.from&&v.to&&today>=v.from){var b=new Date(v.to+'T12:00:00');b.setDate(b.getDate()-1);if(today<ymd(b))return v.by==='water'?{water:v.water}:{room:v.air}}
+  var o=c.override;if(o&&o.until>now)return {room:o.temp};
+  if(c.progOn&&c.prog){var n=new Date(),sg=c.prog[(n.getDay()+6)%7][segAt((n.getDay()+6)%7,n.getHours()*60+n.getMinutes())];return sg&&sg.temp==null?{off:true}:{room:sg?sg.temp:null}}
+  return null}
+function applyState(st){ST=st;APPLYING=true;try{
+  var e=st.ekv||{};if(e.curve&&e.curve.length>=2)curve=e.curve.map(function(p){return [p[0],p[1]]});shift=e.shift||0;$('#shift').value=shift;shiftLbl();
+  OUT_NOW=st.outside.eff!=null?st.outside.eff:(st.outside.now!=null?st.outside.now:OUT_NOW);
+  $('#roomOn').checked=(e.gain||0)>0;if(e.gain)$('#rg').value=e.gain;$('#roomBox').style.opacity=e.gain?1:.45;$('#roomBox').style.pointerEvents=e.gain?'auto':'none';$('#rgV').textContent=fmt(Number($('#rg').value))+' °C / °C';
+  var c=st.ctrl||{};if(c.man&&c.man.v)man.v=c.man.v;
+  if(c.prog&&c.prog.length===7)prog=c.prog.map(function(d){return clone(d)});
+  $('#progOn').checked=!!c.progOn;
+  if(c.vac){vac.by=c.vac.by||vac.by;vac.air=c.vac.air||vac.air;vac.water=c.vac.water||vac.water;$('#vac').checked=!!c.vac.on;if(c.vac.from)$('#vFrom').value=c.vac.from;if(c.vac.to)$('#vTo').value=c.vac.to}
+  if(['ZAP','MAN','VYP'].indexOf(e.mode)>=0)setMode(e.mode);
+  manRender();vacRender();renderProg();renderLive();if(cur==='ekviterm')drawCurve();
+}finally{APPLYING=false}}
+function renderLive(){if(!ST)return;var r=ST.room,b=ST.boiler,pl=planNow();
+  $('#who').textContent=(ST._user||'').split('@')[0];
+  $('#heroT').innerHTML=(r.temp!=null?fmt(r.temp,0):'—')+'<span>°C</span>';$('#heroAgo').textContent=ago(r.t);
+  $('#heroSub').textContent=pl&&pl.room!=null?t('target',{v:fmt(pl.room,1)}):pl&&pl.water!=null?t('supply')+' '+pl.water+' °C':pl&&pl.off?t('kind.o'):t('prog.off');
+  $('#chipBurner').textContent=b.burner?t('burnOn',{m:fmt(b.modulation||0,0)}):t('burnOff');$('#chipB').className='chip '+(b.burner?'heat':'');
+  $('#eOut').textContent=fmt(OUT_NOW)+' °C';updateSet();updateChip();
+  var since=Date.now()-864e5,n=(ST.alerts||[]).filter(function(a){return a.t>since}).length;
+  $('#sysShort').textContent=n?t('sysWarn',{n:n}):t('sysOk')+' · '+t('src.boiler').split(' ·')[0]+' '+ago(b.t);$('#sysDot').style.background=n?'var(--warn)':'var(--ok)';
+  renderTiles('home');if(cur==='statistiky')renderTiles('stats');renderSys()}
+function renderSys(){if(!ST)return;var b=ST.boiler,o=ST.outside,r=ST.room,old=function(ms,min){return !ms||Date.now()-ms>min*60000};
+  var li=function(a,sub,ok,badge){return '<div class="li"><div class="t"><b>'+a+'</b><small>'+sub+'</small></div><span class="badge '+(ok?'ok':'warn')+'">'+badge+'</span></div>'};
+  $('#src').innerHTML=li(t('src.boiler'),ago(b.t)+' · '+fmt(b.pressure,1)+' bar · Wi-Fi '+fmt(b.wifi,0)+' dBm',!old(b.t,40),old(b.t,40)?t('src.old'):t('src.ok'))+
+    li(t('src.out')+o.source,ago(o.t),!old(o.t,60),old(o.t,60)?t('src.old'):t('src.ok'))+
+    li(t('src.room'),ago(r.t)+(r.temp!=null?' · '+r.temp+' °C':''),!old(r.t,60),old(r.t,60)?t('src.old'):t('src.ok'))+
+    li(t('src.data'),'Ekviterm · Teploty · Plyn',true,t('src.ok'));
+  var A=ST.alerts||[];$('#alerts').innerHTML=A.length?A.map(function(a){return '<div class="li"><div class="t"><b>'+esc(a.text)+'</b><small>'+new Date(a.t).toLocaleString(lang==='es'?'es-ES':'cs-CZ')+'</small></div><span class="dot" style="background:var(--warn)"></span></div>'}).join(''):'<p class="muted small" style="margin:4px 0">'+t('none')+'</p>';
+  $('#elog').innerHTML=(ST.elog||[]).map(function(x){var d=new Date(x.t),chg=x.wrote!=null,err=/chyb/.test(x.reason);
+    return '<div class="li"><span class="num muted" style="width:44px">'+d.getHours()+':'+pad(d.getMinutes())+'</span><div class="t"><b>'+(chg?fmt(x.had,0)+' → '+fmt(x.wrote,0)+' °C':err?esc(x.reason.split(':')[0]):t('unchanged'))+'</b><small>'+t('out').toLowerCase()+' '+fmt(x.out)+' °C · '+t('target',{v:fmt(x.target)})+' · '+esc(x.reason.split(' · ').slice(1).join(' · '))+'</small></div>'+(chg?'<span class="badge ok">'+t('logBadge').ok+'</span>':err?'<span class="badge warn">'+t('logBadge').warn+'</span>':'')+'</div>'}).join('');
+  var C=ST.clog||[];$('#clog').innerHTML=C.length?C.map(function(x){return '<div class="li"><div class="t"><b>'+esc(x.what)+'</b><small>'+esc(String(x.who).split('@')[0])+' · '+new Date(x.t).toLocaleString(lang==='es'?'es-ES':'cs-CZ')+'</small></div></div>'}).join(''):'<p class="muted small" style="margin:4px 0">'+t('none')+'</p>';
+  $('#meLine').textContent=t('me',{e:ST._user||''})}
+function esc(x){return String(x==null?'':x).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function loadHistory(){return api('history',{from:ymd(SEASON0),to:ymd(new Date())}).then(function(j){
+  HOURS=j.hours.map(function(a){return {t:a[0],out:a[1],room:a[2],sup:a[3],set:a[4],gas:a[5]||0,burn:a[6]||0,starts:a[7]||0,on:a[8]||0}});
+  var from=Date.now()-864e5;S24=HOURS.filter(function(h){return h.t>=from&&h.room!=null}).map(function(h){return {t:h.t+1800e3,room:h.room}});
+  renderTiles('home');renderCharts('home');if(cur==='statistiky')drawStats();if(cur==='programy')renderProg()})}
+function refresh(){if(!TOKEN||BUSY||document.hidden)return;api('state').then(function(j){j.state._user=j.user;applyState(j.state)}).catch(function(){})}
+function boot(){$('#loginErr').textContent=t('login.loading');
+  api('state').then(function(j){j.state._user=j.user;applyState(j.state);$('#login').style.display='none';return loadHistory()})
+    .catch(function(e){if(e.message!=='unauthorized')$('#loginErr').textContent=t('login.err')+' '+e.message})}
+function logout(reason){TOKEN=null;ST=null;try{sessionStorage.removeItem('topeni-tok')}catch(e){}
+  $('#login').style.display='flex';$('#loginErr').textContent=reason==='not allowed'?t('login.denied'):reason?t('login.again'):'';
+  if(reason&&reason!=='not allowed'){try{google.accounts.id.prompt()}catch(e){}}}
+function onCred(r){TOKEN=r.credential;try{sessionStorage.setItem('topeni-tok',TOKEN)}catch(e){}boot()}
+function initLogin(){if(!/apps\.googleusercontent\.com$/.test(CLIENT_ID)){$('#loginErr').textContent=t('login.notready');return}
+  if(!(window.google&&google.accounts&&google.accounts.id)){setTimeout(initLogin,150);return}
+  google.accounts.id.initialize({client_id:CLIENT_ID,callback:onCred,auto_select:true,cancel_on_tap_outside:false,itp_support:true,use_fedcm_for_prompt:true});
+  google.accounts.id.renderButton($('#gbtn'),{theme:'outline',size:'large',shape:'pill',text:'signin_with',locale:lang==='es'?'es':'cs'});
+  if(!TOKEN)google.accounts.id.prompt()}
+setInterval(refresh,120000);setInterval(function(){if(TOKEN&&!document.hidden)loadHistory().catch(function(){})},900000);
+document.addEventListener('visibilitychange',function(){if(!document.hidden)refresh()});
+
 manRender();setMode(mode);applyLang();go((location.hash||'#prehled').slice(1));
+try{TOKEN=sessionStorage.getItem('topeni-tok')}catch(e){}if(TOKEN)boot();initLogin();
 var mq=matchMedia('(prefers-color-scheme: dark)');if(mq.addEventListener)mq.addEventListener('change',function(){go(cur)});
 })();
 </script>
